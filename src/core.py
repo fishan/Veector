@@ -48,6 +48,7 @@ class Veector:
         self.neural_embeddings = {}
         self.sync_queue = queue.Queue()
         self.cache = {}
+        self.local_cache = {}
         self.cache_size = cache_size
         self.eviction_strategy = eviction_strategy.upper()  # Приводим к верхнему регистру для надежности
         self.cache_access_count = {}
@@ -56,6 +57,7 @@ class Veector:
         self.use_memory = use_memory  # Добавили флаг использования Memory
         self.memory = Memory()  # Инициализируем Memory
         self.evolution = Evolution(self)
+        self.protected_layers = {}
 
         if use_neural_storage:
             self._init_neural_storage()
@@ -291,6 +293,18 @@ class Veector:
 
         dfs(start)
         return result
+    
+    def cache_data(self, key, data):
+        self.local_cache[key] = data
+
+    def get_cached_data(self, key):
+        return self.local_cache.get(key)
+    
+    def add_protected_layer(self, layer_id, data):
+        self.protected_layers[layer_id] = data
+
+    def get_protected_layer(self, layer_id):
+        return self.protected_layers.get(layer_id)
 
     def _lru_cache_evict(self):
         if len(self.cache) >= self.cache_size:

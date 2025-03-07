@@ -18,6 +18,7 @@ class VirtualSpace:
             doc = self.db.get(doc_id)  # Используем self.db для получения документа
             return doc["data"] if doc else None
         return None
+    
 
     def execute(self, start_tensor):
         results = []
