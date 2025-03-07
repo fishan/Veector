@@ -147,6 +147,16 @@ if __name__ == "__main__":
         [0, 1, 0],
         []
     ]
+    operations = [
+    (1, 0, 0),  # Сложение
+    (0, 1, 0),  # Умножение
+    (1, 1, 1)   # Вычитание
+    ]
+    data_list = [
+        [5, 3],     # Данные для сложения
+        [2, 4],     # Данные для умножения
+        [10, 7]     # Данные для вычитания
+    ]
     vs.add_tensor(tensor1)
     vs.add_tensor(tensor2)
     vs.add_tensor(tensor3)
@@ -174,3 +184,12 @@ if __name__ == "__main__":
     print("\nТест эволюции:")  # Тест эволюции
     evolved_result = vs.veector.evolve_tensor(tensor1)
     print(f"Эволюционированный результат: {evolved_result}")
+
+    results = v.parallel_compute(operations, data_list)
+    print("Результаты параллельных вычислений:", results)
+
+
+
+
+
+
