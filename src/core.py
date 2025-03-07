@@ -12,6 +12,7 @@ from operations import (matrix_multiply, gradient_descent, softmax,
                         convolution, transpose, mean, std_dev, relu, sigmoid, exponential_smoothing, normalize, interpolate)
 from memory import Memory  # Импортируем Memory
 from evolution import Evolution
+import concurrent.futures  # Для параллелизма
 
 
 class NeuralStorage(nn.Module):  # (1. Улучшение нейронного хранилища)
@@ -217,8 +218,16 @@ class Veector:
 
         self.neural_model.load_state_dict(state_dict)
 
+
     def sync_neural(self, peer_veector):  # (2. Расширение возможностей федеративного обучения)
         self.sync_queue.put(peer_veector)
+
+    def federated_train(self, peer_veectors):
+        """
+        Запускает федеративное обучение с заданными peer_veectors.
+        """
+        for peer_veector in peer_veectors:
+            self.sync_neural(peer_veector)
 
     def _reason(self, x):  # (3. Развитие операции Reason)
         # (3. Развитие операции Reason)
@@ -349,7 +358,12 @@ class Veector:
             if self.dropout_rate > 0 and op != [59, 0, 0]:  # Применяем dropout ко всем операциям кроме самой операции dropout
                 data = self._dropout(data)
 
-            result = op_func(data)
+            # Параллельное выполнение операций
+            if isinstance(data, list) and len(data) > 1:
+                results = self.parallel_compute([op] * len(data), data)
+                result = results[0] if len(results) == 1 else results
+            else:
+                result = op_func(data)
 
         metadata = {"tensor": tensor, "coords": (data_layer, data_coords)}
         doc_id = self.db.insert("tensor_result", result, metadata)
@@ -373,6 +387,23 @@ class Veector:
 
         return result
 
+    def parallel_compute(self, operations, data_list):
+        """
+        Выполняет параллельные вычисления для заданных операций и данных.
+        """
+        results = []
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for operation, data in zip(operations, data_list):
+                op_func = self.core.get(tuple(operation), lambda x: x)
+                future = executor.submit(op_func, data)
+                futures.append(future)
+
+            # Сбор результатов
+            results = [future.result() for future in futures]
+
+        return results
+
     def add_to_space(self, tensor):
         layer, coords = tensor[0][0], tuple(tensor[0][1])
         doc_id = self.db.insert("tensor", tensor)
@@ -383,3 +414,5 @@ class Veector:
         Вызывает процесс эволюции для заданного тензора.
         """
         return self.evolution.log_evolution(tensor, self)
+
+
