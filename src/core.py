@@ -4,19 +4,29 @@ import torch
 import torch.nn as nn
 import queue
 import threading
+import time  # Для Time-Aware Cache
+import random  # Для Dropout
 
-class NeuralStorage(nn.Module):
-    def __init__(self, input_dim=16):
+from operations import (matrix_multiply, gradient_descent, softmax,
+                        matrix_determinant, matrix_eigenvalues, matrix_lu_decomposition,
+                        convolution, transpose, mean, std_dev, relu, sigmoid, exponential_smoothing, normalize, interpolate)
+from memory import Memory  # Импортируем Memory
+from evolution import Evolution
+
+
+class NeuralStorage(nn.Module):  # (1. Улучшение нейронного хранилища)
+    def __init__(self, input_dim=16, hidden_dim=64, bottleneck_dim=32,  # Добавлено hidden_dim и bottleneck_dim
+                 activation_fn=nn.ReLU):  # Добавлена функция активации
         super(NeuralStorage, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Linear(input_dim, 64),
-            nn.ReLU(),
-            nn.Linear(64, 32)
+            nn.Linear(input_dim, hidden_dim),
+            activation_fn(),  # Используем переданную функцию активации
+            nn.Linear(hidden_dim, bottleneck_dim)
         )
         self.decoder = nn.Sequential(
-            nn.Linear(32, 64),
-            nn.ReLU(),
-            nn.Linear(64, input_dim)
+            nn.Linear(bottleneck_dim, hidden_dim),
+            activation_fn(),  # Используем переданную функцию активации
+            nn.Linear(hidden_dim, input_dim)
         )
 
     def forward(self, x):
@@ -24,18 +34,33 @@ class NeuralStorage(nn.Module):
         decoded = self.decoder(encoded)
         return encoded, decoded
 
+
 class Veector:
-    def __init__(self, db_path="vectordb.json", use_neural_storage=False):
+    def __init__(self, db_path="vectordb.json", use_neural_storage=False,
+                 cache_size=1000, eviction_strategy="LRU",  # Настройка стратегии вытеснения
+                 dropout_rate=0.0, use_memory=False):
+
         self.db = VeectorDB(db_path)
         self.use_neural_storage = use_neural_storage
         self.neural_model = None
         self.max_coord = 0
         self.neural_embeddings = {}
         self.sync_queue = queue.Queue()
+        self.cache = {}
+        self.cache_size = cache_size
+        self.eviction_strategy = eviction_strategy.upper()  # Приводим к верхнему регистру для надежности
+        self.cache_access_count = {}
+        self.cache_timestamps = {}
+        self.dropout_rate = dropout_rate
+        self.use_memory = use_memory  # Добавили флаг использования Memory
+        self.memory = Memory()  # Инициализируем Memory
+        self.evolution = Evolution(self)
+
         if use_neural_storage:
             self._init_neural_storage()
-            self._start_sync_thread()
-        self.core = {
+        self._start_sync_thread()
+
+        self.core = {  # Обновленный набор операций
             (1, 0, 0): lambda x: np.sum(x),
             (1, 1, 1): lambda x: x[0] - x[1],
             (0, 1, 0): lambda x: x[0] * x[1],
@@ -60,25 +85,38 @@ class Veector:
             (3, 0, 0): lambda x, t, f: t if x[0] else f,
             (4, 0, 0): lambda x, n: x[0] * n,
             (5, 0, 0): lambda x, *opts: opts[x[0]],
-            (6, 0, 0): lambda x: max(x[0], 0),
+            (6, 0, 0): lambda x: max(x[0], 0),  # relu
+            (11, 1, 0): lambda x: 1 / (1 + np.exp(-x[0])),  # sigmoid
             (7, 0, 0): lambda x: print(f"Output: {x[0]}"),
             (8, 0, 0): lambda x: x,
             (9, 0, 0): lambda x: self._reason(x),
             (10, 1, 0): lambda x: self._dfs(x[0], x[1]),
-            (11, 1, 0): lambda x: 1 / (1 + np.exp(-x[0])),
+            (50, 0, 0): matrix_multiply,
+            (51, 0, 0): matrix_determinant,
+            (52, 0, 0): matrix_eigenvalues,
+            (53, 0, 0): convolution,
+            (54, 0, 0): transpose,
+            (55, 0, 0): mean,
+            (56, 0, 0): std_dev,
+            (57, 0, 0): sigmoid,
+            (58, 0, 0): relu,
+            (59, 0, 0): lambda x: self._dropout(x),  # Dropout
+            (60, 0, 0): exponential_smoothing,
+            (61, 0, 0): normalize,
+            (62, 0, 0): interpolate,
         }
-        self.space = {}
-        self.cache = {}
 
-    def _init_neural_storage(self):
+        self.space = {}  # (layer, coords) -> doc_id
+
+    def _init_neural_storage(self):  # (1. Улучшение нейронного хранилища)
         print("Инициализация нейронного хранилища")
         input_dim = self._get_max_input_dim()
-        self.neural_model = NeuralStorage(input_dim=input_dim)
+        self.neural_model = NeuralStorage(input_dim=input_dim, activation_fn=nn.ReLU)  # Параметры NeuralStorage
         self.neural_optimizer = torch.optim.Adam(self.neural_model.parameters(), lr=0.001)
         self.neural_loss = nn.MSELoss()
         self._train_neural_storage()
 
-    def _get_max_input_dim(self):
+    def _get_max_input_dim(self):  # (1. Улучшение нейронного хранилища)
         results = self.db.find_by_type("tensor_result")
         max_dim = 16
         for doc in results:
@@ -88,11 +126,12 @@ class Veector:
                 max_dim = max(max_dim, flat_len)
         return max_dim
 
-    def _train_neural_storage(self):
+    def _train_neural_storage(self):  # (1. Улучшение нейронного хранилища)
         results = self.db.find_by_type("tensor_result")
         if not results:
             print("Нет данных для обучения нейросети")
             return
+
         input_dim = self._get_max_input_dim()
         train_data = []
         for doc in results:
@@ -105,7 +144,9 @@ class Veector:
             else:
                 data = np.array([0] * input_dim)
             train_data.append(data)
+
         train_data = torch.tensor(train_data, dtype=torch.float32)
+
         for epoch in range(50):
             self.neural_optimizer.zero_grad()
             encoded, decoded = self.neural_model(train_data)
@@ -113,11 +154,12 @@ class Veector:
             loss.backward()
             self.neural_optimizer.step()
             if epoch % 10 == 0:
-                print(f"Эпоха {epoch+1}, Loss: {loss.item()}")
+                print(f"Эпоха {epoch + 1}, Loss: {loss.item()}")
 
-    def _store_in_neural(self, result, doc_id):
+    def _store_in_neural(self, result, doc_id):  # (1. Улучшение нейронного хранилища)
         if not self.use_neural_storage or not self.neural_model:
             return
+
         input_dim = self._get_max_input_dim()
         if isinstance(result, (int, float, np.number)):
             data = np.array([float(result)] + [0] * (input_dim - 1))
@@ -126,124 +168,101 @@ class Veector:
             data = np.pad(flat, (0, max(0, input_dim - len(flat))), mode='constant')[:input_dim]
         else:
             data = np.array([0] * input_dim)
+
         tensor_data = torch.tensor(data, dtype=torch.float32)
         encoded, _ = self.neural_model(tensor_data)
         self.neural_embeddings[doc_id] = encoded.detach().numpy()
         print(f"Сохранено в нейросеть: {doc_id} -> {encoded.detach().numpy()[:5]}...")
 
-    def _retrieve_from_neural(self, doc_id):
+    def _retrieve_from_neural(self, doc_id):  # (1. Улучшение нейронного хранилища)
         if not self.use_neural_storage or not self.neural_model or doc_id not in self.neural_embeddings:
             return None
+
         encoded = torch.tensor(self.neural_embeddings[doc_id], dtype=torch.float32)
         decoded = self.neural_model.decoder(encoded)
         return decoded.detach().numpy()
 
-    def _start_sync_thread(self):
+    def _start_sync_thread(self):  # (2. Расширение возможностей федеративного обучения)
         def sync_worker():
             while True:
                 peer_veector = self.sync_queue.get()
                 self._sync_neural_blocking(peer_veector)
                 self.sync_queue.task_done()
+
         t = threading.Thread(target=sync_worker, daemon=True)
         t.start()
 
-    def _sync_neural_blocking(self, peer_veector):
+    def _sync_neural_blocking(self, peer_veector):  # (2. Расширение возможностей федеративного обучения)
         if not self.use_neural_storage or not peer_veector.use_neural_storage:
             return
+
         if not self.neural_model or not peer_veector.neural_model:
             return
+
         print("Синхронизация нейронных моделей (федеративное обучение)")
         self_data_count = len(self.db.find_by_type("tensor_result"))
         peer_data_count = len(peer_veector.db.find_by_type("tensor_result"))
         total_data = self_data_count + peer_data_count
+
         if total_data == 0:
             return
+
         state_dict = self.neural_model.state_dict()
         peer_state_dict = peer_veector.neural_model.state_dict()
+
         for key in state_dict:
             self_weight = self_data_count / total_data
             peer_weight = peer_data_count / total_data
             state_dict[key] = self_weight * state_dict[key] + peer_weight * peer_state_dict[key]
+
         self.neural_model.load_state_dict(state_dict)
 
-    def sync_neural(self, peer_veector):
+    def sync_neural(self, peer_veector):  # (2. Расширение возможностей федеративного обучения)
         self.sync_queue.put(peer_veector)
 
-    def _reason(self, x):
+    def _reason(self, x):  # (3. Развитие операции Reason)
+        # (3. Развитие операции Reason)
         print(f"Reason input: {x}")
+
+        if self.use_memory:
+            cached_result = self.memory.retrieve(x)
+            if cached_result is not None:
+                print(f"Использована память для Reason: {x} -> {cached_result}")
+                return cached_result
+
         if isinstance(x, (int, float, np.number)):
             if x > 10:
                 result = np.log(x)
-                new_tensor = [
-                    [[0], [self._next_coords(), 0, 0], [result], 1],
-                    [[0], [self._next_coords(), 0, 0], [3, 1, 0], 1],
-                    [1, 0, 0],
-                    [0, 1, 0],
-                    []
-                ]
             else:
                 result = x * 2
-                new_tensor = [
-                    [[0], [self._next_coords(), 0, 0], [result], 1],
-                    [[0], [self._next_coords(), 0, 0], [9, 0, 0], 1],
-                    [1, 0, 0],
-                    [0, 1, 0],
-                    []
-                ]
-            self.add_to_space(new_tensor)
-            print(f"Reason result: {result}")
-            return result
+
         elif isinstance(x, list):
             if len(x) == 1:
-                return self._reason(x[0])
+                result = self._reason(x[0])
             elif len(x) > 0 and isinstance(x[0], list):
                 result = [self._reason(sub_x) for sub_x in x]
-                new_tensor = [
-                    [[0], [self._next_coords(), 0, 0], result, len(result)],
-                    [[0], [self._next_coords(), 0, 0], [9, 0, 0], 1],
-                    [1, 0, 0],
-                    [0, 1, 0],
-                    []
-                ]
-                self.add_to_space(new_tensor)
-                print(f"Reason result (nested): {result}")
-                return result
-            elif len(x) == 2:
-                result = 1 if x[0] > x[1] else 0
-                new_tensor = [
-                    [[0], [self._next_coords(), 0, 0], x, 2],
-                    [[0], [self._next_coords(), 0, 0], [3, 0, 0], 1],
-                    [1, 0, 0],
-                    [0, 1, 0],
-                    [[[0], [self._next_coords(), 0, 0]], [[0], [self._next_coords(), 0, 0]]]
-                ]
-                self.add_to_space(new_tensor)
-                print(f"Reason result: {result}")
-                return result
+            else:
+                result = None  # Обработка других случаев списка
+
+        elif len(x) == 2:
+            result = 1 if x[0] > x[1] else 0
+
         elif isinstance(x, np.ndarray):
             if x.ndim == 2 and x.shape[0] == x.shape[1]:
                 result = np.dot(x, x)
-                new_tensor = [
-                    [[0], [self._next_coords(), 0, 0], result.tolist(), result.size],
-                    [[0], [self._next_coords(), 0, 0], [4, 1, 0], 1],
-                    [1, 0, 0],
-                    [0, 1, 0],
-                    [[[0], [self._next_coords(), 0, 0]]]
-                ]
             else:
                 result = np.sum(x)
-                new_tensor = [
-                    [[0], [self._next_coords(), 0, 0], x.tolist(), len(x)],
-                    [[0], [self._next_coords(), 0, 0], [4, 0, 0], 1],
-                    [1, 0, 0],
-                    [0, 1, 0],
-                    [[[0], [self._next_coords(), 0, 0]]]
-                ]
-            self.add_to_space(new_tensor)
-            print(f"Reason result: {result}")
-            return result
-        print(f"Reason fallback: {x}")
-        return x
+
+        else:
+            result = x  # Fallback
+
+        # Сохраняем результат в память, если используем Memory
+        if self.use_memory:
+            self.memory.store(x, result)
+            print(f"Сохранено в памяти: {x} -> {result}")
+
+        print(f"Reason result: {result}")
+        return result
 
     def _next_coords(self):
         coords = max([key[1][0] for key in self.space.keys()] + [self.max_coord]) + 1
@@ -253,16 +272,40 @@ class Veector:
     def _dfs(self, graph, start):
         visited = set()
         result = []
+
         def dfs(node):
             if node not in visited:
                 visited.add(node)
                 result.append(node)
                 for neighbor in graph.get(node, []):
                     dfs(neighbor)
+
         dfs(start)
         return result
 
-    def compute(self, tensor):
+    def _lru_cache_evict(self):
+        if len(self.cache) >= self.cache_size:
+            oldest_key = min(self.cache_timestamps, key=self.cache_timestamps.get)
+            del self.cache[oldest_key]
+            del self.cache_timestamps[oldest_key]
+            if oldest_key in self.cache_access_count:
+                del self.cache_access_count[oldest_key]  # Чистим за собой
+
+    def _lfu_cache_evict(self):
+        if len(self.cache) >= self.cache_size:
+            least_frequent_key = min(self.cache_access_count, key=self.cache_access_count.get)
+            del self.cache[least_frequent_key]
+            del self.cache_access_count[least_frequent_key]
+            if least_frequent_key in self.cache_timestamps:
+                del self.cache_timestamps[least_frequent_key]  # Чистим за собой
+
+    def _dropout(self, x):  # Dropout
+        if self.dropout_rate > 0 and isinstance(x, np.ndarray):
+            mask = (np.random.rand(*x.shape) < self.dropout_rate)
+            x[mask] = 0
+        return x
+
+    def compute(self, tensor):  # (4. Улучшение механизма кэширования)
         if not isinstance(tensor, list) or len(tensor) < 4:
             return tensor
 
@@ -274,16 +317,19 @@ class Veector:
 
         cache_key = (tuple(data_layer), tuple(data_coords), tuple(op))
         if cache_key in self.cache:
+            self.cache_access_count[cache_key] = self.cache_access_count.get(cache_key, 0) + 1
+            self.cache_timestamps[cache_key] = time.time()
             return self.cache[cache_key]
 
         if isinstance(data, list):
             data = [self.compute(d) if isinstance(d, list) else d for d in data]
-            if len(data) == 1 and tuple(op) in [(2, 1, 0), (2, 1, 1), (2, 2, 0), (2, 2, 1)]:
-                data = data
-            elif len(data) == 1 and not isinstance(data[0], list):
-                data = data[0]
+        if len(data) == 1 and tuple(op) in [(2, 1, 0), (2, 1, 1), (2, 2, 0), (2, 2, 1)]:
+            data = data
+        elif len(data) == 1 and not isinstance(data[0], list):
+            data = data[0]
 
         op_func = self.core.get(tuple(op), lambda x: x)
+
         if op == [3, 0, 0]:
             cond = self.compute(data[0]) if isinstance(data, list) else data
             true_val = self.compute(data[1])
@@ -300,17 +346,40 @@ class Veector:
         else:
             if isinstance(data, list) and tuple(op) not in [(2, 1, 0), (2, 1, 1), (2, 2, 0), (2, 2, 1)]:
                 data = np.array(data)
+            if self.dropout_rate > 0 and op != [59, 0, 0]:  # Применяем dropout ко всем операциям кроме самой операции dropout
+                data = self._dropout(data)
+
             result = op_func(data)
 
         metadata = {"tensor": tensor, "coords": (data_layer, data_coords)}
         doc_id = self.db.insert("tensor_result", result, metadata)
+
         if self.use_neural_storage and self.neural_model:
             self._store_in_neural(result, doc_id)
+
         self.space[(tuple(data_layer), tuple(data_coords))] = doc_id
+
+        if len(self.cache) >= self.cache_size:
+            if self.eviction_strategy == "LRU":
+                self._lru_cache_evict()
+            elif self.eviction_strategy == "LFU":
+                self._lfu_cache_evict()
+            else:
+                self._lru_cache_evict()  # LRU по умолчанию
+
         self.cache[cache_key] = result
+        self.cache_access_count[cache_key] = 1
+        self.cache_timestamps[cache_key] = time.time()
+
         return result
 
     def add_to_space(self, tensor):
         layer, coords = tensor[0][0], tuple(tensor[0][1])
         doc_id = self.db.insert("tensor", tensor)
         self.space[(tuple(layer), coords)] = doc_id
+
+    def evolve_tensor(self, tensor):
+        """
+        Вызывает процесс эволюции для заданного тензора.
+        """
+        return self.evolution.log_evolution(tensor, self)
