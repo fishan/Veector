@@ -33,8 +33,6 @@ def matrix_lu_decomposition(a):
 
 def convolution(data, kernel):
     """Свертка (convolution)."""
-    # Простая реализация для 2D данных и 2D ядра
-    # TODO: Оптимизировать и расширить для n-мерных данных
     if not isinstance(data, np.ndarray) or not isinstance(kernel, np.ndarray):
         return None
     if data.ndim != 2 or kernel.ndim != 2:
@@ -72,26 +70,59 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 def exponential_smoothing(data, alpha=0.5):
-    """
-    Экспоненциальное сглаживание данных.
-    """
+    """Экспоненциальное сглаживание данных."""
     smoothed = [data[0]]
     for i in range(1, len(data)):
         smoothed.append(alpha * data[i] + (1 - alpha) * smoothed[-1])
     return smoothed
 
 def normalize(data):
-    """
-    Нормализация данных в диапазоне [0, 1].
-    """
+    """Нормализация данных в диапазоне [0, 1]."""
     min_val = np.min(data)
     max_val = np.max(data)
     return (data - min_val) / (max_val - min_val)
 
 def interpolate(data, new_length):
-    """
-    Линейная интерполяция данных до новой длины.
-    """
+    """Линейная интерполяция данных до новой длины."""
     x_old = np.linspace(0, 1, len(data))
     x_new = np.linspace(0, 1, new_length)
     return np.interp(x_new, x_old, data)
+
+# Новые операции для языковых моделей
+
+def self_attention(inputs):
+    """
+    Выполняет операцию self-attention.
+    :param inputs: Список из трех тензоров [query, key, value].
+    """
+    query, key, value = inputs
+    qk = matrix_multiply(query, key)
+    attention_weights = softmax(qk)
+    output = matrix_multiply(attention_weights, value)
+    return output
+
+def layer_normalization(inputs):
+    """
+    Выполняет операцию layer normalization.
+    """
+    x = inputs[0]
+    mean_val = mean(x)
+    std_val = std_dev(x)
+    normalized = (x - mean_val) / (std_val + 1e-8)
+    return normalized
+
+def multi_head_attention(inputs, num_heads=8):
+    """
+    Выполняет операцию multi-head attention.
+    :param inputs: Список из трех тензоров [query, key, value].
+    """
+    query, key, value = inputs
+    head_dim = query.shape[-1] // num_heads
+    outputs = []
+    for i in range(num_heads):
+        q_head = query[..., i*head_dim:(i+1)*head_dim]
+        k_head = key[..., i*head_dim:(i+1)*head_dim]
+        v_head = value[..., i*head_dim:(i+1)*head_dim]
+        head_output = self_attention([q_head, k_head, v_head])
+        outputs.append(head_output)
+    return np.concatenate(outputs, axis=-1)
