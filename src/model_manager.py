@@ -1,136 +1,276 @@
-import numpy as np
+import os
 import torch
-from transformers import AutoModelForCausalLM
+import torch.nn.functional as F
+import numpy as np
 from ipfshttpclient import connect
-from tensors import create_tensor
+from pathlib import Path
+from src.virtual_space import VirtualSpace
+from src.tensors import create_tensor
+from src.sync import P2PNode
+from qiskit import QuantumCircuit  # Добавлено: для управления квантовыми цепями
 
 class ModelManager:
-    def __init__(self, veector, ipfs_enabled=True, p2p_node=None):
+    def __init__(self, veector, block_size=(1024, 1024), ipfs_enabled=True, model_dir="data/models"):
+        """
+        Менеджер моделей для работы с блочно-матричной архитектурой и квантовыми цепями.
+        :param veector: Экземпляр ядра Veector.
+        :param block_size: Размер блока матрицы (высота, ширина).
+        :param ipfs_enabled: Включить IPFS-хранилище.
+        :param model_dir: Директория для локальных данных.
+        """
         self.veector = veector
+        self.block_size = block_size
         self.ipfs_enabled = ipfs_enabled
-        self.p2p_node = p2p_node
-        self.model_space = {}
-        self.tensor_cache = {}
+        self.model_dir = Path(model_dir)
+        self.model_dir.mkdir(parents=True, exist_ok=True)
+        self.model_space = {}  # { (model_name, layer, block_coords): tensor_info }
+        self.tensor_metadata = {}  # Хранение метаданных тензоров
+        self.quantum_circuits = {}  # { model_name: QuantumCircuit } — для квантовых цепей
+        self.p2p_node = veector.p2p_node if ipfs_enabled and veector.p2p_node else None
+        self.virtual_space = VirtualSpace(veector, use_ipfs=ipfs_enabled)
 
-    def add_model(self, model_name, model_path):
+    def load_pre_split_model(self, model_name, tensor_dir):
         """
-        Разделяет модель на тензоры и добавляет их в пространство.
+        Загрузка предварительно разбитой модели.
+        :param model_name: Название модели.
+        :param tensor_dir: Путь к директории с блоками тензоров.
         """
-        print(f"Добавление модели: {model_name}")
-        model = AutoModelForCausalLM.from_pretrained(model_path)
-        state_dict = model.state_dict()
+        tensor_dir = Path(tensor_dir)
+        self.virtual_space.load_blocks_model_into_matrix(model_name, tensor_dir)
+        if self.ipfs_enabled and self.p2p_node:
+            self.p2p_node.sync_model_blocks(model_name, tensor_dir)
 
-        layer_idx = 0
-        for name, tensor in state_dict.items():
-            tensor_np = tensor.cpu().numpy()
-            coords = self.veector._next_coords()
-            tensor_info = self._store_tensor(model_name, name, tensor_np, layer_idx, coords)
-            self.model_space[(model_name, layer_idx, tuple(coords))] = tensor_info
-            # Создаем тензор Veector-формата для каждого слоя
-            veector_tensor = create_tensor(
-                [layer_idx], coords, tensor_np, tensor_np.size,
-                op=[50, 0, 0],  # Пример операции (matrix_multiply)
-                metadata={"model_name": model_name, "layer_idx": layer_idx, "role": self._infer_tensor_role(name)}
-            )
-            self.veector.add_to_space(veector_tensor)
-            layer_idx += 1
+        # Заполняем model_space и tensor_metadata
+        for coords, block_info in self.virtual_space.virtual_matrix.matrices.get(model_name, {}).get("blocks", {}).items():
+            key = (model_name, 0, coords)  # layer=0 для плоской структуры
+            self.model_space[key] = {
+                "tensor_id": block_info["hash"],
+                "shape": self.block_size,
+                "data": None  # Данные загружаются по запросу
+            }
+            self.tensor_metadata[key] = {
+                "role": "flat_model_block",
+                "dependencies": [],
+                "shape": self.block_size,
+                "tensor_id": block_info["hash"]
+            }
+        print(f"Модель {model_name} загружена из {tensor_dir} с {len(self.model_space)} блоками")
 
-    def _store_tensor(self, model_name, tensor_name, tensor_np, layer_idx, coords):
-        metadata = {
-            "model_name": model_name,
-            "tensor_name": tensor_name,
-            "role": self._infer_tensor_role(tensor_name),
-            "shape": tensor_np.shape,
-            "dependencies": self._infer_dependencies(tensor_name, layer_idx),
-        }
+    def get_block(self, model_name, layer_idx, coords):
+        """
+        Получение блока из кэша, IPFS или локального хранилища.
+        :param model_name: Название модели.
+        :param layer_idx: Индекс слоя (0 для плоской структуры).
+        :param coords: Координаты блока (row, col).
+        :return: Тензор блока (torch.Tensor).
+        """
+        key = (model_name, layer_idx, coords)
+        if key not in self.model_space:
+            raise ValueError(f"Блок {key} не найден в model_space")
 
-        if self.ipfs_enabled:
-            ipfs_hash = self._store_in_ipfs(tensor_np)
-            metadata["ipfs_hash"] = ipfs_hash
-            tensor_data = None
-        else:
-            tensor_data = tensor_np
+        if self.model_space[key]["data"] is None:
+            tensor_id = self.model_space[key]["tensor_id"]
+            if self.ipfs_enabled and self.p2p_node and tensor_id:
+                block = self.p2p_node._load_from_ipfs(tensor_id, self.block_size, dtype="float16")
+                self.model_space[key]["data"] = block.numpy() if block is not None else None
+            else:
+                block = self.virtual_space.virtual_matrix.load_block(model_name, coords)
+                self.model_space[key]["data"] = block.numpy() if block is not None else None
 
-        tensor_info = {
-            "data": tensor_data,
-            "metadata": metadata
-        }
+        data = self.model_space[key]["data"]
+        return torch.from_numpy(data) if data is not None else None
 
-        if self.p2p_node:
-            self.p2p_node.sync_tensor(tensor_np, metadata)
+    def perform_inference(self, model_name, input_data):
+        """
+        Выполнение инференса через VirtualSpace.
+        :param model_name: Название модели.
+        :param input_data: Входные данные (np.ndarray).
+        :return: Результат инференса (np.ndarray).
+        """
+        if model_name not in self.virtual_space.matrix_models:
+            self.load_pre_split_model(model_name, "data/blocks")
+        
+        input_tensor = (torch.from_numpy(input_data).long() 
+                        if input_data.dtype in (np.int64, np.int32) 
+                        else torch.from_numpy(input_data).float())
+        output = self.virtual_space.perform_inference(input_tensor)
+        return output.cpu().numpy()
 
-        return tensor_info
-
-    def _store_in_ipfs(self, tensor_np):
-        client = connect()
-        ipfs_hash = client.add_bytes(tensor_np.tobytes())
-        return ipfs_hash
-
-    def _load_from_ipfs(self, ipfs_hash, shape):
-        client = connect()
-        tensor_data = client.cat(ipfs_hash)
-        return np.frombuffer(tensor_data, dtype=np.float32).reshape(shape)
-
-    def _infer_tensor_role(self, tensor_name):
-        if "self_attn" in tensor_name:
-            return "attention_weights"
-        elif "layer_norm" in tensor_name:
-            return "layer_normalization"
-        elif "mlp" in tensor_name or "dense" in tensor_name:
-            return "feed_forward"
-        else:
-            return "unknown"
-
-    def _infer_dependencies(self, tensor_name, layer_idx):
-        dependencies = []
-        if "self_attn" in tensor_name:
-            dependencies.append((layer_idx, "layer_norm"))
-        return dependencies
-
-    def get_tensor(self, model_name, layer_idx, coords):
-        key = (model_name, layer_idx, tuple(coords))
-        if key in self.tensor_cache:
-            return self.tensor_cache[key]
-
-        tensor_info = self.model_space.get(key)
-        if tensor_info is None:
-            raise ValueError(f"Tensor at {key} not found")
-
-        if tensor_info["data"] is None and "ipfs_hash" in tensor_info["metadata"]:
-            tensor_np = self._load_from_ipfs(tensor_info["metadata"]["ipfs_hash"], tensor_info["metadata"]["shape"])
-            tensor_info["data"] = tensor_np
-
-        self.tensor_cache[key] = tensor_info["data"]
-        return tensor_info["data"]
-
-    def perform_inference(self, model_name, input_tensor, max_layers=32):
-        current_tensor = input_tensor
-        for layer_idx in range(max_layers):
-            coords = None
-            for k in self.model_space.keys():
-                if k[0] == model_name and k[1] == layer_idx:
-                    coords = k[2]
-                    break
-            if coords is None:
+    def update_parameters(self, model_name, learning_rate=1e-4):
+        """
+        Обновление параметров после обратного распространения.
+        :param model_name: Название модели.
+        :param learning_rate: Скорость обучения.
+        """
+        for key in self.model_space:
+            m_name, layer, coords = key
+            if m_name != model_name:
                 continue
+            tensor_info = self.model_space[key]
+            if tensor_info["data"] is None:
+                self.get_block(model_name, layer, coords)
+            data_tensor = torch.from_numpy(tensor_info["data"])
+            if data_tensor.requires_grad and data_tensor.grad is not None:
+                updated_data = data_tensor - learning_rate * data_tensor.grad
+                tensor_info["data"] = updated_data.detach().numpy()
+                if self.ipfs_enabled and self.p2p_node:
+                    self.p2p_node.sync_tensor(updated_data, {
+                        "tensor_id": tensor_info["tensor_id"],
+                        "model_name": model_name,
+                        "coords": coords
+                    })
 
-            tensor_info = self.model_space.get((model_name, layer_idx, coords))
-            if tensor_info is None:
+    def save_model(self, model_name, output_dir):
+        """
+        Сохранение модели в директорию.
+        :param model_name: Название модели.
+        :param output_dir: Путь к директории для сохранения.
+        """
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        for key in self.model_space:
+            m_name, layer, coords = key
+            if m_name != model_name:
                 continue
+            if self.model_space[key]["data"] is None:
+                self.get_block(model_name, layer, coords)
+            tensor = torch.from_numpy(self.model_space[key]["data"])
+            filename = f"{model_name}_layer_{layer}_block_{coords[0]}_{coords[1]}.pt"
+            torch.save(tensor, output_dir / filename)
+        print(f"Модель {model_name} сохранена в {output_dir}")
 
-            role = tensor_info["metadata"]["role"]
-            tensor_data = self.get_tensor(model_name, layer_idx, coords)
+    def get_num_layers(self, model_name):
+        """
+        Получение количества слоёв (для плоской структуры всегда 1).
+        :param model_name: Название модели.
+        :return: Число слоёв.
+        """
+        return 1 if any(m_name == model_name for m_name, _, _ in self.model_space) else 0
 
-            if role == "attention_weights":
-                current_tensor = self.veector.compute(
-                    create_tensor([layer_idx], coords, [current_tensor, current_tensor, current_tensor], 3, op=[70, 0, 0])
-                )
-            elif role == "feed_forward":
-                current_tensor = self.veector.compute(
-                    create_tensor([layer_idx], coords, current_tensor, 1, op=[50, 0, 0])
-                )
-            elif role == "layer_normalization":
-                current_tensor = self.veector.compute(
-                    create_tensor([layer_idx], coords, current_tensor, 1, op=[71, 0, 0])
-                )
-        return current_tensor
+    # Методы для квантовых цепей
+    def add_quantum_circuit(self, model_name, circuit):
+        """
+        Добавление квантовой цепи для модели.
+        :param model_name: Название модели.
+        :param circuit: Объект QuantumCircuit из Qiskit.
+        """
+        if not isinstance(circuit, QuantumCircuit):
+            raise ValueError("circuit должен быть объектом QuantumCircuit")
+        self.quantum_circuits[model_name] = circuit
+        print(f"Квантовая цепь добавлена для модели {model_name}")
+
+    def execute_quantum_circuit(self, model_name, input_state=None):
+        """
+        Выполнение квантовой цепи.
+        :param model_name: Название модели.
+        :param input_state: Начальное состояние (np.ndarray с комплексными числами).
+        :return: Результат выполнения (np.ndarray).
+        """
+        if model_name not in self.quantum_circuits:
+            raise ValueError(f"Квантовая цепь для {model_name} не найдена")
+        
+        from qiskit.providers.aer import Aer
+        circuit = self.quantum_circuits[model_name]
+        num_qubits = circuit.num_qubits
+
+        if input_state is not None:
+            input_state = np.array(input_state, dtype=np.complex128)
+            if input_state.size != 2 ** num_qubits:
+                raise ValueError(f"Размер входного состояния {input_state.size} не соответствует {2 ** num_qubits}")
+            circuit.initialize(input_state / np.linalg.norm(input_state), range(num_qubits))
+
+        simulator = Aer.get_backend('statevector_simulator')
+        job = execute(circuit, simulator)
+        result = job.result().get_statevector()
+        return np.array(result, dtype=np.complex128)
+
+    # Методы для работы с программами (из Veector)
+    def generate_program_tensor(self, prompt, max_steps=5):
+        """
+        Генерация программного тензора на основе текстового запроса.
+        :param prompt: Текстовый запрос.
+        :param max_steps: Максимальное число шагов.
+        :return: Программный тензор.
+        """
+        # Простая заглушка: генерируем тензор с операцией вывода
+        data = np.array([prompt], dtype=object)
+        return create_tensor(
+            layer=[0],
+            coords=[0, 0, 0],
+            data=data,
+            length=1,
+            op=[8, 0, 0],  # Операция вывода
+            metadata={"prompt": prompt, "steps": max_steps}
+        )
+
+    def share_program(self, program_tensors):
+        """
+        Поделиться программным тензором через P2PNode.
+        :param program_tensors: Список тензоров программы.
+        :return: Хэш IPFS или None.
+        """
+        if not self.ipfs_enabled or not self.p2p_node:
+            print("P2PNode не доступен для совместного использования")
+            return None
+        
+        program_data = np.array([t[0][2] for t in program_tensors], dtype=object)
+        tensor_id = f"program_{int(time.time())}"
+        return self.p2p_node.sync_tensor(program_data, {"tensor_id": tensor_id, "type": "program"})
+
+    def improve_program(self, program_tensors, feedback_data, iterations=3):
+        """
+        Улучшение программы на основе обратной связи.
+        :param program_tensors: Список тензоров программы.
+        :param feedback_data: Данные обратной связи (np.ndarray).
+        :param iterations: Число итераций улучшения.
+        :return: Улучшенные тензоры.
+        """
+        # Простая заглушка: возвращаем исходные тензоры
+        print(f"Улучшение программы на основе feedback_data shape={feedback_data.shape} за {iterations} итераций")
+        return program_tensors
+
+    def execute_program(self, program_tensors, input_data=None):
+        """
+        Выполнение программы, заданной тензорами.
+        :param program_tensors: Список тензоров программы.
+        :param input_data: Входные данные (опционально).
+        :return: Результат выполнения.
+        """
+        results = []
+        for tensor in program_tensors:
+            result = self.veector.compute(tensor)
+            results.append(result)
+        return results
+
+if __name__ == "__main__":
+    from src.core import Veector
+    from src.sync import P2PNode
+    import time
+
+    # Тест
+    p2p_node = P2PNode("localhost", 5000, use_ipfs=True)
+    veector = Veector(p2p_node=p2p_node)
+    manager = ModelManager(veector)
+
+    # Загрузка модели
+    manager.load_pre_split_model("DeepSeek-R1-Distill-Qwen-1.5B", "data/blocks")
+
+    # Инференс
+    input_data = np.random.randint(0, 32768, (1, 512))
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", input_data)
+    print(f"Результат инференса: {output.shape}")
+
+    # Тест квантовой цепи
+    from qiskit import QuantumCircuit
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    manager.add_quantum_circuit("quantum_test", qc)
+    result = manager.execute_quantum_circuit("quantum_test", input_state=[1, 0, 0, 0])
+    print(f"Результат квантовой цепи: {result}")
+
+    # Тест программы
+    program_tensor = manager.generate_program_tensor("Привет, мир!", max_steps=3)
+    manager.share_program([program_tensor])
+    result = manager.execute_program([program_tensor])
+    print(f"Результат программы: {result}")
