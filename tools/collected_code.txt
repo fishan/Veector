@@ -1,57 +1,119 @@
-===== Код из файла: core.py =====
+  + !refs/
+    - buffer.py
+    - howTo.txt
+    - talks.txt
+  + config/
+    + blocks/
+      + arithmetic/
+        - simple.vtr
+    + datasets/
+    + db/
+      - veectordb.json
+      + DeepSeek-R1-Distill-Qwen-1.5B/
+        - DeepSeek-R1-Distill-Qwen-1.5B_row0_col0.pt
+        .......
+        - DeepSeek-R1-Distill-Qwen-1.5B_row1694_col0.pt
+        - config.json
+    + deepseek-ai/
+      - Info DeepSeek-R1-Distill-Qwen-1.5B.txt
+    + models/
+    + pretrained/
+      - core.vtr
+      - evolved.vtr
+    + tensors/
+      - tensor_result_1741839372.4694395_6190.npy
+      - tensor_result_1741840116.6680386_4819.npy
+      - tensor_result_1741840363.2619934_8958.npy
+  + data/
+      + db/
+        - user_data.json
+        - veectordb.json
+      + local_cache/
+      + models/
+      + tensors/
+    + data/
+  + device/
+    - run_veector.py
+  + docs/
+    - README.md
+    - memory.md
+    - roadmap.md
+    - training.md
+    - veector.md
+  + examples/
+    - advanced.py
+    - calculator.vtr
+  + go-ipfs/
+    - LICENSE
+    - LICENSE-APACHE
+    - LICENSE-MIT
+    - README.md
+    - install.sh
+  + src/
+    - core.py
+    - evolution.py
+    - federated_learning.py
+    - file_transfer.py
+    - interface.py
+    - main.py
+    - memory.py
+    - model_manager.py
+    - operations.py
+    - sync.py
+    - tensors.py
+    - test_imports.py
+    - tokenization.py
+    - utils.py
+    - veectordb.py
+    - virtual_space.py
+  + tests/
+    - test_basic.py
+    - test_federate.py
+    - test_hybrid.py
+    - test_logic.py
+    - test_loops.py
+    - test_parallel.py
+    - test_system.py
+  + tools/
+    - app.log
+    - collected_code.txt
+    - config.json
+    - folder_code_collector.py
+    - project_info_collect_v2.py
+    - show_structure.py
++ Veector/
+  - .gitignore
+  - LICENSE
+  - README.md
+  - go-ipfs_v0.20.0_linux-amd64.tar.gz
+  - requirements.txt
+  - setup_project.sh
+  - update_project.sh
 
+
+===== Код из файла: /workspaces/Veector/src/core.py =====
+
+# /workspaces/Veector/src/core.py
 import numpy as np
-from veectordb import VeectorDB
 import torch
 import torch.nn as nn
 import queue
 import threading
 import time
 import random
+from qiskit import QuantumCircuit
+from qiskit.primitives import Sampler  # Для измерений (если нужно позже)
+from qiskit_aer import AerSimulator  # Для statevector симуляции
+from qiskit_aer.noise import NoiseModel, depolarizing_error
+from veectordb import VeectorDB
 from operations import (
-    mod,
-    floor,
-    ceil,
-    arcsin,
-    arccos,
-    arctan,
-    xor,
-    nand,
-    nor,
-    matrix_multiply,
-    gradient_descent,
-    softmax,
-    matrix_determinant,
-    matrix_eigenvalues,
-    matrix_lu_decomposition,
-    convolution,
-    transpose,
-    mean,
-    std_dev,
-    relu,
-    leaky_relu,
-    batch_norm,
-    sigmoid,
-    exponential_smoothing,
-    normalize,
-    interpolate,
-    inverse,
-    trace,
-    random_uniform,
-    random_normal,
-    median,
-    dropout,
-    self_attention,
-    layer_normalization,
-    multi_head_attention,
-    quantum_hadamard,
-    quantum_pauli_x,
-    quantum_cnot,
-    quantum_measure,
-    quantum_superposition,
-    quantum_entanglement,
-    causal_mask,
-    masked_fill
+    mod, floor, ceil, arcsin, arccos, arctan, xor, nand, nor, matrix_multiply,
+    gradient_descent, softmax, matrix_determinant, matrix_eigenvalues, matrix_lu_decomposition,
+    convolution, transpose, mean, std_dev, relu, leaky_relu, batch_norm, sigmoid,
+    exponential_smoothing, normalize, interpolate, inverse, trace, random_uniform,
+    random_normal, median, dropout, self_attention, layer_normalization,
+    multi_head_attention, quantum_hadamard, quantum_pauli_x, quantum_cnot,
+    quantum_measure, quantum_superposition, quantum_entanglement, causal_mask, masked_fill
 )
 from memory import Memory
 from evolution import Evolution
@@ -81,9 +143,9 @@ class NeuralStorage(nn.Module):
         return encoded, decoded
 
 class Veector:
-    def __init__(self, db_path="data/db/veectordb.json", use_neural_storage=False, cache_size=1000,
-                 eviction_strategy="LRU", dropout_rate=0.0, use_memory=False, model_manager=None, p2p_node=None,
-                 ipfs_address='/ip4/127.0.0.1/tcp/5001'):
+    def __init__(self, db_path="../data/db/veectordb.json", use_neural_storage=False, cache_size=1000,
+                 eviction_strategy="LRU", dropout_rate=0.0, use_memory=False, model_manager=None, 
+                 p2p_node=None, ipfs_enabled=True, ipfs_address='/ip4/127.0.0.1/tcp/5001'):
         self.db = VeectorDB(db_path)
         self.use_neural_storage = use_neural_storage
         self.neural_model = None
@@ -97,13 +159,15 @@ class Veector:
         self.cache_access_count = {}
         self.cache_timestamps = {}
         self.dropout_rate = dropout_rate
-        self.use_memory = Memory()
-        self.evolution = Evolution(self)
-        self.model_manager = model_manager
-        self.p2p_node = p2p_node
-        self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address)
-        self.models_dir = "data/models"
-        self.tensors_dir = "data/tensors"
+        self.use_memory = Memory() if use_memory else None
+        self.evolution = Evolution(self)        
+        self.p2p_node = p2p_node        
+        self.ipfs_client = None
+        if ipfs_enabled and p2p_node and ipfs_address:  # Подключаем IPFS только если ipfs_enabled=True
+            self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address) if ipfs_address else None
+        self.model_manager = model_manager or ModelManager(self)
+        self.models_dir = "../data/models"
+        self.tensors_dir = "../data/tensors"
 
         os.makedirs(self.models_dir, exist_ok=True)
         os.makedirs(self.tensors_dir, exist_ok=True)
@@ -113,128 +177,157 @@ class Veector:
         self._start_sync_thread()
 
         self.core = {
-            # === Арифметика (коды 0-9) ===
-            (0, 0, 0): lambda x: np.sum(x),
+            # Арифметика (0-9)
+            (0, 0, 0): lambda x: np.sum(x, dtype=np.complex128),
             (0, 0, 1): lambda x: x[0] - x[1],
             (0, 1, 0): lambda x: x[0] * x[1],
             (0, 1, 1): lambda x: x[0] / x[1],
-            (0, 2, 0): lambda x: np.sqrt(x[0]),
-            (0, 2, 1): lambda x: np.power(x[0], x[1]),
+            (0, 2, 0): lambda x: np.sqrt(x[0], dtype=np.complex128),
+            (0, 2, 1): lambda x: np.power(x[0], x[1], dtype=np.complex128),
             (0, 3, 0): lambda x: np.abs(x[0]),
             (0, 4, 0): lambda x: np.dot(x[0], x[1]) if x[0].shape[1] == x[1].shape[0] else None,
-            (0, 5, 0): mod(x[0], x[1]),
-            (0, 6, 0): floor(x[0]),
-            (0, 6, 1): ceil(x[0]),
+            (0, 5, 0): lambda x: mod(x[0], x[1]),
+            (0, 6, 0): lambda x: floor(x[0]),
+            (0, 6, 1): lambda x: ceil(x[0]),
 
-            # === Тригонометрия (коды 1) ===
-            (1, 0, 0): lambda x: np.sin(x[0]),
-            (1, 0, 1): lambda x: np.cos(x[0]),
-            (1, 1, 0): lambda x: np.tan(x[0]),
-            (1, 1, 1): lambda x: 1 / np.tan(x[0]) if np.tan(x[0]) != 0 else np.nan,
-            (1, 2, 0): arcsin(x[0]),
-            (1, 2, 1): arccos(x[0]),
-            (1, 3, 0): arctan(x[0]),
+            # Тригонометрия (1)
+            (1, 0, 0): lambda x: np.sin(x[0], dtype=np.complex128),
+            (1, 0, 1): lambda x: np.cos(x[0], dtype=np.complex128),
+            (1, 1, 0): lambda x: np.tan(x[0], dtype=np.complex128),
+            (1, 1, 1): lambda x: 1 / np.tan(x[0], dtype=np.complex128) if np.tan(x[0]) != 0 else np.nan,
+            (1, 2, 0): lambda x: arcsin(x[0]),
+            (1, 2, 1): lambda x: arccos(x[0]),
+            (1, 3, 0): lambda x: arctan(x[0]),
 
-            # === Логика (коды 2) ===
+            # Логика (2)
             (2, 0, 0): lambda x: 1 if x[0] > x[1] else 0,
             (2, 0, 1): lambda x: 1 if x[0] == x[1] else 0,
             (2, 1, 0): lambda x: 1 if x[0] and x[1] else 0,
             (2, 1, 1): lambda x: 1 if x[0] or x[1] else 0,
             (2, 2, 0): lambda x: 1 if not x[0] else 0,
-            (2, 3, 0): xor(x[0], x[1]),
-            (2, 4, 0): nand(x[0], x[1]),
-            (2, 4, 1): nor(x[0], x[1]),
+            (2, 3, 0): lambda x: xor(x[0], x[1]),
+            (2, 4, 0): nand,
+            (2, 4, 1): nor,
 
-            # === Условные операции (коды 3) ===
+            # Условные операции (3)
             (3, 0, 0): lambda x, t, f: t if x[0] else f,
 
-            # === Циклы (коды 4) ===
+            # Циклы (4)
             (4, 0, 0): lambda x, n: x[0] * n,
 
-            # === Рандом (коды 5) ===
-            (5, 1, 0): random_uniform(min, max),
-            (5, 1, 1): random_normal(mu, sigma),
-            (5, 2, 0): median(x[0]),
+            # Рандом (5)
+            (5, 1, 0): lambda x: random_uniform(x[0], x[1]),
+            (5, 1, 1): lambda x: random_normal(x[0], x[1]),
+            (5, 2, 0): lambda x: median(x[0]),
 
-            # === Выбор (коды 7) ===
-            (7, 0, 0): lambda x, *opts: opts[int(x[0])] if opts else None,            
+            # Выбор (7)
+            (7, 0, 0): lambda x, *opts: opts[int(x[0])] if opts else None,
 
-            # === Вывод (коды 8) ===
-            (8, 0, 0): lambda x: print(f"Output: {x[0]}"),
+            # Вывод (8)
+            (8, 0, 0): lambda x: print(f"Output: {x[0]}") or x[0],
 
-            # === Идентичность (коды 9) ===
+            # Идентичность (9)
             (9, 0, 0): lambda x: x[0],
 
-            # === Эволюция (коды 10) ===
+            # Эволюция (10)
             (10, 0, 0): lambda x: self._reason(x),
 
-            # === Графовые операции (коды 15) ===
+            # Графовые операции (15)
             (15, 0, 0): lambda x: self._dfs(x[0], x[1]),
 
-            # === Статистика (16) ===
-            (16, 0, 0): lambda x: np.mean(x[0]),
-            (16, 1, 0): lambda x: np.std(x[0]),
+            # Статистика (16)
+            (16, 0, 0): lambda x: np.mean(x[0], dtype=np.complex128),
+            (16, 1, 0): lambda x: np.std(x[0], dtype=np.complex128),
 
-            # === Регуляризация (17) ===
+            # Регуляризация (17)
             (17, 0, 0): lambda x: self._dropout(x[0]),
 
-            # === Активации (коды 18) ===
-            (18, 0, 0): lambda x: np.maximum(x[0], 0),  # ReLU
-            (18, 1, 0): lambda x: 1 / (1 + np.exp(-x[0])),  # Сигмоид
-            (18, 2, 0): softmax(x[0]),
-            (18, 3, 0): leaky_relu(x[0]),
+            # Активации (18)
+            (18, 0, 0): lambda x: np.maximum(x[0], 0),
+            (18, 1, 0): lambda x: 1 / (1 + np.exp(-x[0])),
+            (18, 2, 0): softmax,
+            (18, 3, 0): leaky_relu,
 
-            # === Сглаживание (13) ===
+            # Сглаживание (19)
             (19, 0, 0): exponential_smoothing,
 
-            # === Нормализация (20) ===
+            # Нормализация (20)
             (20, 0, 0): normalize,
             (20, 1, 0): interpolate,
 
-            # === Матричные операции (коды 30) ===
+            # Матричные операции (30)
             (30, 0, 0): matrix_multiply,
             (30, 1, 0): matrix_determinant,
             (30, 2, 0): matrix_eigenvalues,
             (30, 3, 0): convolution,
             (30, 4, 0): transpose,
-            (30, 5, 0): inverse(x[0]),
-            (30, 6, 0): trace(x[0]),
+            (30, 5, 0): inverse,
+            (30, 6, 0): trace,
 
-            # === Нейросетевые операции (40) ===
-            (40, 0, 0): self_attention,
+            # Нейросетевые операции (40)
+            (40, 0, 0): lambda x: self.model_manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", x),
             (40, 1, 0): layer_normalization,
             (40, 2, 0): lambda x: multi_head_attention(x, num_heads=8),
-            (40, 3, 0): dropout(x[0], rate=0.5),
-            (40, 4, 0): batch_norm(x[0]), 
-            
-            # === Квантовые операции (50) ===
-            (50, 0, 0): quantum_hadamard,
-            (50, 0, 1): quantum_pauli_x,
-            (50, 1, 0): quantum_cnot,
-            (50, 2, 0): quantum_measure,
-            (50, 3, 0): quantum_superposition(x[0]),
-            (50, 4, 0): quantum_entanglement(x[0], x[1])
+            (40, 3, 0): lambda x: dropout(x[0], rate=0.5),
+            (40, 4, 0): batch_norm,
+
+            # Квантовые операции (50)
+            (50, 0, 0): lambda x: self._quantum_operation(x[0], "hadamard"),
+            (50, 0, 1): lambda x: self._quantum_operation(x[0], "pauli_x"),
+            (50, 1, 0): lambda x: self._quantum_operation([x[0], x[1]], "cnot"),
+            (50, 2, 0): lambda x: self._quantum_operation(x[0], "measure"),
+            (50, 3, 0): lambda x: self._quantum_operation(x[0], "superposition"),
+            (50, 4, 0): lambda x: self._quantum_operation([x[0], x[1]], "entanglement"),
         }
 
+    def _quantum_operation(self, data, op_type):
+        """Выполнение квантовых операций через Qiskit 1.4.1 с шумом."""
+        if isinstance(data, list):
+            num_qubits = len(data)
+            initial_state = np.array(data, dtype=np.complex128).flatten()
+        else:
+            num_qubits = 1
+            initial_state = np.array([data, 0], dtype=np.complex128) if np.isscalar(data) else data
+
+        # Нормализация начального состояния
+        initial_state = initial_state / np.linalg.norm(initial_state)
+
+        # Создаём квантовую цепь
+        qc = QuantumCircuit(num_qubits)
+        qc.initialize(initial_state, range(num_qubits))
+
+        # Применяем операцию
+        if op_type == "hadamard":
+            qc.h(0)
+        elif op_type == "pauli_x":
+            qc.x(0)
+        elif op_type == "cnot" and num_qubits >= 2:
+            qc.cx(0, 1)
+        elif op_type == "measure":
+            qc.measure_all()
+        elif op_type == "superposition":
+            qc.h(0)
+        elif op_type == "entanglement" and num_qubits >= 2:
+            qc.h(0)
+            qc.cx(0, 1)
+
+        # Добавляем квантовый шум (деполяризация)
+        noise_model = NoiseModel()
+        error = depolarizing_error(0.05, num_qubits)  # 5% шум
+        noise_model.add_all_qubit_quantum_error(error, ['h', 'x', 'cx'])
+
+        # Симуляция через AerSimulator
+        simulator = AerSimulator(method='statevector')
+        result = simulator.run(qc, noise_model=noise_model).result()
+        statevector = result.get_statevector()
+        return np.array(statevector, dtype=np.complex128)
 
     def _apply_quantum_ops(self, op, data):
-        if op == (50, 0, 0):
-            return quantum_hadamard(data[0])
-        elif op == (50, 0, 1):
-            return quantum_pauli_x(data[0])
-        elif op == (50, 1, 0):
-            return quantum_cnot(data[0], data[1])
-        elif op == (50, 2, 0):
-            return quantum_measure(data[0])
+        """Устаревший метод, теперь используется _quantum_operation."""
         return data
 
     def _apply_neural_ops(self, op, data):
-        if op == (40, 0, 0):
-            return self_attention(data[0], data[1], data[2])
-        elif op == (40, 1, 0):
-            return layer_normalization(data[0])
-        elif op == (40, 2, 0):
-            return multi_head_attention(data[0], num_heads=8)
+        """Устаревший метод, теперь операции в self.core."""
         return data
 
     def _next_coords(self):
@@ -270,14 +363,14 @@ class Veector:
         train_data = []
         for doc in results:
             result = doc["data"]
-            if isinstance(result, (int, float)):
-                data = np.array([float(result)] + [0] * (input_dim - 1))
-            elif isinstance(result, list) and all(isinstance(x, (int, float)) for x in result):
-                flat = np.array(result).flatten()
+            if isinstance(result, (int, float, complex)):
+                data = np.array([complex(result)] + [0] * (input_dim - 1), dtype=np.complex128)
+            elif isinstance(result, list) and all(isinstance(x, (int, float, complex)) for x in result):
+                flat = np.array(result, dtype=np.complex128).flatten()
                 data = np.pad(flat, (0, max(0, input_dim - len(flat))), mode='constant')[:input_dim]
             else:
-                data = np.array([0] * input_dim)
-            train_data.append(data)
+                data = np.array([0] * input_dim, dtype=np.complex128)
+            train_data.append(np.real(data))
 
         train_data = torch.tensor(train_data, dtype=torch.float32)
 
@@ -295,15 +388,15 @@ class Veector:
             return
 
         input_dim = self._get_max_input_dim()
-        if isinstance(result, (int, float, np.number)):
-            data = np.array([float(result)] + [0] * (input_dim - 1))
+        if isinstance(result, (int, float, complex, np.number)):
+            data = np.array([complex(result)] + [0] * (input_dim - 1), dtype=np.complex128)
         elif isinstance(result, np.ndarray):
             flat = result.flatten()
             data = np.pad(flat, (0, max(0, input_dim - len(flat))), mode='constant')[:input_dim]
         else:
-            data = np.array([0] * input_dim)
+            data = np.array([0] * input_dim, dtype=np.complex128)
 
-        tensor_data = torch.tensor(data, dtype=torch.float32)
+        tensor_data = torch.tensor(np.real(data), dtype=torch.float32)
         encoded, _ = self.neural_model(tensor_data)
         self.neural_embeddings[doc_id] = encoded.detach().numpy()
         print(f"Сохранено в нейросеть: {doc_id} -> {encoded.detach().numpy()[:5]}...")
@@ -356,51 +449,44 @@ class Veector:
 
     def _reason(self, x):
         print(f"Reason input: {x}")
-
-        # Проверка кэша
         if self.use_memory:
-            cached_result = self.memory.retrieve(x)
+            cached_result = self.use_memory.retrieve(x)
             if cached_result is not None:
                 print(f"Использована память для Reason: {x} -> {cached_result}")
                 return cached_result
         
-        # Оригинальная логика + обучение
-        if isinstance(x, (int, float, np.number)):
-            result = self._apply_rl_strategy(x)  # Новая: RL-логика
-            
+        if isinstance(x, (int, float, complex, np.number)):
+            result = self._apply_rl_strategy(x)
         elif isinstance(x, list):
-            result = self._evolve_program(x)  # Новая: эволюция программ
-            
+            result = self._evolve_program(x)
         elif isinstance(x, np.ndarray):
-            result = self._optimize_tensor(x)  # Новая: оптимизация тензоров
-            
+            result = self._optimize_tensor(x)
         else:
-            result = self.evolution.evolve(x)  # Существующая эволюция
+            result = self.evolution.evolve(x)
 
-        # Сохранение в кэш
         if self.use_memory:
-            self.memory.store(x, result, reward=self._calculate_reward(result, x))
+            self.use_memory.store(x, result, reward=self._calculate_reward(result, x))
         
         print(f"Reason result: {result}")
         return result
 
     def _apply_rl_strategy(self, x):
-        """Обучение с подкреплением для числовых данных."""
-        state = torch.tensor([x], dtype=torch.float32)
-        action_probs = self.rl_model(state)
-        action = torch.multinomial(action_probs, 1).item()
-        
-        if action == 0:
-            return np.log(x)
-        elif action == 1:
-            return x * 2
-        else:
-            return x  # Без изменений
+        """Обучение с подкреплением для числовых данных (заглушка)."""
+        return x
+
+    def _evolve_program(self, x):
+        """Эволюция программ (заглушка)."""
+        return x
+
+    def _optimize_tensor(self, x):
+        """Оптимизация тензоров (заглушка)."""
+        return x
 
     def _calculate_reward(self, result, input_data):
-        """Оценка качества результата."""
-        if isinstance(input_data, (int, float)):
-            return 1.0 if result > input_data else -1.0  # Пример для чисел
+        if isinstance(input_data, (int, float, complex)):
+            return 1.0 if np.abs(result) > np.abs(input_data) else -1.0
+        elif isinstance(input_data, np.ndarray):
+            return -np.mean(np.abs(result - input_data) ** 2)
         return 0.0
 
     def _dfs(self, graph, start):
@@ -440,46 +526,50 @@ class Veector:
         return x
 
     def _store_tensor_in_ipfs(self, tensor_data):
-        """Stores tensor data in IPFS and returns the hash."""
+        """Сохранение тензора в IPFS."""
+        if not self.ipfs_client:
+            return None
         try:
             res = self.ipfs_client.add(tensor_data.tobytes())
             return res['Hash']
         except Exception as e:
-            print(f"Error storing in IPFS: {e}")
+            print(f"Ошибка сохранения в IPFS: {e}")
             return None
 
-    def _load_tensor_from_ipfs(self, ipfs_hash, shape, dtype=np.float32):
-        """Loads tensor data from IPFS."""
+    def _load_tensor_from_ipfs(self, ipfs_hash, shape, dtype=np.complex128):
+        """Загрузка тензора из IPFS."""
+        if not self.ipfs_client:
+            return None
         try:
             data = self.ipfs_client.cat(ipfs_hash)
             return np.frombuffer(data, dtype=dtype).reshape(shape)
         except Exception as e:
-            print(f"Error loading from IPFS: {e}")
+            print(f"Ошибка загрузки из IPFS: {e}")
             return None
 
     def _save_model_metadata(self, model_name, ipfs_hash):
-        """Saves model metadata in veectordb."""
+        """Сохранение метаданных модели в veectordb."""
         model_metadata = {
             "name": model_name,
             "ipfs_hash": ipfs_hash,
-            "location": "ipfs",  # or "local"
+            "location": "ipfs",
             "timestamp": time.time()
         }
         self.db.insert_model(model_name, model_metadata)
-        print(f"Model metadata saved: {model_name} -> {ipfs_hash}")
+        print(f"Метаданные модели сохранены: {model_name} -> {ipfs_hash}")
 
     def load_model(self, model_name):
-        """Loads a model's metadata."""
+        """Загрузка метаданных модели."""
         model_metadata = self.db.get_model_metadata(model_name)
         if model_metadata:
             return model_metadata
         else:
-            print(f"Model {model_name} not found in database.")
+            print(f"Модель {model_name} не найдена в базе данных.")
             return None
 
     def save_tensor(self, tensor, tensor_id, use_ipfs=True):
-        """Saves tensor to IPFS and stores metadata in database."""
-        if use_ipfs:
+        """Сохранение тензора в IPFS или локально."""
+        if use_ipfs and self.ipfs_client:
             ipfs_hash = self._store_tensor_in_ipfs(tensor)
             if ipfs_hash:
                 tensor_metadata = {
@@ -491,13 +581,12 @@ class Veector:
                     "timestamp": time.time()
                 }
                 self.db.insert_tensor(tensor_id, tensor_metadata)
-                print(f"Tensor {tensor_id} saved to IPFS: {ipfs_hash}")
+                print(f"Тензор {tensor_id} сохранён в IPFS: {ipfs_hash}")
                 return ipfs_hash
             else:
-                print(f"Failed to save tensor {tensor_id} to IPFS.")
+                print(f"Не удалось сохранить тензор {tensor_id} в IPFS.")
                 return None
         else:
-            # Save tensor locally
             tensor_path = os.path.join(self.tensors_dir, f"{tensor_id}.npy")
             np.save(tensor_path, tensor)
             tensor_metadata = {
@@ -509,14 +598,14 @@ class Veector:
                 "timestamp": time.time()
             }
             self.db.insert_tensor(tensor_id, tensor_metadata)
-            print(f"Tensor {tensor_id} saved locally: {tensor_path}")
+            print(f"Тензор {tensor_id} сохранён локально: {tensor_path}")
             return tensor_path
 
     def load_tensor(self, tensor_id):
-        """Loads tensor from IPFS or local storage based on metadata."""
+        """Загрузка тензора из IPFS или локального хранилища."""
         tensor_metadata = self.db.get_tensor_metadata(tensor_id)
         if not tensor_metadata:
-            print(f"Tensor {tensor_id} not found in the database.")
+            print(f"Тензор {tensor_id} не найден в базе данных.")
             return None
 
         if tensor_metadata["location"] == "ipfs":
@@ -525,22 +614,22 @@ class Veector:
             dtype = np.dtype(tensor_metadata["dtype"])
             tensor_data = self._load_tensor_from_ipfs(ipfs_hash, shape, dtype)
             if tensor_data is not None:
-                print(f"Tensor {tensor_id} loaded from IPFS: {ipfs_hash}")
+                print(f"Тензор {tensor_id} загружен из IPFS: {ipfs_hash}")
                 return tensor_data
             else:
-                print(f"Failed to load tensor {tensor_id} from IPFS.")
+                print(f"Не удалось загрузить тензор {tensor_id} из IPFS.")
                 return None
         elif tensor_metadata["location"] == "local":
             tensor_path = tensor_metadata["path"]
             try:
                 tensor_data = np.load(tensor_path)
-                print(f"Tensor {tensor_id} loaded locally: {tensor_path}")
+                print(f"Тензор {tensor_id} загружен локально: {tensor_path}")
                 return tensor_data
             except Exception as e:
-                print(f"Error loading tensor from local file: {e}")
+                print(f"Ошибка загрузки тензора из локального файла: {e}")
                 return None
         else:
-            print(f"Unknown tensor location: {tensor_metadata['location']}")
+            print(f"Неизвестное местоположение тензора: {tensor_metadata['location']}")
             return None
 
     def compute(self, tensor):
@@ -584,28 +673,22 @@ class Veector:
             result = op_func(data[0], *opts)
         else:
             if isinstance(data, list) and tuple(op) not in [(2, 1, 0), (2, 1, 1), (2, 2, 0), (2, 2, 1)]:
-                data = np.array(data)
+                data = np.array(data, dtype=np.complex128)
             if self.dropout_rate > 0 and op != [59, 0, 0]:
                 data = self._dropout(data)
 
             result = op_func(data)
 
         tensor_id = f"tensor_result_{time.time()}_{random.randint(1000, 9999)}"
-        self.save_tensor(result, tensor_id, use_ipfs=True)
+        self.save_tensor(result, tensor_id, use_ipfs=self.ipfs_client is not None)
         metadata = {"tensor": tensor, "coords": (data_layer, data_coords), "tensor_id": tensor_id}
-
-        if op[0] >= 1000 and op[0] < 2000:
-            return self._apply_quantum_ops(op, data)
-
-        # Нейросетевые операции
-        elif op[0] >= 7000 and op[0] < 8000:
-            return self._apply_neural_ops(op, data)
 
         if self.use_neural_storage and self.neural_model:
             self._store_in_neural(result, tensor_id)
 
         if self.p2p_node:
-            self.p2p_node.sync_tensor(result, metadata)
+            sync_data = np.abs(result) if np.iscomplexobj(result) else result
+            self.p2p_node.sync_tensor(sync_data, metadata)
 
         self.space[(tuple(data_layer), tuple(data_coords))] = tensor_id
 
@@ -626,7 +709,7 @@ class Veector:
     def add_to_space(self, tensor):
         layer, coords = tensor[0][0], tuple(tensor[0][1])
         tensor_id = f"tensor_{time.time()}_{random.randint(1000, 9999)}"
-        self.save_tensor(tensor, tensor_id, use_ipfs=True)
+        self.save_tensor(tensor[0][2], tensor_id, use_ipfs=self.ipfs_client is not None)
         self.space[(tuple(layer), coords)] = tensor_id
 
     def evolve_tensor(self, tensor):
@@ -644,8 +727,18 @@ class Veector:
     def execute_program(self, program_tensors, input_data=None):
         return self.model_manager.execute_program(program_tensors, input_data)
 
+if __name__ == "__main__":
+    # Пример использования
+    p2p_node = P2PNode("localhost", 5000, use_ipfs=True)
+    p2p_node.start()
+    veector = Veector(p2p_node=p2p_node, use_memory=True)
+    
+    # Тест квантовой операции (Hadamard)
+    tensor = create_tensor([0], [0, 0, 0], [1, 0], 2, op=[50, 0, 0])
+    result = veector.compute(tensor)
+    print(f"Результат квантовой операции Hadamard: {result}")
 
-===== Код из файла: evolution.py =====
+===== Код из файла: /workspaces/Veector/src/evolution.py =====
 
 class Evolution:
     def __init__(self, veector):
@@ -726,7 +819,7 @@ class Evolution:
         self.evolution_strategy = strategy
 
 
-===== Код из файла: federated_learning.py =====
+===== Код из файла: /workspaces/Veector/src/federated_learning.py =====
 
 def local_fine_tuning(user_data):
     # Загрузка только необходимых блоков
@@ -750,7 +843,7 @@ def sync_updates(new_hash):
     client.add(encrypted)
     p2p.broadcast(encrypted)
 
-===== Код из файла: file_transfer.py =====
+===== Код из файла: /workspaces/Veector/src/file_transfer.py =====
 
 # src/file_transfer.py
 import socket
@@ -1015,7 +1108,7 @@ if __name__ == "__main__":
     print("Закомментируйте или раскомментируйте нужные строки для запуска в нужном режиме.")
 
 
-===== Код из файла: interface.py =====
+===== Код из файла: /workspaces/Veector/src/interface.py =====
 
 # src/interface.py
 import numpy as np
@@ -1113,150 +1206,104 @@ def human_readable(tensor):
     return f"Layer: {layer}, Coords: {coords}, Data: {data}, Op: {op}, Next: {next_coords}"
 
 
-===== Код из файла: main.py =====
+===== Код из файла: /workspaces/Veector/src/main.py =====
 
+# src/main_test.py
 from core import Veector
 from model_manager import ModelManager
-from sync import P2PNode
 import numpy as np
 
-p2p_node = P2PNode(host="localhost", port=5000, use_ipfs=True)
-veector = Veector(db_path="vectordb.json", p2p_node=p2p_node)
-veector.model_manager = ModelManager(veector, ipfs_enabled=True, p2p_node=p2p_node)
-
-p2p_node.start()
-
-veector.model_manager.load_pre_split_model("deepseek-coder-1.3b", tensor_dir="../data/deepseek-ai/deepseek-coder-1.3b-base/")
-
-prompt = "Сложи два числа и выведи результат"
-program_tensors = veector.generate_program_tensor(prompt)
-print("Сгенерирована программа:", [t[1][2] for t in program_tensors])
-
-input_data = np.array([5, 3])
-result = veector.execute_program(program_tensors, input_data)
-print("Результат:", result)
-
-hashes = veector.share_program(program_tensors)
-print("Хэши IPFS:", hashes)
-
-feedback = {"input": np.array([5, 3]), "target": np.array([8])}
-improved_program = veector.improve_program(program_tensors, feedback)
-print("Улучшенная программа:", [t[1][2] for t in improved_program])
-
-===== Код из файла: main2.py =====
-
-from core import Veector
-from model_manager import ModelManager
-from sync import P2PNode
-import numpy as np
-
-p2p_node = P2PNode(host="localhost", port=5000, use_ipfs=True)
-veector = Veector(db_path="vectordb.json", p2p_node=p2p_node)
-veector.model_manager = ModelManager(veector, ipfs_enabled=True)
-
-p2p_node.start()
+# Инициализация системы
+veector = Veector(use_memory=False, ipfs_enabled=False)  # Отключаем IPFS и память
+model_manager = ModelManager(veector, ipfs_enabled=False)  # Отключаем IPFS
+veector.model_manager = model_manager
 
 # Загружаем модель из локальной папки с тензорами
-veector.model_manager.load_pre_split_model("deepseek-coder-1.3b", tensor_dir="../data/deepseek-ai/deepseek-coder-1.3b-base/")
+model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
+tensor_dir = "../data/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
 
-prompt = "Сложи два числа и выведи результат"
-program_tensors = veector.generate_program_tensor(prompt)
-print("Сгенерирована программа:", [t[1][2] for t in program_tensors])
+try:
+    veector.model_manager.load_pre_split_model(model_name, tensor_dir)
+    print(f"Модель {model_name} успешно загружена.")
+except Exception as e:
+    print(f"Ошибка при загрузке модели: {e}")
+    exit(1)
 
-input_data = np.array([5, 3])
-result = veector.execute_program(program_tensors, input_data)
-print("Результат:", result)
+# Генерация входных данных
+vocab_size = 151936  # Размер словаря модели
+max_sequence_length = 512  # Максимальная длина последовательности
+batch_size = 1  # Размер батча
 
-hashes = veector.share_program(program_tensors)
-print("Хэши IPFS:", hashes)
+# Создаем случайные входные данные (токены)
+input_data = np.random.randint(0, vocab_size, (batch_size, max_sequence_length), dtype=np.int32)
 
-feedback = {"input": np.array([5, 3]), "target": np.array([8])}
-improved_program = veector.improve_program(program_tensors, feedback)
-print("Улучшенная программа:", [t[1][2] for t in improved_program])
+print(f"Сгенерированные входные данные: {input_data.shape}")
 
-===== Код из файла: memory.py =====
+# Выполнение инференса
+output = veector.model_manager.perform_inference(model_name, input_data)
 
+# Вывод результата
+print(f"Результат инференса: {output.shape}")
+
+===== Код из файла: /workspaces/Veector/src/memory.py =====
+
+# /workspaces/Veector/device/src/memory.py
 import hashlib
 import pickle
-import lru  # pip install lru-cache
+import numpy as np
+import time
+from collections import OrderedDict  # Для реализации LRU вручную
 
 class Memory:
     def __init__(self, capacity=1000, use_lru_cache=True, use_hashing=True):
-        """
-        Инициализация Memory.
-        :param capacity: Максимальное количество элементов в хранилище.
-        :param use_lru_cache: Использовать LRU-кэш для повышения производительности.
-        :param use_hashing: Использовать хеширование ключей для большей стабильности.
-        """
         self.use_lru_cache = use_lru_cache
         self.use_hashing = use_hashing
         self.capacity = capacity
         
         if use_lru_cache:
-            self.storage = lru.LRU(capacity) # Использовать LRU кэш
+            self.storage = OrderedDict()  # Используем OrderedDict для LRU
         else:
             self.storage = {}
 
     def _hash_key(self, key):
-        """
-        Генерирует хеш-сумму для ключа.
-        """
-        if isinstance(key, (tuple, list)):  # Преобразуем в кортеж
+        if isinstance(key, (tuple, list)):
             key = tuple(key)
-        if isinstance(key, np.ndarray):  # Преобразуем NumPy array в bytes
+        if isinstance(key, np.ndarray):
             key = key.tobytes()
-        return hashlib.sha256(pickle.dumps(key)).hexdigest() # Hash serialized bytes
+        return hashlib.sha256(pickle.dumps(key)).hexdigest()
 
     def store(self, key, value):
-        """
-        Сохраняет значение в хранилище.
-        :param key: Ключ для сохранения.
-        :param value: Значение для сохранения.
-        """
         if self.use_hashing:
             key = self._hash_key(key)
-        if not self.use_lru_cache and len(self.storage) >= self.capacity:
-             self._evict_oldest()
-
+        if self.use_lru_cache and len(self.storage) >= self.capacity:
+            self.storage.popitem(last=False)  # Удаляем самый старый элемент
+        elif not self.use_lru_cache and len(self.storage) >= self.capacity:
+            self._evict_oldest()
         self.storage[key] = value
+        if self.use_lru_cache:
+            self.storage.move_to_end(key)  # Перемещаем в конец для LRU
 
     def retrieve(self, key):
-        """
-        Извлекает значение из хранилища.
-        :param key: Ключ для извлечения.
-        :return: Значение или None, если ключ не найден.
-        """
         if self.use_hashing:
             key = self._hash_key(key)
-        return self.storage.get(key)
+        if key in self.storage:
+            if self.use_lru_cache:
+                self.storage.move_to_end(key)  # Обновляем порядок для LRU
+            return self.storage[key]
+        return None
     
     def _evict_oldest(self):
-        """
-        Удаляет самый старый элемент из хранилища.
-        """
         if self.storage:
-            oldest_key = next(iter(self.storage))  # Получаем ключ первого элемента
+            oldest_key = next(iter(self.storage))
             del self.storage[oldest_key]
 
     def clear(self):
-        """
-        Очищает хранилище.
-        """
         self.storage.clear()
 
     def __len__(self):
-        """
-        Возвращает количество элементов в хранилище.
-        :return: Количество элементов.
-        """
         return len(self.storage)
 
     def __contains__(self, key):
-        """
-        Проверяет наличие ключа в хранилище.
-        :param key: Ключ для проверки.
-        :return: True, если ключ есть в хранилище, иначе False.
-        """
         if self.use_hashing:
             key = self._hash_key(key)
         return key in self.storage
@@ -1265,7 +1312,7 @@ class MemoryManager:
     def __init__(self, max_size=512):
         self.cache = {}
         self.access_times = {}
-        self.max_size = max_size  # Максимальный размер кэша в МБ
+        self.max_size = max_size
     
     def add_block(self, block_name, block):
         if self._get_size() + block_size(block) > self.max_size:
@@ -1278,149 +1325,192 @@ class MemoryManager:
         del self.cache[oldest_block]
         del self.access_times[oldest_block]
 
+    def _get_size(self):
+        return sum([block.nbytes / (1024 * 1024) if isinstance(block, np.ndarray) else 0 for block in self.cache.values()])
 
-===== Код из файла: model_manager.py =====
+def block_size(block):
+    return block.nbytes / (1024 * 1024) if isinstance(block, np.ndarray) else 0
 
+===== Код из файла: /workspaces/Veector/src/model_manager.py =====
+
+# /workspaces/Veector/device/src/model_manager.py
 import os
 import torch
 import torch.nn.functional as F
 import numpy as np
 from ipfshttpclient import connect
 from pathlib import Path
-from src.virtual_space import VirtualSpace
-from src.tensors import create_tensor
-from src.sync import IPFSSync
+from virtual_space import VirtualSpace
+from tensors import create_tensor
+from sync import P2PNode
+from qiskit import QuantumCircuit
+from utils import parse_block_name
 
 class ModelManager:
-    def __init__(self, veector, block_size=(512, 512), ipfs_enabled=True, model_dir="data/models"):
+    def __init__(self, veector, block_size=(1024, 1024), ipfs_enabled=True, model_dir="../data/models"):
         """
-        Менеджер моделей для работы с блочно-матричной архитектурой
-        :param veector: Экземпляр ядра Veector
-        :param block_size: Размер блока матрицы (высота, ширина)
-        :param ipfs_enabled: Включить IPFS-хранилище
-        :param model_dir: Директория для локальных данных
+        Менеджер моделей для работы с блочно-матричной архитектурой и квантовыми цепями.
+        :param veector: Экземпляр ядра Veector.
+        :param block_size: Размер блока матрицы (высота, ширина).
+        :param ipfs_enabled: Включить IPFS-хранилище.
+        :param model_dir: Директория для локальных данных.
         """
         self.veector = veector
         self.block_size = block_size
         self.ipfs_enabled = ipfs_enabled
         self.model_dir = Path(model_dir)
         self.model_dir.mkdir(parents=True, exist_ok=True)
-        self.model_space = {}  # { (model_name, layer, block_coords): tensor_info }
-        self.tensor_metadata = {}  # Новое: Хранение расширенных метаданных
-        self.ipfs_sync = IPFSSync() if ipfs_enabled else None
-        self.virtual_space = VirtualSpace(veector)
+        self.model_space = {}
+        self.tensor_metadata = {}
+        self.quantum_circuits = {}
+        self.p2p_node = veector.p2p_node if ipfs_enabled and veector.p2p_node else None
+        self.virtual_space = VirtualSpace(veector, use_ipfs=ipfs_enabled)
+
+    def load_model(self, model_name, blocks_dir="../data/blocks"):
+        config = load_config(model_name)
+        vocab_size = config["vocab_size"]
+        hidden_size = config["hidden_size"]
+        num_layers = config["num_layers"]
+
+        self.load_blocks_model_into_matrix(model_name, blocks_dir)
+        loader = MatrixLoader(self.virtual_matrix)
+        self.matrix_models[model_name] = MatrixModel(
+            loader,
+            vocab_size=vocab_size,
+            hidden_size=hidden_size,
+            num_layers=num_layers
+        )
+        self.switch_model(model_name)
+        print(f"Модель {model_name} загружена с параметрами: vocab_size={vocab_size}, hidden_size={hidden_size}, num_layers={num_layers}")
 
     def load_pre_split_model(self, model_name, tensor_dir):
         """
-        Загрузка предварительно разбитой модели
-        :param model_name: Название модели
-        :param tensor_dir: Путь к директории с блоками тензоров
+        Загрузка предварительно разбитой модели.
+        :param model_name: Название модели.
+        :param tensor_dir: Путь к директории с блоками тензоров.
         """
         tensor_dir = Path(tensor_dir)
-        for file_path in tensor_dir.glob("*.pt"):
-            layer_idx, coords = self._parse_tensor_filename(file_path)
-            tensor = torch.load(file_path, weights_only=True)
-            self._store_tensor_block(model_name, layer_idx, coords, tensor)
-
-    def _parse_tensor_filename(self, file_path):
-        """Парсинг координат из имени файла (например: layer_0_block_0_0.pt)"""
-        parts = file_path.stem.split('_')
-        layer = int(parts[1])
-        coords = tuple(map(int, parts[3:]))
-        return layer, coords
-
-    def _store_tensor_block(self, model_name, layer_idx, coords, tensor):
-        """Сохранение блока тензора в виртуальной матрице"""
-        # Разделение на подблоки если размер не совпадает
-        for i in range(0, tensor.shape[0], self.block_size[0]):
-            for j in range(0, tensor.shape[1], self.block_size[1]):
-                block = tensor[i:i+self.block_size[0], j:j+self.block_size[1]]
-                block_coords = (i, j)
-                self._save_block(model_name, layer_idx, block_coords, block)
-
-    def _save_block(self, model_name, layer_idx, coords, block):
-        """Сохранение отдельного блока в model_space и IPFS"""
-        tensor_name = f"{model_name}_layer{layer_idx}_coords{coords}"
-        tensor_id = self.ipfs_sync.store_block(block) if self.ipfs_enabled else None
         
-        # Сохранение расширенных метаданных
-        self.tensor_metadata[(model_name, layer_idx, coords)] = {
-            "role": self._infer_tensor_role(tensor_name),
-            "dependencies": self._infer_dependencies(tensor_name, layer_idx),
-            "shape": block.shape,
-            "tensor_id": tensor_id
-        }
+        # Словарь для хранения блоков
+        blocks = {}
         
-        self.model_space[(model_name, layer_idx, coords)] = {
-            "tensor_id": tensor_id,
-            "shape": block.shape,
-            "data": block.numpy()
-        }
-
-    def _infer_tensor_role(self, tensor_name):
-        if "self_attn" in tensor_name or "attn" in tensor_name:
-            return "attention_weights"
-        elif "layer_norm" in tensor_name or "ln" in tensor_name:
-            return "layer_normalization"
-        elif "mlp" in tensor_name or "dense" in tensor_name:
-            return "feed_forward"
-        else:
-            return "unknown"
+        # Проходим по всем файлам блоков
+        for block_file in tensor_dir.glob(f"{model_name}_row*_col*.pt"):
+            try:
+                # Разбираем имя файла
+                parsed = parse_block_name(block_file.name)
+                if parsed["model_name"] != model_name:
+                    raise ValueError(f"Некорректное название модели в файле: {block_file.name}")
+                
+                coords = (parsed["row"], parsed["col"])
+                
+                # Загружаем блок
+                block = torch.load(block_file, map_location="cpu", weights_only=True)
+                
+                # Сохраняем информацию о блоке
+                block_hash = self.p2p_node.block_map.get(model_name, {}).get(coords) if self.ipfs_enabled else None
+                blocks[coords] = {"path": str(block_file), "hash": block_hash, "shape": block.shape}
+            except Exception as e:
+                print(f"Ошибка при обработке файла {block_file.name}: {e}")
+                continue
         
-    def _infer_dependencies(self, tensor_name, layer_idx):
-        dependencies = []
-        if "self_attn" in tensor_name or "attn" in tensor_name:
-            dependencies.append((layer_idx, "layer_norm"))
-        # Добавьте другие зависимости по мере необходимости
-        return dependencies
-    
+        if not blocks:
+            raise ValueError(f"Не найдено блоков для {model_name} в {tensor_dir}")
+        
+        # Проверяем размеры блоков
+        block_shapes = {info["shape"] for info in blocks.values()}
+        if len(block_shapes) > 1:
+            raise ValueError(f"Блоки модели {model_name} имеют разные размеры: {block_shapes}")
+        
+        # Загружаем блоки в матрицу
+        self.virtual_space.virtual_matrix.matrices[model_name] = {"blocks": blocks}
+        self.virtual_space.switch_model(model_name)
+        
+        # Синхронизируем блоки через IPFS, если включено
+        if self.ipfs_enabled and self.p2p_node:
+            self.p2p_node.sync_model_blocks(model_name, tensor_dir)
+        
+        # Определяем параметры модели из первого блока
+        first_block = None
+        for coords, block_info in blocks.items():
+            if not first_block:
+                block_path = block_info["path"]
+                first_block = torch.load(block_path, map_location="cpu")
+            
+            key = (model_name, 0, coords)
+            self.model_space[key] = {
+                "tensor_id": block_info["hash"],
+                "shape": block_info["shape"],
+                "data": None
+            }
+            self.tensor_metadata[key] = {
+                "role": "flat_model_block",
+                "dependencies": [],
+                "shape": block_info["shape"],
+                "tensor_id": block_info["hash"]
+            }
+        
+        if not first_block:
+            raise ValueError(f"Не удалось загрузить блоки для модели {model_name}")
+        
+        # Определяем vocab_size и hidden_size из первого блока
+        vocab_size, hidden_size = first_block.shape
+        
+        # Создаём модель с динамическими параметрами
+        loader = MatrixLoader(self.virtual_space.virtual_matrix)
+        self.virtual_space.matrix_models[model_name] = MatrixModel(
+            loader,
+            vocab_size=vocab_size,
+            hidden_size=hidden_size,
+            num_layers=len(blocks)
+        )
+        self.virtual_space.switch_model(model_name)
+        
+        print(f"Модель {model_name} загружена из {tensor_dir} с {len(self.model_space)} блоками")
     def get_block(self, model_name, layer_idx, coords):
-        """Получение блока из кэша/IPFS"""
         key = (model_name, layer_idx, coords)
-        if key not in self.model_space and self.ipfs_enabled:
-            self._load_block_from_ipfs(key)
-        return torch.from_numpy(self.model_space[key]["data"])
+        if key not in self.model_space:
+            raise ValueError(f"Блок {key} не найден в model_space")
 
-    def _load_block_from_ipfs(self, key):
-        """Загрузка блока из IPFS при отсутствии в кэше"""
-        model_name, layer_idx, coords = key
-        metadata = self.tensor_metadata.get(key, {})
-        tensor_id = metadata.get("tensor_id")
-        
-        if not tensor_id:
-            raise ValueError(f"Tensor ID not found for key: {key}")
-        
-        block_data = self.ipfs_sync.load_block(tensor_id)
-        self.model_space[key] = {
-            "data": block_data,
-            "tensor_id": tensor_id
-        }
+        if self.model_space[key]["data"] is None:
+            tensor_id = self.model_space[key]["tensor_id"]
+            if self.ipfs_enabled and self.p2p_node and tensor_id:
+                block = self.p2p_node._load_from_ipfs(tensor_id, self.block_size, dtype="float16")
+                self.model_space[key]["data"] = block.numpy() if block is not None else None
+            else:
+                block = self.virtual_space.virtual_matrix.load_block(model_name, coords)
+                self.model_space[key]["data"] = block.numpy() if block is not None else None
+
+        data = self.model_space[key]["data"]
+        return torch.from_numpy(data) if data is not None else None
+
+    def select_model(self, input_data):
+        complexity = self._estimate_complexity(input_data)  # Оценка сложности
+        if complexity < 0.5:
+            return "small_specialized_model"
+        else:
+            return "large_general_model"
 
     def perform_inference(self, model_name, input_data):
-        input_tensor = torch.from_numpy(input_data).float()
-        hidden_states = input_tensor
-        
-        for layer in range(self.get_num_layers(model_name)):
-            # Добавлена обработка зависимостей
-            dependencies = self._get_layer_dependencies(model_name, layer)
-            for dep in dependencies:
-                self.get_block(model_name, *dep)
-            
-            attn_blocks = self._get_attention_blocks(model_name, layer)
-            hidden_states = self._apply_attention(hidden_states, attn_blocks)
-            
-            mlp_blocks = self._get_mlp_blocks(model_name, layer)
-            hidden_states = self._apply_mlp(hidden_states, mlp_blocks)
-        
-        return self._apply_final_layer(model_name, hidden_states)
-
-    def _get_layer_dependencies(self, model_name, layer_idx):
-        dependencies = []
-        for key in self.tensor_metadata:
-            m_name, l_idx, coords = key
-            if m_name == model_name and l_idx == layer_idx:
-                dependencies.extend(self.tensor_metadata[key]["dependencies"])
-        return list(set(dependencies))
+        if model_name not in self.virtual_space.matrix_models:
+            raise ValueError(f"Модель {model_name} не загружена")
+        self.virtual_space.switch_model(model_name)  # Переключаемся на нужную модель
+        input_tensor = (
+            torch.from_numpy(input_data).long() 
+            if input_data.dtype in (np.int64, np.int32) 
+            else torch.from_numpy(input_data).float()
+        )
+        output = self.virtual_space.perform_inference(input_tensor)
+        return output.cpu().numpy()
+    
+    def collaborative_inference(self, input_ids, model_names):
+        for model_name in model_names:
+            result = self.perform_inference(input_ids, model_name=model_name)
+            if result is not None:
+                print(f"Ответ получен от модели {model_name}")
+                return result
+        print("Ни одна модель не смогла дать ответ.")
+        return None
 
     def update_parameters(self, model_name, learning_rate=1e-4):
         for key in self.model_space:
@@ -1428,54 +1518,18 @@ class ModelManager:
             if m_name != model_name:
                 continue
             tensor_info = self.model_space[key]
-            grad = getattr(tensor_info.get("data"), "grad", None)
-            if grad is not None:
-                updated_data = tensor_info["data"] - learning_rate * grad
-                self.model_space[key]["data"] = updated_data
-                if self.ipfs_enabled:
-                    self.ipfs_sync.update_block(key, updated_data)
-
-    def _apply_attention(self, x, attn_blocks):
-        """Применение attention-слоев"""
-        q, k, v, o = attn_blocks
-        attn_output = F.scaled_dot_product_attention(q, k, v)
-        return F.linear(attn_output, o) + x  # Скип-коннекшн
-
-    def _apply_mlp(self, x, mlp_blocks):
-        """Применение MLP-слоев"""
-        gate, up, down = mlp_blocks
-        return F.linear(F.silu(gate(x)) * up(x), down) + x  # SwiGLU
-
-    def _get_attention_blocks(self, model_name, layer):
-        """Получение attention-блоков для слоя"""
-        return [
-            self.get_block(model_name, layer, (0, 0)),  # Q
-            self.get_block(model_name, layer, (0, 1)),  # K
-            self.get_block(model_name, layer, (0, 2)),  # V
-            self.get_block(model_name, layer, (0, 3))   # O
-        ]
-
-    def _get_mlp_blocks(self, model_name, layer):
-        """Получение MLP-блоков для слоя"""
-        return [
-            self.get_block(model_name, layer, (1, 0)),  # Gate
-            self.get_block(model_name, layer, (1, 1)),  # Up
-            self.get_block(model_name, layer, (1, 2))   # Down
-        ]
-
-    def update_parameters(self, model_name, learning_rate=1e-4):
-        """Обновление параметров после обратного распространения"""
-        for key in self.model_space:
-            m_name, layer, coords = key
-            if m_name != model_name:
-                continue
-            tensor_info = self.model_space[key]
-            grad = tensor_info.get("grad")
-            if grad is not None:
-                updated_data = tensor_info["data"] - learning_rate * grad
-                self.model_space[key]["data"] = updated_data
-                if self.ipfs_enabled:
-                    self.ipfs_sync.update_block(key, updated_data)
+            if tensor_info["data"] is None:
+                self.get_block(model_name, layer, coords)
+            data_tensor = torch.from_numpy(tensor_info["data"])
+            if data_tensor.requires_grad and data_tensor.grad is not None:
+                updated_data = data_tensor - learning_rate * data_tensor.grad
+                tensor_info["data"] = updated_data.detach().numpy()
+                if self.ipfs_enabled and self.p2p_node:
+                    self.p2p_node.sync_tensor(updated_data, {
+                        "tensor_id": tensor_info["tensor_id"],
+                        "model_name": model_name,
+                        "coords": coords
+                    })
 
     def save_model(self, model_name, output_dir):
         output_dir = Path(output_dir)
@@ -1484,23 +1538,150 @@ class ModelManager:
             m_name, layer, coords = key
             if m_name != model_name:
                 continue
-            tensor = self.model_space[key]["data"]
-            filename = f"layer_{layer}_block_{coords[0]}_{coords[1]}.pt"
+            if self.model_space[key]["data"] is None:
+                self.get_block(model_name, layer, coords)
+            tensor = torch.from_numpy(self.model_space[key]["data"])
+            filename = f"{model_name}_layer_{layer}_block_{coords[0]}_{coords[1]}.pt"
             torch.save(tensor, output_dir / filename)
+        print(f"Модель {model_name} сохранена в {output_dir}")
 
     def get_num_layers(self, model_name):
-        layers = set()
-        for key in self.model_space:
-            m_name, layer, _ = key
-            if m_name == model_name:
-                layers.add(layer)
-        return max(layers) + 1 if layers else 0
+        return 1 if any(m_name == model_name for m_name, _, _ in self.model_space) else 0
 
-===== Код из файла: operations.py =====
+    def add_quantum_circuit(self, model_name, circuit):
+        if not isinstance(circuit, QuantumCircuit):
+            raise ValueError("circuit должен быть объектом QuantumCircuit")
+        self.quantum_circuits[model_name] = circuit
+        print(f"Квантовая цепь добавлена для модели {model_name}")
+
+    def execute_quantum_circuit(self, model_name, input_state=None):
+        if model_name not in self.quantum_circuits:
+            raise ValueError(f"Квантовая цепь для {model_name} не найдена")
+        
+        from qiskit import execute  # Ленивый импорт для Qiskit
+        from qiskit.providers.aer import Aer
+        circuit = self.quantum_circuits[model_name]
+        num_qubits = circuit.num_qubits
+
+        if input_state is not None:
+            input_state = np.array(input_state, dtype=np.complex128)
+            if input_state.size != 2 ** num_qubits:
+                raise ValueError(f"Размер входного состояния {input_state.size} не соответствует {2 ** num_qubits}")
+            circuit.initialize(input_state / np.linalg.norm(input_state), range(num_qubits))
+
+        simulator = Aer.get_backend('statevector_simulator')
+        job = execute(circuit, simulator)
+        result = job.result().get_statevector()
+        return np.array(result, dtype=np.complex128)
+
+    def generate_program_tensor(self, prompt, max_steps=5):
+        # Преобразуем строку в числовой формат
+        encoded_prompt = [ord(char) for char in prompt]  # Преобразуем каждый символ в ASCII код
+        
+        return create_tensor(
+            layer=[0],
+            coords=[0, 0, 0],
+            data=encoded_prompt,  # Используем числовое представление
+            length=len(encoded_prompt),
+            op=[8, 0, 0],  # Операция вывода
+            metadata={
+                "prompt": prompt,
+                "steps": max_steps,
+                "type": "program"
+            }
+        )
+
+    def share_program(self, program_tensors):
+        if not self.ipfs_enabled or not self.p2p_node:
+            print("P2PNode не доступен для совместного использования")
+            return None
+        # Собираем только числовые данные
+        program_data = np.array([t[0][2] for t in program_tensors], dtype=int)
+        tensor_id = f"program_{int(time.time())}"
+        return self.p2p_node.sync_tensor(program_data, {"tensor_id": tensor_id, "type": "program"})
+
+    def improve_program(self, program_tensors, feedback_data, iterations=3):
+        """
+        Улучшает программу на основе обратной связи.
+        :param program_tensors: Список тензоров программы
+        :param feedback_data: Словарь с входными данными и целевыми значениями
+        :param iterations: Количество итераций улучшения
+        """
+        print(f"Начинаем улучшение программы за {iterations} итераций")
+        
+        # Извлекаем данные из feedback_data
+        input_data = feedback_data.get("input")
+        target_data = feedback_data.get("target")
+        
+        if input_data is None or target_data is None:
+            print("Недостаточные данные для улучшения программы")
+            return program_tensors
+        
+        for i in range(iterations):
+            print(f"Итерация улучшения {i+1}/{iterations}")
+            
+            # Выполняем текущую программу
+            output = self.execute_program(program_tensors, input_data)
+            
+            # Вычисляем ошибку
+            error = np.mean(np.abs(np.array(output) - target_data))
+            print(f"Текущая ошибка: {error}")
+            
+            # Простое правило обновления (заглушка)
+            for tensor in program_tensors:
+                data_layer, data_coords, data, data_length = tensor[0]
+                if isinstance(data, np.ndarray):
+                    # Очень простая форма обучения
+                    data -= 0.1 * (np.array(output) - target_data)
+                    tensor[0][2] = data  # Обновляем данные в тензоре
+                    
+        print("Улучшение программы завершено")
+        return program_tensors
+
+    def execute_program(self, program_tensors, input_data=None):
+        results = []
+        for tensor in program_tensors:
+            result = self.veector.compute(tensor)
+            results.append(result)
+        return results
+
+if __name__ == "__main__":
+    from src.core import Veector
+    from src.sync import P2PNode
+    import time
+
+    p2p_node = P2PNode("localhost", 5000, use_ipfs=True)
+    veector = Veector(p2p_node=p2p_node)
+    manager = ModelManager(veector)
+
+    manager.load_pre_split_model("DeepSeek-R1-Distill-Qwen-1.5B", "../data/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
+    vocab_size = 151936  # Размер словаря модели
+    max_sequence_length = 512  # Максимальная длина последовательности
+    batch_size = 1  # Размер батча
+
+    # Создаем случайные входные данные (токены)
+    input_data = np.random.randint(0, vocab_size, (batch_size, max_sequence_length), dtype=np.int32)
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", input_data)
+    print(f"Результат инференса: {output.shape}")
+
+    from qiskit import QuantumCircuit
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    manager.add_quantum_circuit("quantum_test", qc)
+    result = manager.execute_quantum_circuit("quantum_test", input_state=[1, 0, 0, 0])
+    print(f"Результат квантовой цепи: {result}")
+
+    program_tensor = manager.generate_program_tensor("Привет, мир!", max_steps=3)
+    manager.share_program([program_tensor])
+    result = manager.execute_program([program_tensor])
+    print(f"Результат программы: {result}")
+
+===== Код из файла: /workspaces/Veector/src/operations.py =====
 
 import numpy as np
 import scipy.linalg  # Для LU-разложения
-from scipy.signal import convolve2d  # Для улучшенной свертки
+from scipy.signal import convolve2d  # Для улучшенной свёртки
 
 def mod(x, y):
     """Возвращает остаток от деления x на y."""
@@ -1520,7 +1701,7 @@ def ceil(x):
         return None
     return np.ceil(x)
 
-### --- Расширенные тригонометрические функции ---
+# --- Расширенные тригонометрические функции ---
 def arcsin(x):
     """Возвращает арксинус (в радианах)."""
     if x is None:
@@ -1557,7 +1738,7 @@ def nor(x, y):
         return None
     return ~(x | y)
 
-### --- Дополнительные операции с матрицами ---
+# --- Дополнительные операции с матрицами ---
 def inverse(matrix):
     """Обратная матрица."""
     if matrix is None:
@@ -1573,7 +1754,7 @@ def trace(matrix):
         return None
     return np.trace(matrix)
 
-### --- Вероятностные функции и статистика ---
+# --- Вероятностные функции и статистика ---
 def random_uniform(min_val, max_val):
     """Генерирует случайное число с равномерным распределением."""
     return np.random.uniform(min_val, max_val)
@@ -1587,7 +1768,6 @@ def median(x):
     if x is None:
         return None
     return np.median(x)
-
 
 def matrix_multiply(a, b):
     """Умножение матриц (a @ b.T)."""
@@ -1632,13 +1812,13 @@ def matrix_lu_decomposition(a):
         return None
 
 def convolution(data, kernel):
-    """Улучшенная свертка с использованием SciPy."""
+    """Улучшенная свёртка с использованием SciPy."""
     if data is None or kernel is None:
         return None
     try:
         return convolve2d(data, kernel, mode='same', boundary='fill', fillvalue=0)
     except Exception as e:
-        print(f"Ошибка свертки: {e}")
+        print(f"Ошибка свёртки: {e}")
         return None
 
 def transpose(a):
@@ -1699,7 +1879,7 @@ def interpolate(data, new_length):
     return np.interp(new_indices, old_indices, data)
 
 def self_attention(inputs):
-    """Self-Attention механизм для трех входов [Q, K, V]."""
+    """Self-Attention механизм для трёх входов [Q, K, V]."""
     if len(inputs) != 3 or any(i is None for i in inputs):
         return None
     q, k, v = inputs
@@ -1731,38 +1911,30 @@ def multi_head_attention(inputs, num_heads=8):
         heads.append(head_output)
     return np.concatenate(heads, axis=-1)
 
-# Новые квантовые операции
+# Квантовые операции перенесены в core.py (Qiskit)
 def quantum_hadamard(qubit):
-    """Применяет гейт Адамара к кубиту (1 qubit)."""
-    if qubit is None or qubit.shape != (2,):
-        return None
-    hadamard = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
-    return np.dot(hadamard, qubit)
-
-
+    """Заглушка: реализация в core.py через Qiskit."""
+    return qubit
 
 def quantum_pauli_x(qubit):
-    """Применяет гейт Паули-X (NOT)."""
-    if qubit is None or qubit.shape != (2,):
-        return None
-    pauli_x = np.array([[0, 1], [1, 0]])
-    return np.dot(pauli_x, qubit)
+    """Заглушка: реализация в core.py через Qiskit."""
+    return qubit
 
 def quantum_cnot(control, target):
-    """Применяет CNOT-гейт к двум кубитам."""
-    if control is None or target is None or control.shape != (2,) or target.shape != (2,):
-        return None
-    cnot = np.array([[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]])
-    combined = np.kron(control, target)
-    return np.dot(cnot, combined).reshape(2,2)  # Возвращает состояние двух кубитов
+    """Заглушка: реализация в core.py через Qiskit."""
+    return [control, target]
 
 def quantum_measure(qubit_state):
-    """Измеряет кубит и возвращает коллапсированное состояние."""
-    if qubit_state is None or qubit_state.shape != (2,):
-        return None
-    probs = np.abs(qubit_state)**2
-    outcome = np.random.choice([0, 1], p=probs / np.sum(probs))
-    return np.array([1, 0]) if outcome == 0 else np.array([0, 1])
+    """Заглушка: реализация в core.py через Qiskit."""
+    return qubit_state
+
+def quantum_superposition(state):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return state
+
+def quantum_entanglement(qubit1, qubit2):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return [qubit1, qubit2]
 
 def batch_norm(x):
     """Batch Normalization."""
@@ -1772,22 +1944,6 @@ def batch_norm(x):
     std_x = np.std(x, axis=0)
     return (x - mean_x) / (std_x + 1e-5)
 
-### --- Квантовые операции ---
-def quantum_superposition(state):
-    """Создаёт суперпозицию кубита."""
-    if state is None or state.shape != (2,):
-        return None
-    hadamard = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
-    return np.dot(hadamard, state)
-
-def quantum_entanglement(qubit1, qubit2):
-    """Создаёт запутанное состояние для двух кубитов."""
-    if qubit1 is None or qubit2 is None or qubit1.shape != (2,) or qubit2.shape != (2,):
-        return None
-    bell_state = (np.kron(qubit1, qubit2) + np.kron(qubit2, qubit1)) / np.sqrt(2)
-    return bell_state
-
-# Функции для нейросетевых операций
 def leaky_relu(x, alpha=0.01):
     """Leaky ReLU."""
     if x is None:
@@ -1804,8 +1960,8 @@ def dropout(x, rate=0.5):
     """Dropout-регуляризация."""
     if x is None:
         return None
-    mask = np.random.binomial(1, rate, size=x.shape)
-    return x * mask
+    mask = np.random.binomial(1, 1 - rate, size=x.shape)  # Исправлено: 1 - rate для корректного dropout
+    return x * mask / (1 - rate)  # Масштабирование для сохранения ожидаемого значения
 
 def scaled_dot_product_attention(query, key, value, mask=None):
     """Scaled Dot-Product Attention с маскированием."""
@@ -1819,9 +1975,9 @@ def scaled_dot_product_attention(query, key, value, mask=None):
     return matrix_multiply(attention, value)
 
 def causal_mask(size):
-    """Создает causal mask для авторегрессивных моделей."""
+    """Создаёт causal mask для авторегрессивных моделей."""
     mask = np.triu(np.ones((1, size, size)), k=1)
-    return mask.astype(bool)
+    return 1 - mask.astype(bool)  # Исправлено: инверсия маски (1 для видимых, 0 для скрытых)
 
 def masked_fill(tensor, mask, value):
     """Заполняет тензор значениями по маске."""
@@ -1829,15 +1985,26 @@ def masked_fill(tensor, mask, value):
         return None
     return np.where(mask, value, tensor)
 
-===== Код из файла: sync.py =====
+if __name__ == "__main__":
+    # Пример использования
+    x = np.array([1, -2, 3, -4])
+    print(f"ReLU: {relu(x)}")
+    print(f"Sigmoid: {sigmoid(x)}")
+    print(f"Softmax: {softmax(x)}")
+    print(f"Dropout: {dropout(x, rate=0.5)}")
+
+===== Код из файла: /workspaces/Veector/src/sync.py =====
 
 import socket
 import threading
 from ipfshttpclient import connect
 import pickle
-import numpy as np  # Import numpy
+import numpy as np
+import torch
 import time
 import random
+from pathlib import Path
+from utils import parse_block_name
 
 class P2PNode:
     def __init__(self, host, port, use_ipfs=True):
@@ -1846,10 +2013,12 @@ class P2PNode:
         self.peers = []
         self.use_ipfs = use_ipfs
         self.ipfs_client = connect() if use_ipfs else None
-        self.known_tensors = set()  # Track known tensor IDs
+        self.known_tensors = set()  # Трекер известных тензоров
+        self.block_map = {}  # Хранит хэши IPFS для блоков модели: {model_name: {(row, col): ipfs_hash}}
 
     def start(self):
         server_thread = threading.Thread(target=self._start_server)
+        server_thread.daemon = True  # Завершается с главным процессом
         server_thread.start()
 
     def _start_server(self):
@@ -1859,25 +2028,26 @@ class P2PNode:
             while True:
                 conn, addr = s.accept()
                 peer_thread = threading.Thread(target=self._handle_peer, args=(conn, addr))
+                peer_thread.daemon = True
                 peer_thread.start()
 
     def _handle_peer(self, conn, addr):
         with conn:
             try:
-                data = conn.recv(4096)  # Increase buffer size
+                data = conn.recv(4096)
                 if data:
                     self._process_data(data)
             except Exception as e:
-                print(f"Error handling peer connection: {e}")
+                print(f"Ошибка обработки соединения с {addr}: {e}")
 
     def connect_to_peer(self, peer_host, peer_port):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.connect((peer_host, peer_port))
                 self.peers.append((peer_host, peer_port))
-                print(f"Connected to peer: {peer_host}:{peer_port}")
+                print(f"Подключён к узлу: {peer_host}:{peer_port}")
         except Exception as e:
-            print(f"Error connecting to peer {peer_host}:{peer_port}: {e}")
+            print(f"Ошибка подключения к {peer_host}:{peer_port}: {e}")
 
     def send_data(self, data):
         for peer in self.peers:
@@ -1886,116 +2056,151 @@ class P2PNode:
                     s.connect(peer)
                     serialized_data = pickle.dumps(data)
                     s.sendall(serialized_data)
-                print(f"Sent data to peer: {peer}")
+                print(f"Данные отправлены узлу: {peer}")
             except Exception as e:
-                print(f"Error sending data to peer {peer}: {e}")
+                print(f"Ошибка отправки данных узлу {peer}: {e}")
 
     def _process_data(self, data):
         try:
             received_data = pickle.loads(data)
-
             if isinstance(received_data, dict) and "tensor_id" in received_data:
                 tensor_id = received_data["tensor_id"]
                 metadata = received_data.get("metadata", {})
 
-                # Check if we already know about this tensor
                 if tensor_id not in self.known_tensors:
-                    self.known_tensors.add(tensor_id)  # Mark as known
+                    self.known_tensors.add(tensor_id)
 
-                    # Fetch tensor from IPFS if IPFS hash is available
                     if "ipfs_hash" in metadata:
                         ipfs_hash = metadata["ipfs_hash"]
                         shape = metadata.get("shape")
-                        dtype = metadata.get("dtype", np.float32)
+                        dtype = metadata.get("dtype", "float16")
+                        model_name = metadata.get("model_name")
+                        coords = metadata.get("coords")  # Координаты блока (row, col)
 
-                        if shape:
+                        if shape and model_name and coords:
                             tensor_data = self._load_from_ipfs(ipfs_hash, shape, dtype)
                             if tensor_data is not None:
-                                print(f"Received tensor from peer (IPFS): {tensor_data.shape}")
+                                print(f"Получен блок модели {model_name} {coords}: {tensor_data.shape}")
+                                if model_name not in self.block_map:
+                                    self.block_map[model_name] = {}
+                                self.block_map[model_name][coords] = ipfs_hash
                             else:
-                                print(f"Failed to load tensor {tensor_id} from IPFS.")
+                                print(f"Не удалось загрузить блок {tensor_id} из IPFS")
                         else:
-                            print(f"Shape information missing for tensor {tensor_id}.")
+                            print(f"Недостаточно метаданных для {tensor_id}")
                     else:
-                        print(f"Received tensor ID without IPFS hash: {tensor_id}")
+                        print(f"Получен tensor_id без IPFS-хэша: {tensor_id}")
                 else:
-                    print(f"Already know about tensor: {tensor_id}, skipping.")
+                    print(f"Тензор уже известен: {tensor_id}, пропускаем")
             else:
-                print(f"Received data: {received_data}")
+                print(f"Получены данные: {received_data}")
         except Exception as e:
-            print(f"Error processing data: {e}")
+            print(f"Ошибка обработки данных: {e}")
 
-    def store_in_ipfs(self, tensor_np):
-        """
-        Сохраняет тензор в IPFS.
-        :return: Хэш IPFS.
-        """
+    def store_in_ipfs(self, tensor):
+        """Сохранение тензора в IPFS."""
         if not self.use_ipfs:
             return None
         try:
-            ipfs_hash = self.ipfs_client.add_bytes(tensor_np.tobytes())
+            tensor_bytes = tensor.numpy().tobytes() if isinstance(tensor, torch.Tensor) else tensor.tobytes()
+            ipfs_hash = self.ipfs_client.add_bytes(tensor_bytes)
             return ipfs_hash
         except Exception as e:
-            print(f"Error storing data in IPFS: {e}")
+            print(f"Ошибка сохранения в IPFS: {e}")
             return None
 
-    def _load_from_ipfs(self, ipfs_hash, shape, dtype=np.float32):
-        """
-        Загружает тензор из IPFS.
-        :return: numpy массив.
-        """
+    def _load_from_ipfs(self, ipfs_hash, shape, dtype="float16"):
+        """Загрузка тензора из IPFS."""
         if not self.use_ipfs:
             return None
         try:
             tensor_data = self.ipfs_client.cat(ipfs_hash)
-            return np.frombuffer(tensor_data, dtype=dtype).reshape(shape)
+            np_dtype = np.dtype(dtype)
+            tensor_np = np.frombuffer(tensor_data, dtype=np_dtype).reshape(shape)
+            return torch.from_numpy(tensor_np)
         except Exception as e:
-            print(f"Error loading data from IPFS: {e}")
+            print(f"Ошибка загрузки из IPFS: {e}")
             return None
 
-    def sync_tensor(self, tensor_np, metadata):
-        """
-        Синхронизирует тензор с другими узлами.
-        :param tensor_np: Тензор для синхронизации.
-        :param metadata: Метаданные тензора.
-        """
+    def sync_tensor(self, tensor, metadata):
+        """Синхронизация тензора с другими узлами."""
         if self.use_ipfs:
-            ipfs_hash = self.store_in_ipfs(tensor_np)
+            ipfs_hash = self.store_in_ipfs(tensor)
             if ipfs_hash:
                 sync_data = {
-                    "tensor_id": metadata.get("tensor_id", "unknown"),
+                    "tensor_id": metadata.get("tensor_id", f"tensor_{random.randint(0, 10000)}"),
                     "metadata": {
                         "ipfs_hash": ipfs_hash,
-                        "shape": tensor_np.shape,
-                        "dtype": str(tensor_np.dtype),
+                        "shape": tensor.shape,
+                        "dtype": str(tensor.dtype),
                         **metadata
                     }
                 }
                 self.send_data(sync_data)
-                print(f"Synced tensor with peers (IPFS): {metadata.get('tensor_id', 'unknown')}")
+                print(f"Тензор синхронизирован с узлами (IPFS): {sync_data['tensor_id']}")
             else:
-                print("Failed to store tensor in IPFS, skipping sync.")
+                print("Не удалось сохранить тензор в IPFS, синхронизация отменена")
         else:
-            print("IPFS is disabled, skipping sync.")
+            print("IPFS отключён, синхронизация пропущена")
 
+    def sync_model_blocks(self, model_name, blocks_dir):
+            """Синхронизация блоков модели из директории."""
+            if not self.use_ipfs:
+                print("IPFS отключён, синхронизация блоков невозможна")
+                return
+            block_files = list(Path(blocks_dir).glob(f"{model_name}_row*_col*.pt"))
+            if not block_files:
+                print(f"Блоки для модели {model_name} не найдены в {blocks_dir}")
+                return
+            for block_file in block_files:
+                parsed = parse_block_name(block_file.name)  # Используем функцию разбора имени
+                coords = (parsed["row"], parsed["col"])
+                block = torch.load(block_file, map_location="cpu")
+                ipfs_hash = self.store_in_ipfs(block)
+                if ipfs_hash:
+                    if model_name not in self.block_map:
+                        self.block_map[model_name] = {}
+                    self.block_map[model_name][coords] = ipfs_hash
+                    sync_data = {
+                        "tensor_id": f"{model_name}_block_{coords[0]}_{coords[1]}",
+                        "metadata": {
+                            "ipfs_hash": ipfs_hash,
+                            "shape": block.shape,
+                            "dtype": str(block.dtype),
+                            "model_name": model_name,
+                            "coords": coords
+                        }
+                    }
+                    self.send_data(sync_data)
+                    print(f"Блок {block_file.name} синхронизирован: {ipfs_hash}")
+                else:
+                    print(f"Не удалось синхронизировать блок {block_file.name}")
+                del block
+                gc.collect()
 
+if __name__ == "__main__":
+    node = P2PNode("localhost", 5000, use_ipfs=True)
+    node.start()
+    node.connect_to_peer("localhost", 5001)
+    node.sync_model_blocks("DeepSeek-R1-Distill-Qwen-1.5B", "data/blocks")
 
-
-===== Код из файла: tensors.py =====
+===== Код из файла: /workspaces/Veector/src/tensors.py =====
 
 import numpy as np
+from datetime import datetime  # Для метаданных
 
 def create_tensor(layer, coords, data, length, op=[1, 0, 0], next_coords=[], metadata=None, version=1):
     """
-    Создает тензор с заданными параметрами и метаданными.
-    :param layer: Слой тензора.
-    :param coords: Координаты тензора.
-    :param data: Данные тензора.
-    :param length: Длина данных тензора.
-    :param op: Операция, применяемая к тензору.
-    :param next_coords: Координаты следующего тензора.
-    :param metadata: Дополнительные метаданные.
-    :param version: Версия тензора.
+    Создаёт тензор с заданными параметрами и метаданными, поддерживает комплексные числа.
+    :param layer: Слой тензора (список).
+    :param coords: Координаты тензора (список).
+    :param data: Данные тензора (число, список или массив, включая комплексные числа).
+    :param length: Длина данных тензора (число).
+    :param op: Операция, применяемая к тензору (список).
+    :param next_coords: Координаты следующего тензора (список).
+    :param metadata: Дополнительные метаданные (словарь или None).
+    :param version: Версия тензора (число).
+    :return: Список, представляющий тензор.
     """
     if not isinstance(layer, list) or not isinstance(coords, list) or not isinstance(op, list):
         raise ValueError("Слой, координаты и операция должны быть списками.")
@@ -2006,15 +2211,29 @@ def create_tensor(layer, coords, data, length, op=[1, 0, 0], next_coords=[], met
     if not isinstance(next_coords, list):
         raise TypeError("Координаты следующего тензора должны быть списком.")
 
+    # Преобразуем данные в np.array с поддержкой комплексных чисел
+    if isinstance(data, (list, np.ndarray)):
+        data = np.array(data, dtype=np.complex128)
+    elif isinstance(data, (int, float, complex)):
+        data = np.array([data], dtype=np.complex128)
+    else:
+        raise ValueError("Данные должны быть числом, списком или массивом.")
+
+    # Проверяем, что длина соответствует данным
+    if data.size != length:
+        raise ValueError(f"Указанная длина {length} не соответствует размеру данных {data.size}")
+
     return [
         [list(map(int, layer)), list(map(int, coords)), data, length],
         [[0], list(map(int, coords)), list(map(int, op)), 1],
-        [1, 0, 0],
-        [0, 1, 0],
+        [1, 0, 0],  # Контекст (по умолчанию)
+        [0, 1, 0],  # Версия (по умолчанию)
         next_coords,
         {
             "version": version,
             "created_at": str(datetime.now()),
+            "dtype": str(data.dtype),
+            "shape": data.shape,
             **(metadata or {})
         }
     ]
@@ -2031,14 +2250,20 @@ def validate_tensor(tensor):
         return False
     if not all(isinstance(t, list) for t in tensor[:2]):
         return False
+    if not isinstance(tensor[0][2], np.ndarray):  # Проверяем, что данные — это np.ndarray
+        return False
+    if not isinstance(tensor[0][3], (int, float)):  # Проверяем длину
+        return False
+    if len(tensor) > 5 and not isinstance(tensor[5], dict):  # Проверяем метаданные
+        return False
     return True
 
 def reshape_tensor(tensor, new_shape):
     """
-    Изменяет форму данных в тензоре.
+    Изменяет форму данных в тензоре с проверкой объёма.
     :param tensor: Тензор для изменения формы.
-    :param new_shape: Новая форма данных.
-    :return: Тензор с измененной формой данных.
+    :param new_shape: Новая форма данных (кортеж или список).
+    :return: Тензор с изменённой формой данных.
     """
     if not validate_tensor(tensor):
         raise ValueError("Невалидный тензор.")
@@ -2048,9 +2273,12 @@ def reshape_tensor(tensor, new_shape):
         raise ValueError("Данные тензора отсутствуют.")
 
     try:
-        data = np.array(data)
+        data = np.array(data, dtype=np.complex128)
+        if np.prod(new_shape) != data.size:
+            raise ValueError(f"Новая форма {new_shape} (объём {np.prod(new_shape)}) не соответствует объёму данных {data.size}")
         reshaped_data = data.reshape(new_shape)
-        tensor[0][2] = reshaped_data.tolist()
+        tensor[0][2] = reshaped_data
+        tensor[5]["shape"] = reshaped_data.shape  # Обновляем метаданные
         return tensor
     except Exception as e:
         raise ValueError(f"Не удалось изменить форму тензора: {e}")
@@ -2059,15 +2287,36 @@ def get_tensor_metadata(tensor):
     """
     Получает метаданные тензора.
     :param tensor: Тензор для получения метаданных.
-    :return: Метаданные тензора.
+    :return: Метаданные тензора (словарь).
     """
     if not validate_tensor(tensor):
         raise ValueError("Невалидный тензор.")
 
     return tensor[5] if len(tensor) > 5 else {}
 
+if __name__ == "__main__":
+    # Пример использования
+    # Создание тензора с комплексными числами
+    tensor = create_tensor(
+        layer=[0],
+        coords=[0, 0, 0],
+        data=[1 + 2j, 3 - 4j],
+        length=2,
+        op=[50, 0, 0],  # Квантовая операция Hadamard
+        metadata={"description": "Тестовый тензор"}
+    )
+    print(f"Созданный тензор: {tensor[0][2]}")
+    print(f"Метаданные: {get_tensor_metadata(tensor)}")
 
-===== Код из файла: test_imports.py =====
+    # Проверка валидации
+    print(f"Валидность тензора: {validate_tensor(tensor)}")
+
+    # Изменение формы
+    reshaped_tensor = reshape_tensor(tensor, (2, 1))
+    print(f"Тензор после изменения формы: {reshaped_tensor[0][2]}")
+    print(f"Обновлённые метаданные: {get_tensor_metadata(reshaped_tensor)}")
+
+===== Код из файла: /workspaces/Veector/src/test_imports.py =====
 
 print("1. Импорт numpy")
 import numpy as np
@@ -2082,7 +2331,7 @@ from model_manager import ModelManager
 print("Импорты завершены")
 
 
-===== Код из файла: tokenization.py =====
+===== Код из файла: /workspaces/Veector/src/tokenization.py =====
 
 class TokenizerWrapper:
     def __init__(self, model_path):
@@ -2096,7 +2345,7 @@ class TokenizerWrapper:
     def encode(self, text, **kwargs):
         return self.tokenizer(text, return_tensors="pt", **kwargs)
 
-===== Код из файла: veectordb.py =====
+===== Код из файла: /workspaces/Veector/src/veectordb.py =====
 
 import json
 import os
@@ -2106,7 +2355,7 @@ import numpy as np
 import uuid # Import the UUID module
 
 class VeectorDB:
-    def __init__(self, db_path="data/db/veectordb.json"):
+    def __init__(self, db_path="../data/db/veectordb.json"):
         self.db_path = db_path
         self.data = {}
         self.load_db()
@@ -2144,6 +2393,16 @@ class VeectorDB:
         """
         combined_data = str(data) + str(self.id_namespace)
         return hashlib.sha256(combined_data.encode()).hexdigest()
+
+    def insert_model(self, model_name, metadata):
+        """
+        Добавляет метаданные модели.
+        :param model_name: Название модели.
+        :param metadata: Метаданные модели (например, vocab_size, hidden_size, num_layers).
+        """
+        model_id = self.generate_id(model_name)
+        self.insert("model", model_name, metadata={"model_id": model_id, **metadata})
+        return model_id
 
     def insert(self, doc_type, data, metadata=None):
         """
@@ -2303,236 +2562,202 @@ class VeectorDB:
             return None
 
 
-===== Код из файла: virtual_space.py =====
+===== Код из файла: /workspaces/Veector/src/virtual_space.py =====
 
+# /workspaces/Veector/device/src/virtual_space.py
 import numpy as np
-from core import Veector
-from model_manager import ModelManager
-from threading import Thread
-from tensors import create_tensor, validate_tensor, reshape_tensor, get_tensor_metadata
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from pathlib import Path
+from collections import defaultdict
+import gc
 
 class VirtualMatrix:
-    def __init__(self, ipfs_client):
+    def __init__(self, ipfs_client=None, block_size=(1024, 1024)):
         self.ipfs = ipfs_client
-        self.loaded_blocks = {}
+        self.block_size = block_size
+        self.matrices = {}
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def load_block(self, block_name, block_hash):
-        """Загрузка блока из IPFS или кэша"""
-        if block_name in self.loaded_blocks:
-            return self.loaded_blocks[block_name]
+    def load_block(self, model_name, coords):
+        if model_name not in self.matrices:
+            raise ValueError(f"Модель {model_name} не найдена в матрице")
+        block_info = self.matrices[model_name]["blocks"].get(coords)
+        if not block_info:
+            raise ValueError(f"Блок {coords} не найден для {model_name}")
         
-        # Загрузка из IPFS
-        self.ipfs.get(block_hash)
-        state_dict = torch.load(f"{block_hash}.pt", map_location=self.device)
+        block_hash = block_info["hash"]
+        if self.ipfs and block_hash:
+            self.ipfs.get(block_hash)
+            return torch.load(f"{block_hash}.pt", map_location=self.device)
+        return torch.load(block_info["path"], map_location=self.device)
+
+class MatrixLoader:
+    def __init__(self, virtual_matrix, max_cache_size=50):
+        self.matrix = virtual_matrix
+        self.max_cache_size = max_cache_size
+        self.loaded_blocks = {}
+        self.access_count = defaultdict(int)
+
+    def get_block(self, model_name, coords):
+        key = (model_name, coords)
+        if key not in self.loaded_blocks:
+            if len(self.loaded_blocks) >= self.max_cache_size:
+                self._evict_least_used()
+            self.loaded_blocks[key] = self.matrix.load_block(model_name, coords)
+        self.access_count[key] += 1
+        return self.loaded_blocks[key]
+
+    def _evict_least_used(self):
+        lru_key = min(self.access_count.items(), key=lambda x: x[1])[0]
+        del self.loaded_blocks[lru_key]
+        del self.access_count[lru_key]
+
+class MatrixModel(nn.Module):
+    def __init__(self, matrix_loader, vocab_size, hidden_size, num_layers):
+        super().__init__()
+        self.loader = matrix_loader
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.device = self.loader.matrix.device
+
+    def forward(self, input_ids):
+        # Проверяем входные данные
+        if not isinstance(input_ids, torch.Tensor):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=self.device)
+        elif input_ids.dtype != torch.long:
+            input_ids = input_ids.long()
         
-        # Инициализация блока
-        if block_name == 'embeddings':
-            block = DistilBertEmbeddings(config)
-        elif 'transformer' in block_name:
-            block = TransformerBlock(config)
-        else:
-            block = nn.Linear(config.hidden_size, config.num_labels)
+        # Проверяем, что входные данные находятся в допустимом диапазоне
+        if torch.any(input_ids >= self.vocab_size):
+            raise ValueError(f"Входные данные содержат значения, превышающие vocab_size ({self.vocab_size})")
         
-        block.load_state_dict(state_dict)
-        self.loaded_blocks[block_name] = block.to(self.device)
-        return block
+        # Обрабатываем эмбеддинги
+        hidden_states = self._process_embeddings(input_ids)
+        
+        # Проходим через слои
+        for _ in range(self.num_layers):
+            block = self.loader.get_block("current_model", (0, 0))  # Пример: берём первый блок
+            if block.shape[0] < self.hidden_size or block.shape[1] < self.hidden_size:
+                raise ValueError(f"Размеры блока ({block.shape}) не соответствуют hidden_size={self.hidden_size}")
+            
+            hidden_states = F.linear(hidden_states, block[:self.hidden_size, :self.hidden_size])
+        
+        # Выходной слой
+        output_block = self.loader.get_block("current_model", (0, 0))  # Пример
+        if output_block.shape[0] < self.hidden_size or output_block.shape[1] < self.vocab_size:
+            raise ValueError(f"Размеры выходного блока ({output_block.shape}) не соответствуют hidden_size={self.hidden_size} и vocab_size={self.vocab_size}")
+        
+        logits = F.linear(hidden_states, output_block[:self.hidden_size, :self.vocab_size])
+        return logits
+
+    def _process_embeddings(self, input_ids):
+        embed_block = self.loader.get_block("current_model", (0, 0))
+        vocab_size, hidden_size = embed_block.shape
+        if vocab_size < self.vocab_size or hidden_size < self.hidden_size:
+            raise ValueError(f"Размеры блока эмбеддингов ({vocab_size}, {hidden_size}) не соответствуют ожидаемым ({self.vocab_size}, {self.hidden_size})")
+        embed_weight = embed_block[:self.vocab_size, :self.hidden_size].to(self.device)
+        return F.embedding(input_ids, embed_weight)
 
 class VirtualSpace:
-    def __init__(self, veector, model_manager=None, use_ipfs=False):
+    def __init__(self, veector, use_ipfs=False, model_manager=None):
         self.veector = veector
-        self.space = self.veector.space
-        self.db = self.veector.db
-        self.model_manager = model_manager
         self.use_ipfs = use_ipfs
-        self.tensor_metadata = {}
-        self.user_interface = self.generate_tensor_ui()
-        self.cache = {}  # Кэш для загруженных тензоров
+        self.model_manager = model_manager
+        self.virtual_matrix = VirtualMatrix(self.veector.ipfs_client if use_ipfs else None, block_size=(1024, 1024))
+        self.matrix_models = {}
+        self.current_model = None
 
-    def add_tensor(self, tensor, model_name=None, layer_idx=None, coords=None, role=None, dependencies=None):
-        """
-        Добавляет тензор в виртуальное пространство.
-        :param tensor: Тензор для добавления.
-        :param model_name: Название модели (если применимо).
-        :param layer_idx: Индекс слоя (если применимо).
-        :param coords: Координаты тензора (если применимо).
-        :param role: Роль тензора (например, "attention_weights").
-        :param dependencies: Список зависимостей тензора.
-        """
-        if model_name and layer_idx is not None and coords is not None:
-            if self.model_manager is None:
-                raise ValueError("ModelManager не инициализирован")
+    def load_blocks_model_into_matrix(self, model_name, blocks_dir="../data/blocks"):
+        blocks = {}
+        blocks_path = Path(blocks_dir)
+        for block_file in blocks_path.glob(f"{model_name}_row*_col*.pt"):
+            parts = block_file.stem.split("_")
+            row = int(parts[-3].replace("row", ""))
+            col = int(parts[-1].replace("col", ""))
+            coords = (row, col)
+            block_hash = self.veector.p2p_node.block_map.get(model_name, {}).get(coords) if self.use_ipfs else None
             
-            # Сохраняем тензор и получаем его ID (IPFS hash или путь к файлу)
-            tensor_id = self._store_tensor(model_name, tensor, layer_idx, coords)
-            
-            # Обновляем model_space
-            self.model_manager.model_space[(model_name, layer_idx, tuple(coords))] = {
-                "tensor_id": tensor_id,
-                "shape": tensor.shape,
-                "role": role or self.model_manager._infer_tensor_role(tensor_name),
-                "dependencies": dependencies
-            }
-            
-            # Создаем Veector-тензор (только с метаданными)
-            veector_tensor = create_tensor(
-                [layer_idx],
-                coords,
-                None,
-                tensor.size,  # Не передаем tensor
-                op=[50, 0, 0],  # По умолчанию matrix_multiply
-                metadata={
-                    "model_name": model_name,
-                    "layer_idx": layer_idx,
-                    "tensor_id": tensor_id,
-                    "role": role or self.model_manager._infer_tensor_role(tensor_name),
-                    "shape": tensor.shape
-                }
-            )
-            self.veector.add_to_space(veector_tensor)  # Сохраняем Veector-тензор
-        else:
-            self.veector.add_to_space(tensor)
-
-    def _store_tensor(self, model_name, tensor, layer_idx, coords):
-        """Сохранение тензора в IPFS или локальном хранилище"""
-        if self.use_ipfs:
-            tensor_bytes = tensor.numpy().tobytes()
-            ipfs_hash = self.veector.ipfs_client.add_bytes(tensor_bytes)
-            return ipfs_hash
-        else:
-            file_path = f"data/local_cache/{model_name}_layer{layer_idx}_coords{'_'.join(map(str, coords))}.pt"
-            torch.save(tensor, file_path)
-            return file_path
-
-    def get_tensor(self, layer, coords, model_name=None):
-        """
-        Получает тензор из виртуального пространства.
-        :param layer: Слой тензора.
-        :param coords: Координаты тензора.
-        :param model_name: Название модели (если применимо).
-        :return: Тензор или None, если не найден.
-        """
-        if model_name and self.model_manager:
-            cache_key = (model_name, layer, tuple(coords))
-            if cache_key in self.cache:
-                return self.cache[cache_key]
-            
-            # Получаем tensor_id из метаданных
-            tensor_info = self.model_manager.model_space.get((model_name, layer, tuple(coords)))
-            if tensor_info is None:
-                return None
-            
-            tensor_id = tensor_info["tensor_id"]
-            
-            # Загружаем тензор с помощью ModelManager
-            tensor = self.model_manager.get_tensor(model_name, layer, coords)
-            self.cache[cache_key] = tensor  # Кэшируем тензор
-            return tensor
+            # Загружаем блок для проверки его размеров
+            block = torch.load(block_file, map_location="cpu")
+            blocks[coords] = {"path": str(block_file), "hash": block_hash}
         
-        doc_id = self.space.get((tuple(layer), tuple(coords)))
-        if doc_id:
-            doc = self.db.get(doc_id)
-            return doc["data"] if doc else None
-        return None
-
-    def perform_inference(self, model_name, input_data):
-        """
-        Выполнение инференса через виртуальное пространство.
-        :param model_name: Название модели.
-        :param input_data: Входные данные (np.ndarray).
-        :return: Результат выполнения.
-        """
-        if self.model_manager is None:
-            raise ValueError("ModelManager не инициализирован")
+        if not blocks:
+            raise ValueError(f"Не найдено блоков для {model_name} в {blocks_dir}")
         
-        input_tensor = torch.from_numpy(input_data).float()
-        hidden_states = input_tensor
+        # Определяем vocab_size и hidden_size из первого блока
+        first_block = torch.load(list(blocks.values())[0]["path"], map_location="cpu")
+        vocab_size, hidden_size = first_block.shape
         
-        for layer in range(self.model_manager.get_num_layers(model_name)):
-            # Обработка attention блоков
-            attn_blocks = self._get_attention_blocks(model_name, layer)
-            hidden_states = self._apply_attention(hidden_states, attn_blocks)
-            
-            # Обработка MLP блоков
-            mlp_blocks = self._get_mlp_blocks(model_name, layer)
-            hidden_states = self._apply_mlp(hidden_states, mlp_blocks)
+        self.virtual_matrix.matrices[model_name] = {"blocks": blocks}
+        loader = MatrixLoader(self.virtual_matrix)
+        self.matrix_models[model_name] = MatrixModel(
+            loader,
+            vocab_size=vocab_size,
+            hidden_size=hidden_size,
+            num_layers=len(blocks)  # Пример: число слоев равно числу блоков
+        )
+        self.switch_model(model_name)
+        print(f"Модель {model_name} загружена из блоков в {blocks_dir}")
+
+    def switch_model(self, model_name):
+        if model_name not in self.matrix_models:
+            raise ValueError(f"Модель {model_name} не найдена")
+        self.current_model = model_name
+        self.virtual_matrix.matrices["current_model"] = self.virtual_matrix.matrices[model_name]
+        print(f"Переключено на модель: {model_name}")
+
+    def perform_inference(self, input_ids):
+        if not self.current_model:
+            raise ValueError("Не выбрана активная модель")
         
-        return self._apply_final_layer(model_name, hidden_states)
+        model = self.matrix_models[self.current_model]
+        if isinstance(input_ids, list):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=model.device)
+        elif isinstance(input_ids, np.ndarray):
+            input_ids = torch.from_numpy(input_ids).long().to(model.device)
+        
+        if torch.any(input_ids >= model.vocab_size):
+            raise ValueError(f"Входные данные содержат значения, превышающие vocab_size ({model.vocab_size})")
+        
+        return model(input_ids)
 
-    def _get_attention_blocks(self, model_name, layer):
-        """Получение attention-блоков для слоя"""
-        return [
-            self.get_tensor(model_name, layer, (0, 0)),  # Q
-            self.get_tensor(model_name, layer, (0, 1)),  # K
-            self.get_tensor(model_name, layer, (0, 2)),  # V
-            self.get_tensor(model_name, layer, (0, 3))   # O
-        ]
+===== Код из файла: /workspaces/Veector/src/utils.py =====
 
-    def _get_mlp_blocks(self, model_name, layer):
-        """Получение MLP-блоков для слоя"""
-        return [
-            self.get_tensor(model_name, layer, (1, 0)),  # Gate
-            self.get_tensor(model_name, layer, (1, 1)),  # Up
-            self.get_tensor(model_name, layer, (1, 2))   # Down
-        ]
+# /workspaces/Veector/src/utils.py
 
-    def _apply_attention(self, x, attn_blocks):
-        """Применение attention-слоев"""
-        q, k, v, o = attn_blocks
-        attn_output = F.scaled_dot_product_attention(q, k, v)
-        return F.linear(attn_output, o) + x  # Скип-коннекшн
+def parse_block_name(filename):
+    """
+    Разбирает имя файла блока на составляющие.
+    :param filename: Полное имя файла (например, "DeepSeek-R1-Distill-Qwen-1.5B_row1691_col0.pt").
+    :return: Словарь с моделью, row и col.
+    """
+    if not filename.endswith(".pt"):
+        raise ValueError("Имя файла должно заканчиваться на .pt")
+    base_name = filename[:-3]  # Удаляем ".pt"
 
-    def _apply_mlp(self, x, mlp_blocks):
-        """Применение MLP-слоев"""
-        gate, up, down = mlp_blocks
-        return F.linear(F.silu(gate(x)) * up(x), down) + x  # SwiGLU
+    # Извлекаем col
+    col_part = base_name.split("_")[-1]
+    if not col_part.startswith("col"):
+        raise ValueError(f"Некорректный формат col: {col_part}")
+    col = int(col_part[3:])  # Удаляем "col"
+    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_colX"
 
-    def _apply_final_layer(self, model_name, hidden_states):
-        """Применение финального слоя"""
-        final_layer = self.get_tensor(model_name, -1, (0, 0))
-        return F.linear(hidden_states, final_layer)
+    # Извлекаем row
+    row_part = base_name.split("_")[-1]
+    if not row_part.startswith("row"):
+        raise ValueError(f"Некорректный формат row: {row_part}")
+    row = int(row_part[3:])  # Удаляем "row"
+    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_rowX"
 
-    def generate_tensor_ui(self):
-        """Генерация пользовательского интерфейса для тензоров"""
-        grid = "<div class='grid'>"
-        for key, tensor_info in self.space.items():
-            grid += f"<div>{key}: {tensor_info['metadata']}</div>"
-        grid += "</div>"
-        tabbed_layout = "<div class='tabs'><button>Layers</button><button>Metadata</button></div>"
-        return f"<div>{grid}{tabbed_layout}</div>"
+    # Оставшаяся часть — название модели
+    model_name = base_name
 
-    def show_interface(self):
-        """Выводит сгенерированный интерфейс."""
-        print(self.user_interface)
-
-if __name__ == "__main__":
-    from sync import P2PNode
-    
-    # Инициализация с P2PNode и ModelManager
-    p2p_node = P2PNode("localhost", 5000, use_ipfs=True)
-    p2p_node.start()
-    
-    veector = Veector(
-        use_neural_storage=True,
-        cache_size=500,
-        dropout_rate=0.2,
-        use_memory=True,
-        p2p_node=p2p_node
-    )
-    
-    model_manager = ModelManager(
-        veector,
-        ipfs_enabled=True,
-        p2p_node=p2p_node
-    )
-    
-    virtual_space = VirtualSpace(
-        veector,
-        model_manager=model_manager,
-        use_ipfs=True
-    )
-    
-    tensor1 = [[[0], [0, 0, 0], [np.pi / 2], 1]]
-    virtual_space.add_tensor(tensor1)
-    virtual_space.show_interface()
+    return {
+        "model_name": model_name,
+        "row": row,
+        "col": col
+    }
 

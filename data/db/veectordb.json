@@ -1,0 +1,62 @@
+{
+    "c7e993407f7478963eb5334d98003c3a0ea8201c98748af23728e12c390c8162": {
+        "id": "c7e993407f7478963eb5334d98003c3a0ea8201c98748af23728e12c390c8162",
+        "type": "tensor",
+        "data": "tensor_result_1741838817.9047046_5048",
+        "metadata": {
+            "tensor_id": "tensor_result_1741838817.9047046_5048",
+            "path": "data/tensors/tensor_result_1741838817.9047046_5048.npy",
+            "shape": [],
+            "dtype": "complex128",
+            "location": "local",
+            "timestamp": 1741838817.904972
+        },
+        "version": 1,
+        "history": []
+    },
+    "a3d15c11ea312df92a6c35b845ae4630f94a1bb4987fb28e8f7ada12b0be3edf": {
+        "id": "a3d15c11ea312df92a6c35b845ae4630f94a1bb4987fb28e8f7ada12b0be3edf",
+        "type": "tensor",
+        "data": "tensor_result_1741839372.4694395_6190",
+        "metadata": {
+            "tensor_id": "tensor_result_1741839372.4694395_6190",
+            "path": "../data/tensors/tensor_result_1741839372.4694395_6190.npy",
+            "shape": [],
+            "dtype": "complex128",
+            "location": "local",
+            "timestamp": 1741839372.4697688
+        },
+        "version": 1,
+        "history": []
+    },
+    "2c810fbc77918c15a87030a585ca5ac732042514fb05c5ce4dd7d906b7dd1a48": {
+        "id": "2c810fbc77918c15a87030a585ca5ac732042514fb05c5ce4dd7d906b7dd1a48",
+        "type": "tensor",
+        "data": "tensor_result_1741840116.6680386_4819",
+        "metadata": {
+            "tensor_id": "tensor_result_1741840116.6680386_4819",
+            "path": "../data/tensors/tensor_result_1741840116.6680386_4819.npy",
+            "shape": [],
+            "dtype": "complex128",
+            "location": "local",
+            "timestamp": 1741840116.6688154
+        },
+        "version": 1,
+        "history": []
+    },
+    "4e95a0649bbac62ed9019eb81893b3eb2f723772ed035dda8dc2116fc240e1d2": {
+        "id": "4e95a0649bbac62ed9019eb81893b3eb2f723772ed035dda8dc2116fc240e1d2",
+        "type": "tensor",
+        "data": "tensor_result_1741840363.2619934_8958",
+        "metadata": {
+            "tensor_id": "tensor_result_1741840363.2619934_8958",
+            "path": "../data/tensors/tensor_result_1741840363.2619934_8958.npy",
+            "shape": [],
+            "dtype": "complex128",
+            "location": "local",
+            "timestamp": 1741840363.3031332
+        },
+        "version": 1,
+        "history": []
+    }
+}

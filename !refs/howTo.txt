@@ -1,5 +1,4 @@
-Запуск
-Сохрани исправленный main.py.
+pip install torch transformers numpy qiskit qiskit-aer
 
 Убедись, что IPFS-демон запущен (если используешь IPFS):
 bash
@@ -25,8 +24,6 @@ bash
 
 cd /workspaces/Veector/src
 python main.py
-zhdem zagruzki zagruzka idet kaifffff cve eshe zhdem
-dolgooooo 23:17 23.32 23:38 23:46 00:07
 
 //git force update
 git add .

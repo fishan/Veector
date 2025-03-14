@@ -1,12 +1,16 @@
+# /workspaces/Veector/src/core.py
 import numpy as np
-from veectordb import VeectorDB
 import torch
 import torch.nn as nn
 import queue
 import threading
 import time
 import random
-from qiskit import QuantumCircuit, Aer, execute  # Интеграция Qiskit для квантовых операций
+from qiskit import QuantumCircuit
+from qiskit.primitives import Sampler  # Для измерений (если нужно позже)
+from qiskit_aer import AerSimulator  # Для statevector симуляции
+from qiskit_aer.noise import NoiseModel, depolarizing_error
+from veectordb import VeectorDB
 from operations import (
     mod, floor, ceil, arcsin, arccos, arctan, xor, nand, nor, matrix_multiply,
     gradient_descent, softmax, matrix_determinant, matrix_eigenvalues, matrix_lu_decomposition,
@@ -44,9 +48,9 @@ class NeuralStorage(nn.Module):
         return encoded, decoded
 
 class Veector:
-    def __init__(self, db_path="data/db/veectordb.json", use_neural_storage=False, cache_size=1000,
-                 eviction_strategy="LRU", dropout_rate=0.0, use_memory=False, model_manager=None, p2p_node=None,
-                 ipfs_address='/ip4/127.0.0.1/tcp/5001'):
+    def __init__(self, db_path="../data/db/veectordb.json", use_neural_storage=False, cache_size=1000,
+                 eviction_strategy="LRU", dropout_rate=0.0, use_memory=False, model_manager=None, 
+                 p2p_node=None, ipfs_enabled=True, ipfs_address='/ip4/127.0.0.1/tcp/5001'):
         self.db = VeectorDB(db_path)
         self.use_neural_storage = use_neural_storage
         self.neural_model = None
@@ -60,13 +64,15 @@ class Veector:
         self.cache_access_count = {}
         self.cache_timestamps = {}
         self.dropout_rate = dropout_rate
-        self.use_memory = Memory() if use_memory else None  # Исправлено: инициализация Memory
-        self.evolution = Evolution(self)
-        self.model_manager = model_manager or ModelManager(self)  # Исправлено: дефолтный ModelManager
-        self.p2p_node = p2p_node
-        self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address)
-        self.models_dir = "data/models"
-        self.tensors_dir = "data/tensors"
+        self.use_memory = Memory() if use_memory else None
+        self.evolution = Evolution(self)        
+        self.p2p_node = p2p_node        
+        self.ipfs_client = None
+        if ipfs_enabled and p2p_node and ipfs_address:  # Подключаем IPFS только если ipfs_enabled=True
+            self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address) if ipfs_address else None
+        self.model_manager = model_manager or ModelManager(self)
+        self.models_dir = "../data/models"
+        self.tensors_dir = "../data/tensors"
 
         os.makedirs(self.models_dir, exist_ok=True)
         os.makedirs(self.tensors_dir, exist_ok=True)
@@ -77,7 +83,7 @@ class Veector:
 
         self.core = {
             # Арифметика (0-9)
-            (0, 0, 0): lambda x: np.sum(x, dtype=np.complex128),  # Поддержка комплексных чисел
+            (0, 0, 0): lambda x: np.sum(x, dtype=np.complex128),
             (0, 0, 1): lambda x: x[0] - x[1],
             (0, 1, 0): lambda x: x[0] * x[1],
             (0, 1, 1): lambda x: x[0] / x[1],
@@ -116,14 +122,14 @@ class Veector:
 
             # Рандом (5)
             (5, 1, 0): lambda x: random_uniform(x[0], x[1]),
-            (5, 1, 1): lambda x: random_normal(x[0], x[1]),  # Исправлено: два аргумента
+            (5, 1, 1): lambda x: random_normal(x[0], x[1]),
             (5, 2, 0): lambda x: median(x[0]),
 
             # Выбор (7)
             (7, 0, 0): lambda x, *opts: opts[int(x[0])] if opts else None,
 
             # Вывод (8)
-            (8, 0, 0): lambda x: print(f"Output: {x[0]}"),
+            (8, 0, 0): lambda x: print(f"Output: {x[0]}") or x[0],
 
             # Идентичность (9)
             (9, 0, 0): lambda x: x[0],
@@ -170,7 +176,7 @@ class Veector:
             (40, 3, 0): lambda x: dropout(x[0], rate=0.5),
             (40, 4, 0): batch_norm,
 
-            # Квантовые операции (50) с шумом через Qiskit
+            # Квантовые операции (50)
             (50, 0, 0): lambda x: self._quantum_operation(x[0], "hadamard"),
             (50, 0, 1): lambda x: self._quantum_operation(x[0], "pauli_x"),
             (50, 1, 0): lambda x: self._quantum_operation([x[0], x[1]], "cnot"),
@@ -180,7 +186,7 @@ class Veector:
         }
 
     def _quantum_operation(self, data, op_type):
-        """Выполнение квантовых операций через Qiskit с шумом."""
+        """Выполнение квантовых операций через Qiskit 1.4.1 с шумом."""
         if isinstance(data, list):
             num_qubits = len(data)
             initial_state = np.array(data, dtype=np.complex128).flatten()
@@ -211,16 +217,15 @@ class Veector:
             qc.cx(0, 1)
 
         # Добавляем квантовый шум (деполяризация)
-        from qiskit.providers.aer.noise import NoiseModel, depolarizing_error
         noise_model = NoiseModel()
         error = depolarizing_error(0.05, num_qubits)  # 5% шум
         noise_model.add_all_qubit_quantum_error(error, ['h', 'x', 'cx'])
 
-        # Симуляция
-        simulator = Aer.get_backend('statevector_simulator')
-        job = execute(qc, simulator, noise_model=noise_model)
-        result = job.result().get_statevector()
-        return np.array(result, dtype=np.complex128)
+        # Симуляция через AerSimulator
+        simulator = AerSimulator(method='statevector')
+        result = simulator.run(qc, noise_model=noise_model).result()
+        statevector = result.get_statevector()
+        return np.array(statevector, dtype=np.complex128)
 
     def _apply_quantum_ops(self, op, data):
         """Устаревший метод, теперь используется _quantum_operation."""
@@ -270,7 +275,7 @@ class Veector:
                 data = np.pad(flat, (0, max(0, input_dim - len(flat))), mode='constant')[:input_dim]
             else:
                 data = np.array([0] * input_dim, dtype=np.complex128)
-            train_data.append(np.real(data))  # Пока используем только вещественную часть
+            train_data.append(np.real(data))
 
         train_data = torch.tensor(train_data, dtype=torch.float32)
 
@@ -296,7 +301,7 @@ class Veector:
         else:
             data = np.array([0] * input_dim, dtype=np.complex128)
 
-        tensor_data = torch.tensor(np.real(data), dtype=torch.float32)  # Только вещественная часть
+        tensor_data = torch.tensor(np.real(data), dtype=torch.float32)
         encoded, _ = self.neural_model(tensor_data)
         self.neural_embeddings[doc_id] = encoded.detach().numpy()
         print(f"Сохранено в нейросеть: {doc_id} -> {encoded.detach().numpy()[:5]}...")
@@ -372,15 +377,15 @@ class Veector:
 
     def _apply_rl_strategy(self, x):
         """Обучение с подкреплением для числовых данных (заглушка)."""
-        return x  # Пока без RL, можно добавить позже
+        return x
 
     def _evolve_program(self, x):
         """Эволюция программ (заглушка)."""
-        return x  # Пока без реализации
+        return x
 
     def _optimize_tensor(self, x):
         """Оптимизация тензоров (заглушка)."""
-        return x  # Пока без реализации
+        return x
 
     def _calculate_reward(self, result, input_data):
         if isinstance(input_data, (int, float, complex)):
@@ -427,6 +432,8 @@ class Veector:
 
     def _store_tensor_in_ipfs(self, tensor_data):
         """Сохранение тензора в IPFS."""
+        if not self.ipfs_client:
+            return None
         try:
             res = self.ipfs_client.add(tensor_data.tobytes())
             return res['Hash']
@@ -436,6 +443,8 @@ class Veector:
 
     def _load_tensor_from_ipfs(self, ipfs_hash, shape, dtype=np.complex128):
         """Загрузка тензора из IPFS."""
+        if not self.ipfs_client:
+            return None
         try:
             data = self.ipfs_client.cat(ipfs_hash)
             return np.frombuffer(data, dtype=dtype).reshape(shape)
@@ -465,7 +474,7 @@ class Veector:
 
     def save_tensor(self, tensor, tensor_id, use_ipfs=True):
         """Сохранение тензора в IPFS или локально."""
-        if use_ipfs:
+        if use_ipfs and self.ipfs_client:
             ipfs_hash = self._store_tensor_in_ipfs(tensor)
             if ipfs_hash:
                 tensor_metadata = {
@@ -576,14 +585,14 @@ class Veector:
             result = op_func(data)
 
         tensor_id = f"tensor_result_{time.time()}_{random.randint(1000, 9999)}"
-        self.save_tensor(result, tensor_id, use_ipfs=True)
+        self.save_tensor(result, tensor_id, use_ipfs=self.ipfs_client is not None)
         metadata = {"tensor": tensor, "coords": (data_layer, data_coords), "tensor_id": tensor_id}
 
         if self.use_neural_storage and self.neural_model:
             self._store_in_neural(result, tensor_id)
 
         if self.p2p_node:
-            sync_data = np.abs(result) if np.iscomplexobj(result) else result  # Только вещественная часть для синхронизации
+            sync_data = np.abs(result) if np.iscomplexobj(result) else result
             self.p2p_node.sync_tensor(sync_data, metadata)
 
         self.space[(tuple(data_layer), tuple(data_coords))] = tensor_id
@@ -605,7 +614,7 @@ class Veector:
     def add_to_space(self, tensor):
         layer, coords = tensor[0][0], tuple(tensor[0][1])
         tensor_id = f"tensor_{time.time()}_{random.randint(1000, 9999)}"
-        self.save_tensor(tensor[0][2], tensor_id, use_ipfs=True)  # Сохраняем только данные
+        self.save_tensor(tensor[0][2], tensor_id, use_ipfs=self.ipfs_client is not None)
         self.space[(tuple(layer), coords)] = tensor_id
 
     def evolve_tensor(self, tensor):
@@ -622,7 +631,6 @@ class Veector:
 
     def execute_program(self, program_tensors, input_data=None):
         return self.model_manager.execute_program(program_tensors, input_data)
-
 
 if __name__ == "__main__":
     # Пример использования
