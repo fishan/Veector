@@ -7,6 +7,7 @@ import torch
 import time
 import random
 from pathlib import Path
+from utils import parse_block_name
 
 class P2PNode:
     def __init__(self, host, port, use_ipfs=True):
@@ -146,41 +147,39 @@ class P2PNode:
             print("IPFS отключён, синхронизация пропущена")
 
     def sync_model_blocks(self, model_name, blocks_dir):
-        """Синхронизация блоков модели из директории."""
-        if not self.use_ipfs:
-            print("IPFS отключён, синхронизация блоков невозможна")
-            return
-        
-        block_files = list(Path(blocks_dir).glob(f"{model_name}_row*_col*.pt"))
-        if not block_files:
-            print(f"Блоки для модели {model_name} не найдены в {blocks_dir}")
-            return
-
-        for block_file in block_files:
-            coords = tuple(map(int, block_file.stem.split("_")[1:3:2]))  # rowX, colY
-            block = torch.load(block_file, map_location="cpu")
-            ipfs_hash = self.store_in_ipfs(block)
-            if ipfs_hash:
-                if model_name not in self.block_map:
-                    self.block_map[model_name] = {}
-                self.block_map[model_name][coords] = ipfs_hash
-                
-                sync_data = {
-                    "tensor_id": f"{model_name}_block_{coords[0]}_{coords[1]}",
-                    "metadata": {
-                        "ipfs_hash": ipfs_hash,
-                        "shape": block.shape,
-                        "dtype": str(block.dtype),
-                        "model_name": model_name,
-                        "coords": coords
+            """Синхронизация блоков модели из директории."""
+            if not self.use_ipfs:
+                print("IPFS отключён, синхронизация блоков невозможна")
+                return
+            block_files = list(Path(blocks_dir).glob(f"{model_name}_row*_col*.pt"))
+            if not block_files:
+                print(f"Блоки для модели {model_name} не найдены в {blocks_dir}")
+                return
+            for block_file in block_files:
+                parsed = parse_block_name(block_file.name)  # Используем функцию разбора имени
+                coords = (parsed["row"], parsed["col"])
+                block = torch.load(block_file, map_location="cpu")
+                ipfs_hash = self.store_in_ipfs(block)
+                if ipfs_hash:
+                    if model_name not in self.block_map:
+                        self.block_map[model_name] = {}
+                    self.block_map[model_name][coords] = ipfs_hash
+                    sync_data = {
+                        "tensor_id": f"{model_name}_block_{coords[0]}_{coords[1]}",
+                        "metadata": {
+                            "ipfs_hash": ipfs_hash,
+                            "shape": block.shape,
+                            "dtype": str(block.dtype),
+                            "model_name": model_name,
+                            "coords": coords
+                        }
                     }
-                }
-                self.send_data(sync_data)
-                print(f"Блок {block_file.name} синхронизирован: {ipfs_hash}")
-            else:
-                print(f"Не удалось синхронизировать блок {block_file.name}")
-            del block
-            gc.collect()
+                    self.send_data(sync_data)
+                    print(f"Блок {block_file.name} синхронизирован: {ipfs_hash}")
+                else:
+                    print(f"Не удалось синхронизировать блок {block_file.name}")
+                del block
+                gc.collect()
 
 if __name__ == "__main__":
     node = P2PNode("localhost", 5000, use_ipfs=True)

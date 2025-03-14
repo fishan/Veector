@@ -6,7 +6,7 @@ import numpy as np
 import uuid # Import the UUID module
 
 class VeectorDB:
-    def __init__(self, db_path="data/db/veectordb.json"):
+    def __init__(self, db_path="../data/db/veectordb.json"):
         self.db_path = db_path
         self.data = {}
         self.load_db()
@@ -44,6 +44,16 @@ class VeectorDB:
         """
         combined_data = str(data) + str(self.id_namespace)
         return hashlib.sha256(combined_data.encode()).hexdigest()
+
+    def insert_model(self, model_name, metadata):
+        """
+        Добавляет метаданные модели.
+        :param model_name: Название модели.
+        :param metadata: Метаданные модели (например, vocab_size, hidden_size, num_layers).
+        """
+        model_id = self.generate_id(model_name)
+        self.insert("model", model_name, metadata={"model_id": model_id, **metadata})
+        return model_id
 
     def insert(self, doc_type, data, metadata=None):
         """

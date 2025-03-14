@@ -1,0 +1,104 @@
+[34;42m.[00m
+├── [34;42m!refs[00m
+│   ├── buffer.py
+│   ├── howTo.txt
+│   └── talks.txt
+├── LICENSE
+├── README.md
+├── [34;42mconfig[00m
+├── [34;42mdata[00m
+│   ├── [34;42mblocks[00m
+│   ├── [34;42mdatasets[00m
+│   │   └── [34;42marithmetic[00m
+│   │       └── simple.vtr
+│   ├── [34;42mdb[00m
+│   │   └── veectordb.json
+│   ├── [34;42mdeepseek-ai[00m
+│   │   ├── [34;42mDeepSeek-R1-Distill-Qwen-1.5B[00m
+│   │   │   ├── DeepSeek-R1-Distill-Qwen-1.5B_row0_col0.pt
+
+│   │   │   ├── DeepSeek-R1-Distill-Qwen-1.5B_row1694_col0.pt
+│   │   │   └── config.json
+│   │   └── Info DeepSeek-R1-Distill-Qwen-1.5B.txt
+│   ├── [34;42mmodels[00m
+│   ├── [34;42mpretrained[00m
+│   │   ├── core.vtr
+│   │   └── evolved.vtr
+│   └── [34;42mtensors[00m
+│       ├── tensor_result_1741839372.4694395_6190.npy
+│       ├── tensor_result_1741840116.6680386_4819.npy
+│       └── tensor_result_1741840363.2619934_8958.npy
+├── [34;42mdevice[00m
+│   ├── [34;42mdata[00m
+│   │   ├── [34;42mdb[00m
+│   │   │   ├── user_data.json
+│   │   │   └── veectordb.json
+│   │   ├── [34;42mlocal_cache[00m
+│   │   ├── [34;42mmodels[00m
+│   │   └── [34;42mtensors[00m
+│   └── run_veector.py
+├── [34;42mdocs[00m
+│   ├── README.md
+│   ├── memory.md
+│   ├── roadmap.md
+│   ├── training.md
+│   └── veector.md
+├── [34;42mexamples[00m
+│   ├── advanced.py
+│   └── calculator.vtr
+├── [01;34mgo-ipfs[00m
+│   ├── LICENSE
+│   ├── LICENSE-APACHE
+│   ├── LICENSE-MIT
+│   ├── README.md
+│   └── [01;32minstall.sh[00m
+├── [01;31mgo-ipfs_v0.20.0_linux-amd64.tar.gz[00m
+├── requirements.txt
+├── [01;32msetup_project.sh[00m
+├── [34;42msrc[00m
+│   ├── [34;42m__pycache__[00m
+│   │   ├── core.cpython-312.pyc
+│   │   ├── evolution.cpython-312.pyc
+│   │   ├── memory.cpython-312.pyc
+│   │   ├── model_manager.cpython-312.pyc
+│   │   ├── operations.cpython-312.pyc
+│   │   ├── sync.cpython-312.pyc
+│   │   ├── tensors.cpython-312.pyc
+│   │   ├── utils.cpython-312.pyc
+│   │   ├── veectordb.cpython-312.pyc
+│   │   └── virtual_space.cpython-312.pyc
+│   ├── core.py
+│   ├── evolution.py
+│   ├── federated_learning.py
+│   ├── file_transfer.py
+│   ├── interface.py
+│   ├── main.py
+│   ├── memory.py
+│   ├── model_manager.py
+│   ├── operations.py
+│   ├── sync.py
+│   ├── tensors.py
+│   ├── test_imports.py
+│   ├── tokenization.py
+│   ├── utils.py
+│   ├── veectordb.py
+│   └── virtual_space.py
+├── [34;42mtests[00m
+│   ├── test_basic.py
+│   ├── test_federate.py
+│   ├── test_hybrid.py
+│   ├── test_logic.py
+│   ├── test_loops.py
+│   ├── test_parallel.py
+│   └── test_system.py
+├── [34;42mtools[00m
+│   ├── app.log
+│   ├── collected_code.txt
+│   ├── config.json
+│   ├── folder_code_collector.py
+│   ├── project_info_collect_v2.py
+│   └── show_structure.py
+├── [01;32mupdate_project.sh[00m
+└── veector_stucture.txt
+
+25 directories, 1768 files

@@ -1,60 +1,28 @@
-# device/run_veector.py
-import torch
-from transformers import AutoTokenizer
-import os
+# /workspaces/Veector/device/run_veector.py
 import sys
-sys.path.append("device/src")
-
-from src.core import Veector
-from src.model_manager import ModelManager
-from src.virtual_space import VirtualSpace
-
-def dynamic_inference(input_text):
-    # Токенизация
-    inputs = tokenizer(input_text, return_tensors='pt').to(device)
-    
-    # Загрузка необходимых блоков
-    embeddings = matrix.load_block('embeddings', block_hashes['embeddings'])
-    hidden_states = embeddings(inputs['input_ids'])
-    
-    for i in range(config.num_hidden_layers):
-        layer_name = f"transformer_layer_{i}"
-        layer = matrix.load_block(layer_name, block_hashes[layer_name])
-        hidden_states = layer(hidden_states)
-    
-    classifier = matrix.load_block('classifier', block_hashes['classifier'])
-    logits = classifier(hidden_states)
-    
-    return torch.argmax(logits, dim=-1).item()
+sys.path.append("/workspaces/Veector/device/src")
+from core import Veector
+import os
+import torch
 
 def main():
-    veector = Veector(db_path="/workspaces/Veector/device/data/db/user_data.json")
-    weights_path = "/workspaces/Veector/data/deepseek-ai/deepseek-coder-1.3b-base"
-    cache_path = "/workspaces/Veector/device/data/local_cache"
-    model_manager = ModelManager(veector, model_dir=weights_path, cache_dir=cache_path)
+    blocks_path = "/workspaces/Veector/data/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"  # Путь к блокам
+    db_path = "../data/db/veectordb.json"
+    model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
 
-    model_name = "deepseek-coder-1.3b"
-    model_manager.load_pre_split_model(model_name, weights_path)
-    print("Model metadata loaded. Available tensors:", len(model_manager.model_space))
+    print("Загрузка модели из блоков...")
+    veector = Veector(db_path=db_path, use_neural_storage=False, use_memory=False, ipfs_enabled=False)
+    veector.model_manager.load_pre_split_model(model_name, blocks_path)
 
-    tokenizer = AutoTokenizer.from_pretrained(weights_path)
-
+    print(f"Veector chat running with model blocks: {blocks_path}")
     while True:
-        prompt = input("Enter your prompt (or 'exit'): ")
-        if prompt.lower() == "exit":
+        message = input("You: ")
+        if message.lower() in ["exit", "quit"]:
             break
-
-        input_ids = tokenizer.encode(prompt, return_tensors="pt")
-        print(f"Input shape: {input_ids.shape}")
-
-        output_ids = model_manager.perform_inference(model_name, input_ids)
-        if output_ids is not None:
-            response = tokenizer.decode(output_ids, skip_special_tokens=True)
-            print(f"DeepSeek: {response}")
-        else:
-            print("Inference failed.")
+        # Пока заглушка для инференса
+        input_ids = torch.randint(0, 32768, (1, 512))  # Заменить на токенизатор позже
+        output = veector.model_manager.perform_inference(model_name, input_ids.numpy())
+        print(f"Veector: {output.shape} (ответ пока не реализован)")
 
 if __name__ == "__main__":
     main()
-
-

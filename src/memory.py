@@ -1,84 +1,60 @@
+# /workspaces/Veector/device/src/memory.py
 import hashlib
 import pickle
-import lru  # pip install lru-cache
+import numpy as np
+import time
+from collections import OrderedDict  # Для реализации LRU вручную
 
 class Memory:
     def __init__(self, capacity=1000, use_lru_cache=True, use_hashing=True):
-        """
-        Инициализация Memory.
-        :param capacity: Максимальное количество элементов в хранилище.
-        :param use_lru_cache: Использовать LRU-кэш для повышения производительности.
-        :param use_hashing: Использовать хеширование ключей для большей стабильности.
-        """
         self.use_lru_cache = use_lru_cache
         self.use_hashing = use_hashing
         self.capacity = capacity
         
         if use_lru_cache:
-            self.storage = lru.LRU(capacity) # Использовать LRU кэш
+            self.storage = OrderedDict()  # Используем OrderedDict для LRU
         else:
             self.storage = {}
 
     def _hash_key(self, key):
-        """
-        Генерирует хеш-сумму для ключа.
-        """
-        if isinstance(key, (tuple, list)):  # Преобразуем в кортеж
+        if isinstance(key, (tuple, list)):
             key = tuple(key)
-        if isinstance(key, np.ndarray):  # Преобразуем NumPy array в bytes
+        if isinstance(key, np.ndarray):
             key = key.tobytes()
-        return hashlib.sha256(pickle.dumps(key)).hexdigest() # Hash serialized bytes
+        return hashlib.sha256(pickle.dumps(key)).hexdigest()
 
     def store(self, key, value):
-        """
-        Сохраняет значение в хранилище.
-        :param key: Ключ для сохранения.
-        :param value: Значение для сохранения.
-        """
         if self.use_hashing:
             key = self._hash_key(key)
-        if not self.use_lru_cache and len(self.storage) >= self.capacity:
-             self._evict_oldest()
-
+        if self.use_lru_cache and len(self.storage) >= self.capacity:
+            self.storage.popitem(last=False)  # Удаляем самый старый элемент
+        elif not self.use_lru_cache and len(self.storage) >= self.capacity:
+            self._evict_oldest()
         self.storage[key] = value
+        if self.use_lru_cache:
+            self.storage.move_to_end(key)  # Перемещаем в конец для LRU
 
     def retrieve(self, key):
-        """
-        Извлекает значение из хранилища.
-        :param key: Ключ для извлечения.
-        :return: Значение или None, если ключ не найден.
-        """
         if self.use_hashing:
             key = self._hash_key(key)
-        return self.storage.get(key)
+        if key in self.storage:
+            if self.use_lru_cache:
+                self.storage.move_to_end(key)  # Обновляем порядок для LRU
+            return self.storage[key]
+        return None
     
     def _evict_oldest(self):
-        """
-        Удаляет самый старый элемент из хранилища.
-        """
         if self.storage:
-            oldest_key = next(iter(self.storage))  # Получаем ключ первого элемента
+            oldest_key = next(iter(self.storage))
             del self.storage[oldest_key]
 
     def clear(self):
-        """
-        Очищает хранилище.
-        """
         self.storage.clear()
 
     def __len__(self):
-        """
-        Возвращает количество элементов в хранилище.
-        :return: Количество элементов.
-        """
         return len(self.storage)
 
     def __contains__(self, key):
-        """
-        Проверяет наличие ключа в хранилище.
-        :param key: Ключ для проверки.
-        :return: True, если ключ есть в хранилище, иначе False.
-        """
         if self.use_hashing:
             key = self._hash_key(key)
         return key in self.storage
@@ -87,7 +63,7 @@ class MemoryManager:
     def __init__(self, max_size=512):
         self.cache = {}
         self.access_times = {}
-        self.max_size = max_size  # Максимальный размер кэша в МБ
+        self.max_size = max_size
     
     def add_block(self, block_name, block):
         if self._get_size() + block_size(block) > self.max_size:
@@ -99,3 +75,9 @@ class MemoryManager:
         oldest_block = min(self.access_times.items(), key=lambda x: x[1])[0]
         del self.cache[oldest_block]
         del self.access_times[oldest_block]
+
+    def _get_size(self):
+        return sum([block.nbytes / (1024 * 1024) if isinstance(block, np.ndarray) else 0 for block in self.cache.values()])
+
+def block_size(block):
+    return block.nbytes / (1024 * 1024) if isinstance(block, np.ndarray) else 0
