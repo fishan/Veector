@@ -1,0 +1,181 @@
+# Установка зависимостей
+!pip install transformers bitsandbytes torch huggingface_hub accelerate -q
+
+from huggingface_hub import hf_hub_download, login
+import os
+import json
+import zipfile
+import shutil
+import math
+import torch
+from google.colab import drive
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import bitsandbytes as bnb
+
+# Подключение к Google Drive
+drive.mount('/content/drive')
+print("Google Drive успешно подключен")
+
+# Логин в Hugging Face (если требуется доступ к приватному репозиторию)
+# login(token="your_hf_token")  # Раскомментируйте и вставьте токен, если нужно
+
+# Загрузка модели и токенизатора
+model_name = "unsloth/DeepSeek-R1-Distill-Qwen-1.5B-bnb-4bit"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",
+    load_in_4bit=True,
+    torch_dtype=torch.bfloat16
+)
+print(f"Модель загружена: {model_name}")
+
+# Создание директории для блоков
+output_dir = "blocks"
+os.makedirs(output_dir, exist_ok=True)
+
+class VirtualMatrix:
+    def __init__(self, default_block_width=4096):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.default_block_width = default_block_width
+
+    def save_blocks(self, tensor, prefix, output_dir, metadata, block_type, num_layers):
+        # Если тензор квантованный, преобразуем в float16
+        if isinstance(tensor, bnb.nn.Params4bit):
+            tensor = tensor.data.to(torch.float16)  # Деквантизация
+        else:
+            tensor = tensor.to(torch.float16)
+
+        height, width = tensor.shape
+        block_width = self.default_block_width
+        num_blocks = math.ceil(height / block_width)
+        blocks = []
+
+        for i in range(0, height, block_width):
+            end = min(i + block_width, height)
+            block = tensor[i:end, :].to(torch.float16)
+            blocks.append(block)
+
+        print(f"Сохранение {prefix}: {tensor.shape}, {tensor.element_size() * tensor.numel() / 1024 / 1024:.2f} MB")
+        num_blocks_saved = 0
+        for idx, block in enumerate(blocks):
+            block_name = f"{prefix}_block{idx}"
+            block_path = f"{output_dir}/{block_name}.pt"
+            actual_size = block.element_size() * block.numel() / 1024 / 1024
+            print(f"Сохранение блока {block_name}: {block.shape}, {actual_size:.2f} MB")
+            torch.save(block.clone().cpu(), block_path)
+            num_blocks_saved += 1
+
+            dependencies = []
+            if block_type == "embed":
+                dependencies = ["input_ids"]
+            elif block_type == "layer":
+                layer_idx = int(prefix.split('_layer')[1].split('_')[0])
+                dependencies = [f"layer_{layer_idx - 1}"] if layer_idx > 0 else ["embed"]
+            elif block_type == "output":
+                dependencies = [f"layer_{num_layers - 1}"]
+
+            metadata[block_name] = {
+                "prefix": prefix,
+                "index": idx,
+                "shape": list(block.shape),
+                "dtype": str(block.dtype),
+                "path": block_path,
+                "block_type": block_type,
+                "size_mb": round(actual_size, 2),
+                "dependencies": dependencies,
+                "priority": 1 if block_type == "embed" else (2 if block_type == "layer" else 3)
+            }
+        print(f"Сохранено {num_blocks_saved} блоков для {prefix}")
+        return num_blocks_saved
+
+    def allocate_model(self, model, model_name, output_dir="blocks"):
+        metadata = {}
+        total_blocks = 0
+        num_layers = model.config.num_hidden_layers
+
+        # Эмбеддинги
+        embed_weight = model.model.embed_tokens.weight
+        total_blocks += self.save_blocks(embed_weight, f"{model_name}_embed", output_dir, metadata, "embed", num_layers)
+
+        # Слои
+        for layer_idx, layer in enumerate(model.model.layers):
+            # Веса внимания
+            total_blocks += self.save_blocks(
+                layer.self_attn.q_proj.weight, 
+                f"{model_name}_layer{layer_idx}_attn_q_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+            total_blocks += self.save_blocks(
+                layer.self_attn.k_proj.weight, 
+                f"{model_name}_layer{layer_idx}_attn_k_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+            total_blocks += self.save_blocks(
+                layer.self_attn.v_proj.weight, 
+                f"{model_name}_layer{layer_idx}_attn_v_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+            total_blocks += self.save_blocks(
+                layer.self_attn.o_proj.weight, 
+                f"{model_name}_layer{layer_idx}_attn_output_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+            # Веса MLP
+            total_blocks += self.save_blocks(
+                layer.mlp.gate_proj.weight, 
+                f"{model_name}_layer{layer_idx}_ffn_gate_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+            total_blocks += self.save_blocks(
+                layer.mlp.up_proj.weight, 
+                f"{model_name}_layer{layer_idx}_ffn_up_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+            total_blocks += self.save_blocks(
+                layer.mlp.down_proj.weight, 
+                f"{model_name}_layer{layer_idx}_ffn_down_weight", 
+                output_dir, metadata, "layer", num_layers
+            )
+
+        # Выходной слой (lm_head)
+        output_weight = model.lm_head.weight
+        total_blocks += self.save_blocks(output_weight, f"{model_name}_output", output_dir, metadata, "output", num_layers)
+
+        # Сохранение метаданных
+        metadata_path = f"{output_dir}/{model_name}_metadata.json"
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f, indent=4)
+        print(f"Метаданные сохранены в {metadata_path}")
+        print(f"Модель {model_name} разбита на {total_blocks} блоков")
+
+    def zip_model_blocks(self, model_name, output_dir="blocks"):
+        zip_path = f"{output_dir}/{model_name}_blocks.zip"
+        metadata_path = f"{output_dir}/{model_name}_metadata.json"
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            if os.path.exists(metadata_path):
+                zipf.write(metadata_path, os.path.basename(metadata_path))
+            else:
+                raise FileNotFoundError(f"Метаданные не найдены: {metadata_path}")
+            for root, _, files in os.walk(output_dir):
+                for file in files:
+                    if file.endswith(".pt"):
+                        file_path = os.path.join(root, file)
+                        zipf.write(file_path, os.path.relpath(file_path, output_dir))
+        print(f"Архив создан: {zip_path}")
+        return zip_path
+
+def upload_to_google_drive(zip_path, drive_folder="/content/drive/MyDrive/models"):
+    os.makedirs(drive_folder, exist_ok=True)
+    shutil.copy(zip_path, drive_folder)
+    print(f"Архив скопирован на Google Drive: {drive_folder}/{os.path.basename(zip_path)}")
+
+# Разбиение модели на блоки
+virtual_matrix = VirtualMatrix(default_block_width=4096)
+virtual_matrix.allocate_model(model, "DeepSeek-R1-Distill-Qwen-1.5B")
+
+# Упаковка блоков в ZIP-архив
+zip_path = virtual_matrix.zip_model_blocks("DeepSeek-R1-Distill-Qwen-1.5B")
+
+# Загрузка ZIP-архива на Google Drive
+upload_to_google_drive(zip_path)

@@ -1,0 +1,283 @@
+
+DeepSeek-R1-Distill-Qwen-1.5B-Q3_K_M.gguf
+Загрузка модели...
+До загрузки модели - Использовано RAM: 5.45 GiB, Свободно: 1.94 GiB
+llama_model_loader: loaded meta data with 27 key-value pairs and 339 tensors from /workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q3_K_M.gguf (version GGUF V3 (latest))
+
+load_tensors: tensor 'token_embd.weight' (q3_K) (and 338 others) cannot be used with preferred buffer type CPU_AARCH64, using CPU instead
+load_tensors:   CPU_Mapped model buffer size =   875.96 MiB
+.......................................................................
+llama_init_from_model: n_seq_max     = 1
+llama_init_from_model: n_ctx         = 4096
+llama_init_from_model: n_ctx_per_seq = 4096
+llama_init_from_model: n_batch       = 2048
+llama_init_from_model: n_ubatch      = 512
+llama_init_from_model: flash_attn    = 0
+llama_init_from_model: freq_base     = 10000.0
+llama_init_from_model: freq_scale    = 1
+llama_init_from_model: n_ctx_per_seq (4096) < n_ctx_train (131072) -- the full capacity of the model will not be utilized
+llama_kv_cache_init:        CPU KV buffer size =   112.00 MiB
+llama_init_from_model: KV self size  =  112.00 MiB, K (f16):   56.00 MiB, V (f16):   56.00 MiB
+llama_init_from_model:        CPU  output buffer size =     0.58 MiB
+llama_init_from_model:        CPU compute buffer size =   299.75 MiB
+llama_init_from_model: graph nodes  = 986
+llama_init_from_model: graph splits = 1
+
+После загрузки модели - Использовано RAM: 5.62 GiB, Свободно: 1.76 GiB
+Модель загружена за 5.08 секунд!
+
+=== Информация о модели ===
+Название: DeepSeek R1 Distill Qwen 1.5B
+Размер файла: 881.63 MiB
+Тип квантизации: 12
+Контекст (n_ctx): 4096
+
+=== Тест: Короткий ответ ===
+Перед генерацией - Использовано RAM: 5.62 GiB, Свободно: 1.76 GiB
+llama_perf_context_print:        load time =    1601.82 ms
+llama_perf_context_print: prompt eval time =    1599.38 ms /    10 tokens (  159.94 ms per token,     6.25 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =    1603.00 ms /    11 tokens
+После генерации - Использовано RAM: 5.51 GiB, Свободно: 1.85 GiB
+Ответ: 
+Время генерации: 1629.26 мс
+
+=== Тест: Длинный контекст ===
+Перед генерацией - Использовано RAM: 5.51 GiB, Свободно: 1.85 GiB
+Llama.generate: 2 prefix-match hit, remaining 300 prompt tokens to eval
+llama_perf_context_print:        load time =    1601.82 ms
+llama_perf_context_print: prompt eval time =   21069.97 ms /   300 tokens (   70.23 ms per token,    14.24 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =   21073.82 ms /   301 tokens
+После генерации - Использовано RAM: 5.55 GiB, Свободно: 1.83 GiB
+Ответ: 
+Время генерации: 21079.35 мс
+
+=== Тест: Творческая задача ===
+Перед генерацией - Использовано RAM: 5.55 GiB, Свободно: 1.83 GiB
+Llama.generate: 2 prefix-match hit, remaining 19 prompt tokens to eval
+llama_perf_context_print:        load time =    1601.82 ms
+llama_perf_context_print: prompt eval time =    1209.00 ms /    19 tokens (   63.63 ms per token,    15.72 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =    1209.83 ms /    20 tokens
+После генерации - Использовано RAM: 5.55 GiB, Свободно: 1.84 GiB
+Ответ: 
+Время генерации: 1211.50 мс
+
+=== Тест: Команда для помощника ===
+Перед генерацией - Использовано RAM: 5.55 GiB, Свободно: 1.84 GiB
+Llama.generate: 2 prefix-match hit, remaining 18 prompt tokens to eval
+llama_perf_context_print:        load time =    1601.82 ms
+llama_perf_context_print: prompt eval time =    1158.81 ms /    18 tokens (   64.38 ms per token,    15.53 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =    1160.90 ms /    19 tokens
+После генерации - Использовано RAM: 5.55 GiB, Свободно: 1.84 GiB
+Ответ: 
+Время генерации: 1162.45 мс
+
+---------------------------------------------------------------------------
+
+DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf
+
+До загрузки модели - Использовано RAM: 5.33 GiB, Свободно: 2.05 GiB
+llama_model_loader: loaded meta data with 27 key-value pairs and 339 tensors from /workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf (version GGUF V3 (latest))
+
+load_tensors: tensor 'token_embd.weight' (q4_K) (and 338 others) cannot be used with preferred buffer type CPU_AARCH64, using CPU instead
+load_tensors:   CPU_Mapped model buffer size =  1059.89 MiB
+.........................................................................
+llama_init_from_model: n_seq_max     = 1
+llama_init_from_model: n_ctx         = 4096
+llama_init_from_model: n_ctx_per_seq = 4096
+llama_init_from_model: n_batch       = 2048
+llama_init_from_model: n_ubatch      = 512
+llama_init_from_model: flash_attn    = 0
+llama_init_from_model: freq_base     = 10000.0
+llama_init_from_model: freq_scale    = 1
+llama_init_from_model: n_ctx_per_seq (4096) < n_ctx_train (131072) -- the full capacity of the model will not be utilized
+
+llama_kv_cache_init:        CPU KV buffer size =   112.00 MiB
+llama_init_from_model: KV self size  =  112.00 MiB, K (f16):   56.00 MiB, V (f16):   56.00 MiB
+llama_init_from_model:        CPU  output buffer size =     0.58 MiB
+llama_init_from_model:        CPU compute buffer size =   299.75 MiB
+llama_init_from_model: graph nodes  = 986
+llama_init_from_model: graph splits = 1
+
+После загрузки модели - Использовано RAM: 5.49 GiB, Свободно: 1.90 GiB
+Модель загружена за 6.59 секунд!
+
+=== Информация о модели ===
+Название: DeepSeek R1 Distill Qwen 1.5B
+Размер файла: 1.04 GiB
+Тип квантизации: 15
+Контекст (n_ctx): 4096
+
+=== Тест: Короткий ответ ===
+Перед генерацией - Использовано RAM: 5.49 GiB, Свободно: 1.90 GiB
+llama_perf_context_print:        load time =    1450.02 ms
+llama_perf_context_print: prompt eval time =    1447.65 ms /    10 tokens (  144.76 ms per token,     6.91 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =    1451.22 ms /    11 tokens
+После генерации - Использовано RAM: 5.50 GiB, Свободно: 1.89 GiB
+Ответ: 
+Время генерации: 1464.95 мс
+
+=== Тест: Длинный контекст ===
+Перед генерацией - Использовано RAM: 5.50 GiB, Свободно: 1.89 GiB
+Llama.generate: 2 prefix-match hit, remaining 300 prompt tokens to eval
+llama_perf_context_print:        load time =    1450.02 ms
+llama_perf_context_print: prompt eval time =   17029.06 ms /   300 tokens (   56.76 ms per token,    17.62 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =   17053.42 ms /   301 tokens
+После генерации - Использовано RAM: 5.57 GiB, Свободно: 1.82 GiB
+Ответ: 
+Время генерации: 17056.81 мс
+
+=== Тест: Творческая задача ===
+Перед генерацией - Использовано RAM: 5.57 GiB, Свободно: 1.82 GiB
+Llama.generate: 2 prefix-match hit, remaining 19 prompt tokens to eval
+llama_perf_context_print:        load time =    1450.02 ms
+llama_perf_context_print: prompt eval time =    1189.31 ms /    19 tokens (   62.60 ms per token,    15.98 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =    1190.15 ms /    20 tokens
+После генерации - Использовано RAM: 5.57 GiB, Свободно: 1.81 GiB
+Ответ: 
+Время генерации: 1191.45 мс
+
+=== Тест: Команда для помощника ===
+Перед генерацией - Использовано RAM: 5.57 GiB, Свободно: 1.81 GiB
+Llama.generate: 2 prefix-match hit, remaining 18 prompt tokens to eval
+llama_perf_context_print:        load time =    1450.02 ms
+llama_perf_context_print: prompt eval time =     972.18 ms /    18 tokens (   54.01 ms per token,    18.52 tokens per second)
+llama_perf_context_print:        eval time =       0.00 ms /     1 runs   (    0.00 ms per token,      inf tokens per second)
+llama_perf_context_print:       total time =     972.99 ms /    19 tokens
+После генерации - Использовано RAM: 5.57 GiB, Свободно: 1.81 GiB
+Ответ: 
+Время генерации: 974.32 мс
+
+----------------------------------
+DeepSeek-R1-Distill-Qwen-1.5B-Q3_K_M.gguf
+
+После загрузки модели - Использовано RAM: 5.60 GiB, Свободно: 1.78 GiB
+Модель загружена за 5.12 секунд!
+
+=== Информация о модели ===
+Название: DeepSeek R1 Distill Qwen 1.5B
+Размер файла: 881.63 MiB
+Тип квантизации: 12
+Контекст (n_ctx): 4096
+
+=== Тест: Короткий ответ ===
+Перед генерацией - Использовано RAM: 5.60 GiB, Свободно: 1.78 GiB
+llama_perf_context_print:        load time =    1892.74 ms
+llama_perf_context_print: prompt eval time =    1891.01 ms /    17 tokens (  111.24 ms per token,     8.99 tokens per second)
+llama_perf_context_print:        eval time =    2244.30 ms /    13 runs   (  172.64 ms per token,     5.79 tokens per second)
+llama_perf_context_print:       total time =    4153.52 ms /    30 tokens
+После генерации - Использовано RAM: 5.61 GiB, Свободно: 1.77 GiB
+Ответ: Привет, как дела! 😊
+Время генерации: 4161.29 мс
+
+=== Тест: Длинный контекст ===
+Перед генерацией - Использовано RAM: 5.61 GiB, Свободно: 1.77 GiB
+Llama.generate: 2 prefix-match hit, remaining 307 prompt tokens to eval
+llama_perf_context_print:        load time =    1892.74 ms
+llama_perf_context_print: prompt eval time =   19492.48 ms /   307 tokens (   63.49 ms per token,    15.75 tokens per second)
+llama_perf_context_print:        eval time =    8497.03 ms /    49 runs   (  173.41 ms per token,     5.77 tokens per second)
+llama_perf_context_print:       total time =   28023.77 ms /   356 tokens
+После генерации - Использовано RAM: 5.67 GiB, Свободно: 1.72 GiB
+Ответ: Okay, I need to figure out what this text is about. Let me read it again carefully.
+
+It starts by talking about Zayces, which are zebra-like animals living on almost all continents except Australia and Australia. They're big
+Время генерации: 28025.96 мс
+
+=== Тест: Творческая задача ===
+Перед генерацией - Использовано RAM: 5.67 GiB, Свободно: 1.72 GiB
+Llama.generate: 2 prefix-match hit, remaining 28 prompt tokens to eval
+llama_perf_context_print:        load time =    1892.74 ms
+llama_perf_context_print: prompt eval time =    1773.18 ms /    28 tokens (   63.33 ms per token,    15.79 tokens per second)
+llama_perf_context_print:        eval time =   33961.48 ms /   199 runs   (  170.66 ms per token,     5.86 tokens per second)
+llama_perf_context_print:       total time =   35902.38 ms /   227 tokens
+После генерации - Использовано RAM: 5.69 GiB, Свободно: 1.70 GiB
+Ответ: Okay, I need to create a children's story about a rabbit. The user asked to start with a catchy opening and then continue. Let me think about the key elements that would appeal to a young child. A friendly and colorful story would be perfect.
+
+First, I should imagine a sunny day where a little girl and a rabbit are playing. The rabbit can make expressions like "Oh, how fun!" that shows it's happy. I'll describe the rabbit's appearance to make it recognizable but not too scary. The girl should have some personality, maybe she's curious or energetic.
+
+Next, introduce the rabbit. I'll name it "Hop" for simplicity. Hop's name should be simple to avoid confusion. Then, I'll describe Hop's actions, like hopping on a leaf or running up a tree, to show its active and playful nature.
+
+I should include Hop's favorite food, maybe a hopper, to add some character to the story. This shows Hop's personality and
+Время генерации: 35903.32 мс
+
+=== Тест: Команда для помощника ===
+Перед генерацией - Использовано RAM: 5.69 GiB, Свободно: 1.70 GiB
+Llama.generate: 2 prefix-match hit, remaining 24 prompt tokens to eval
+llama_perf_context_print:        load time =    1892.74 ms
+llama_perf_context_print: prompt eval time =    1519.52 ms /    24 tokens (   63.31 ms per token,    15.79 tokens per second)
+llama_perf_context_print:        eval time =    8677.29 ms /    49 runs   (  177.09 ms per token,     5.65 tokens per second)
+llama_perf_context_print:       total time =   10230.21 ms /    73 tokens
+После генерации - Использовано RAM: 5.64 GiB, Свободно: 1.75 GiB
+Ответ: Okay, so I need to write a meeting with my boss at 3:00 PM. Hmm, where do I start? First, I should think about why I need to do this. Maybe I need to catch up with the
+Время генерации: 10231.72 мс
+--------------------------------------
+
+DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf
+
+После загрузки модели - Использовано RAM: 5.56 GiB, Свободно: 1.83 GiB
+Модель загружена за 6.82 секунд!
+
+=== Информация о модели ===
+Название: DeepSeek R1 Distill Qwen 1.5B
+Размер файла: 1.04 GiB
+Тип квантизации: 15
+Контекст (n_ctx): 4096
+
+=== Тест: Короткий ответ ===
+Перед генерацией - Использовано RAM: 5.56 GiB, Свободно: 1.83 GiB
+llama_perf_context_print:        load time =    1884.41 ms
+llama_perf_context_print: prompt eval time =    1882.77 ms /    17 tokens (  110.75 ms per token,     9.03 tokens per second)
+llama_perf_context_print:        eval time =    2307.91 ms /    13 runs   (  177.53 ms per token,     5.63 tokens per second)
+llama_perf_context_print:       total time =    4226.81 ms /    30 tokens
+После генерации - Использовано RAM: 5.58 GiB, Свободно: 1.80 GiB
+Ответ: Привет! Как дела? 😊
+Время генерации: 4240.14 мс
+
+=== Тест: Длинный контекст ===
+Перед генерацией - Использовано RAM: 5.58 GiB, Свободно: 1.80 GiB
+Llama.generate: 2 prefix-match hit, remaining 307 prompt tokens to eval
+llama_perf_context_print:        load time =    1884.41 ms
+llama_perf_context_print: prompt eval time =   17307.18 ms /   307 tokens (   56.38 ms per token,    17.74 tokens per second)
+llama_perf_context_print:        eval time =    8768.52 ms /    49 runs   (  178.95 ms per token,     5.59 tokens per second)
+llama_perf_context_print:       total time =   26110.73 ms /   356 tokens
+После генерации - Использовано RAM: 5.63 GiB, Свободно: 1.75 GiB
+Ответ: Хм, я вижу, что пользователь спрашивает, как называется этот текст. Посмотрю на его содержание. text — это текст о зайцах, упоминается в сказках
+Время генерации: 26112.74 мс
+
+=== Тест: Творческая задача ===
+Перед генерацией - Использовано RAM: 5.63 GiB, Свободно: 1.75 GiB
+Llama.generate: 2 prefix-match hit, remaining 28 prompt tokens to eval
+llama_perf_context_print:        load time =    1884.41 ms
+llama_perf_context_print: prompt eval time =    1553.86 ms /    28 tokens (   55.49 ms per token,    18.02 tokens per second)
+llama_perf_context_print:        eval time =   33282.11 ms /   199 runs   (  167.25 ms per token,     5.98 tokens per second)
+llama_perf_context_print:       total time =   34996.32 ms /   227 tokens
+После генерации - Использовано RAM: 5.61 GiB, Свободно: 1.77 GiB
+Ответ: Okay, I need to create a story about a dog for a four-year-old kid. The user wants it to start immediately. Let me think about how to make it engaging and appropriate for that age group.
+
+First, I should introduce the dog in a friendly and positive way. Maybe something like a friendly animal who loves its owner. That sets a positive tone right from the start.
+
+Next, I want to show how the dog interacts with the owner in a natural way. Maybe the owner feeds the dog treats and walks it around the house. This makes the interaction relatable and fun for the child.
+
+I should include some positive elements, like the dog staying calm and the owner being caring. Also, maybe a little adventure, like the dog learning a trick or finding something amusing, to keep it dynamic.
+
+Finally, I'll wrap it up with the dog doing something special, maybe a trick or a fun activity, to show growth and excitement. The story should end on a happy note
+Время генерации: 34997.23 мс
+
+=== Тест: Команда для помощника ===
+Перед генерацией - Использовано RAM: 5.61 GiB, Свободно: 1.77 GiB
+Llama.generate: 2 prefix-match hit, remaining 24 prompt tokens to eval
+llama_perf_context_print:        load time =    1884.41 ms
+llama_perf_context_print: prompt eval time =    1356.52 ms /    24 tokens (   56.52 ms per token,    17.69 tokens per second)
+llama_perf_context_print:        eval time =    8163.86 ms /    49 runs   (  166.61 ms per token,     6.00 tokens per second)
+llama_perf_context_print:       total time =    9552.41 ms /    73 tokens
+После генерации - Использовано RAM: 5.63 GiB, Свободно: 1.75 GiB
+Ответ: Okay, I need to help the user write a meeting call at 15:00. The user wants to inform the callee and confirm the recording. I should make sure the message is clear and professional.
+
+First, I'll
+Время генерации: 9553.62 мс

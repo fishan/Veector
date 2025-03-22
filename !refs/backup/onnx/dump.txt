@@ -1,0 +1,364 @@
+Ладно, брат, вот обновлённые инструкции для нового чата. Я учёл всё, что мы сделали, все ошибки, исправления, и добавил обновлённый код llama_model_load с логами. Ты сможешь закинуть это в новый чат и продолжить работу без потери контекста. Ничего не упустил — всё чётко и по делу.
+Инструкции для нового чата
+Введение
+Вы — Grok 3 от xAI, работаете с пользователем над проектом Veector. Мы чиним сегфолты в llama_model_load_from_file_impl и llama_model_load, чтобы загрузить GGUF-модель DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf в виртуальное пространство для инференса. Текущая дата: 21 марта 2025 года (с учётом временных зон Codespaces).
+Цель
+Зачем мы это делаем:
+Загрузить модель LLaMA (GGUF-формат) в ModelManager для интеграции с VirtualSpace.
+Устранить сегфолты в C++ коде (llama.cpp) и Python-обёртке (llama_cpp_local.py), чтобы модель работала на CPU.
+Конечная цель: рабочий инференс текста и токенов через perform_inference.
+Что сделали
+Изначальная проблема:
+Сегфолт в llama_model_load_from_file_impl на этапе обработки params.devices:
+llama_model_load_from_file_impl: Devices provided, adding to model
+Segmentation fault (core dumped)
+Причина: params.devices приходил как мусор (0x7), а не nullptr.
+Шаги:
+Переписали model_manager.py:
+Убрали конфликт с пакетом llama-cpp-python (удалили через pip uninstall llama-cpp-python -y).
+Переключились на локальный /workspaces/Veector/src/llama_cpp_local.py с импортом from llama_cpp_local import Llama.
+Добавили отладку: logger.debug(f"Imported Llama from module: {Llama.__module__}").
+Обновили llama_cpp_local.py:
+Установили devices=ctypes.cast(None, POINTER(c_void_p)) для передачи nullptr.
+Добавили отладку: ENTERING Llama.__init__, params.devices before call.
+Обновили llama.cpp:
+Добавили защиту в llama_model_load_from_file_impl:
+cpp
+if ((uintptr_t)dev < 0x1000) {
+    LLAMA_LOG_ERROR("%s: Invalid devices pointer (0x%lx), using CPU instead\n", __func__, (uintptr_t)dev);
+}
+Пересобрали libllama.so:
+bash
+cd /workspaces/Veector/llama.cpp/build
+rm bin/libllama.so
+cmake --build . --config Debug
+Исправленные ошибки:
+Сегфолт на params.devices:
+Было: params.devices = 0x7, краш в while (*dev).
+Исправили: защита в llama.cpp ловит мусор и переключается на CPU. Лог:
+llama_model_load_from_file_impl: Invalid devices pointer (0x7), using CPU instead
+Конфликт импорта:
+Было: from llama_cpp import Llama тянул старый пакет.
+Исправили: переключились на локальный llama_cpp_local.py.
+TypeError в Llama.__init__:
+Было: старый API с n_gpu_layers не поддерживался.
+Исправили: убрали неподдерживаемые параметры (n_gpu_layers, main_gpu, etc.).
+Текущая проблема:
+Новый сегфолт в llama_model_load после загрузки метаданных:
+print_info: vocab_only       = 8
+print_info: n_ctx_train      = 0
+print_info: n_embd           = 0
+print_info: n_layer          = 0
+Segmentation fault (core dumped)
+Возможные причины:
+Неправильная инициализация llama_model_params в llama_cpp_local.py.
+Ошибка в llama_model_load (возможно, в load_tensors или load_vocab).
+Повреждённый файл /workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf.
+Текущие файлы
+model_manager.py:
+python
+import os
+import torch
+import numpy as np
+from gguf import GGUFReader
+from ipfshttpclient import connect
+from pathlib import Path
+from virtual_space import VirtualSpace
+from qiskit import QuantumCircuit
+from llama_cpp_local import Llama
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+logger.debug(f"Imported Llama from module: {Llama.__module__}")
+logger.debug(f"Llama defined in: {Llama.__init__.__code__.co_filename}")
+
+class ModelManager:
+    def __init__(self, veector, block_size=4096, ipfs_enabled=True, model_dir="../data/models"):
+        self.veector = veector
+        self.block_size = block_size
+        self.ipfs_enabled = ipfs_enabled
+        self.model_dir = Path(model_dir)
+        self.model_dir.mkdir(parents=True, exist_ok=True)
+        self.virtual_space = VirtualSpace(veector, use_ipfs=ipfs_enabled, model_manager=self)
+        self.models = {}
+        self.llama_instances = {}
+        self.quantum_circuits = {}
+        self.p2p_node = veector.p2p_node if ipfs_enabled and veector.p2p_node else None
+
+    def load_gguf_model(self, model_name, gguf_path, n_threads=4, n_ctx=2048, n_batch=512):
+        if not os.path.exists(gguf_path):
+            raise FileNotFoundError(f"Файл {gguf_path} не найден")
+        
+        logger.debug(f"Loading GGUF model: {model_name} from {gguf_path}")
+        reader = GGUFReader(gguf_path)
+        metadata = {}
+        for tensor in reader.tensors:
+            name = tensor.name
+            shape = tensor.shape
+            if len(shape) == 2:
+                height, width = shape
+                if tensor.tensor_type == 12:
+                    itemsize = 0.5
+                else:
+                    itemsize = 2
+                for i in range(0, height, self.block_size):
+                    block_height = min(self.block_size, height - i)
+                    block_key = f"{name}_block{i // self.block_size}"
+                    metadata[block_key] = {
+                        "tensor_name": name,
+                        "shape": [block_height, width],
+                        "offset": i * width * itemsize,
+                        "path": gguf_path,
+                        "tensor_type": tensor.tensor_type
+                    }
+
+        self.models[model_name] = {"reader": reader, "metadata": metadata}
+        self.virtual_space.switch_model(model_name, metadata)
+        
+        logger.debug(f"Creating Llama instance for {model_name}")
+        llama = Llama(model_path=gguf_path, n_threads=n_threads, n_ctx=n_ctx, n_batch=n_batch)
+        logger.debug(f"Setting virtual dispatcher for {model_name}")
+        llama.set_virtual_dispatcher(self.virtual_space.dispatchers[model_name])
+        self.llama_instances[model_name] = llama
+        
+        logger.info(f"Модель {model_name} загружена в виртуальное пространство из {gguf_path}")
+
+    def perform_inference(self, model_name, input_data, max_tokens=200):
+        if model_name not in self.models:
+            raise ValueError(f"Модель {model_name} не загружена")
+        llama = self.llama_instances[model_name]
+        if isinstance(input_data, str):
+            response = llama(input_data, max_tokens=max_tokens)
+            return response["choices"][0]["text"]
+        elif isinstance(input_data, np.ndarray):
+            input_tensor = torch.from_numpy(input_data).long()
+        elif isinstance(input_data, list):
+            input_tensor = torch.tensor(input_data, dtype=torch.long)
+        else:
+            input_tensor = input_data.long()
+        dispatcher = self.virtual_space.dispatchers[model_name]
+        blocks = dispatcher.get_needed_blocks(input_tensor)
+        for block in blocks:
+            dispatcher.load_block(block)
+        response = llama(input_tensor.tolist(), max_tokens=max_tokens)
+        return torch.tensor([int(x) for x in response["choices"][0]["text"]], dtype=torch.long)
+
+    def add_quantum_circuit(self, model_name, circuit):
+        if not isinstance(circuit, QuantumCircuit):
+            raise ValueError("circuit должен быть объектом QuantumCircuit")
+        self.quantum_circuits[model_name] = circuit
+        print(f"Квантовая цепь добавлена для модели {model_name}")
+
+    def execute_quantum_circuit(self, model_name, input_state=None):
+        if model_name not in self.quantum_circuits:
+            raise ValueError(f"Квантовая цепь для {model_name} не найдена")
+        from qiskit import execute
+        from qiskit.providers.aer import Aer
+        circuit = self.quantum_circuits[model_name]
+        num_qubits = circuit.num_qubits
+        if input_state is not None:
+            input_state = np.array(input_state, dtype=np.complex128)
+            if input_state.size != 2 ** num_qubits:
+                raise ValueError(f"Размер входного состояния {input_state.size} не соответствует {2 ** num_qubits}")
+            circuit.initialize(input_state / np.linalg.norm(input_state), range(num_qubits))
+        simulator = Aer.get_backend('statevector_simulator')
+        job = execute(circuit, simulator)
+        result = job.result().get_statevector()
+        return np.array(result, dtype=np.complex128)
+
+if __name__ == "__main__":
+    from core import Veector
+    veector = Veector(use_memory=False, ipfs_enabled=False)
+    manager = ModelManager(veector, ipfs_enabled=False)
+    manager.load_gguf_model(
+        "DeepSeek-R1-Distill-Qwen-1.5B",
+        "/workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf"
+    )
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", "Hello, world!")
+    print(f"Результат инференса: {output}")
+    input_data = np.array([0, 1, 2, 3, 4, 5], dtype=np.int32)
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", input_data)
+    print(f"Результат инференса с токенами: {output}")
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    manager.add_quantum_circuit("quantum_test", qc)
+    result = manager.execute_quantum_circuit("quantum_test", input_state=[1, 0, 0, 0])
+    print(f"Результат квантовой цепи: {result}")
+llama_cpp_local.py:
+python
+import ctypes
+from ctypes import CFUNCTYPE, c_char_p, c_void_p, POINTER, Structure, c_int
+import logging
+import os
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+logger.debug("Loading libllama.so")
+lib_path = "/workspaces/Veector/llama.cpp/build/bin/libllama.so"
+logger.debug(f"Library path: {lib_path}, modified: {os.path.getmtime(lib_path)}")
+_lib = ctypes.CDLL(lib_path)
+logger.debug("libllama.so loaded successfully")
+
+class VirtualDispatcher(Structure):
+    _fields_ = [
+        ("gguf_path", c_char_p),
+        ("load_block", CFUNCTYPE(c_void_p, c_char_p, c_void_p)),
+        ("user_data", c_void_p)
+    ]
+
+class llama_model_params(Structure):
+    _fields_ = [
+        ("n_gpu_layers", c_int),
+        ("split_mode", c_int),
+        ("main_gpu", c_int),
+        ("devices", POINTER(c_void_p)),
+        ("use_mmap", c_int),
+        ("check_tensors", c_int),
+        ("kv_overrides", c_void_p),
+        ("vocab_only", c_int),
+        ("progress_callback", c_void_p),
+        ("progress_callback_user_data", c_void_p)
+    ]
+
+_lib.llama_set_virtual_dispatcher.argtypes = [POINTER(VirtualDispatcher)]
+_lib.llama_model_load_from_file.argtypes = [c_char_p, POINTER(llama_model_params)]
+_lib.llama_model_load_from_file.restype = c_void_p
+
+class Llama:
+    def __init__(self, model_path, n_threads=4, n_ctx=2048, n_batch=512):
+        logger.debug(f"ENTERING Llama.__init__ with model_path: {model_path}, n_threads: {n_threads}, n_ctx: {n_ctx}, n_batch: {n_batch}")
+        params = llama_model_params(
+            n_gpu_layers=0,
+            split_mode=0,
+            main_gpu=0,
+            devices=ctypes.cast(None, POINTER(c_void_p)),
+            use_mmap=1,
+            check_tensors=0,
+            kv_overrides=None,
+            vocab_only=0,
+            progress_callback=None,
+            progress_callback_user_data=None
+        )
+        logger.debug(f"params: n_gpu_layers={params.n_gpu_layers}, split_mode={params.split_mode}, main_gpu={params.main_gpu}, devices={params.devices}, use_mmap={params.use_mmap}, check_tensors={params.check_tensors}, vocab_only={params.vocab_only}")
+        logger.debug("Calling llama_model_load_from_file")
+        self._llama = _lib.llama_model_load_from_file(model_path.encode("utf-8"), ctypes.byref(params))
+        if not self._llama:
+            logger.error("Failed to load llama model")
+            raise RuntimeError("Failed to load llama model")
+        logger.debug("Llama model loaded successfully")
+
+    def set_virtual_dispatcher(self, dispatcher):
+        logger.debug("Setting virtual dispatcher")
+        @CFUNCTYPE(c_void_p, c_char_p, c_void_p)
+        def load_block(block_key, user_data):
+            key = block_key.decode("utf-8")
+            logger.debug(f"Calling load_block for key: {key}")
+            block = dispatcher.load_block(key)
+            result = block.ctypes.data_as(c_void_p) if block else None
+            logger.debug(f"load_block result: {result}")
+            return result
+        c_dispatcher = VirtualDispatcher()
+        gguf_path = getattr(dispatcher, "gguf_path", "")
+        c_dispatcher.gguf_path = gguf_path.encode("utf-8")
+        c_dispatcher.load_block = load_block
+        c_dispatcher.user_data = None
+        logger.debug("Calling llama_set_virtual_dispatcher")
+        _lib.llama_set_virtual_dispatcher(ctypes.byref(c_dispatcher))
+        logger.debug("Virtual dispatcher set successfully")
+
+    def __call__(self, input_data, max_tokens=200):
+        logger.debug(f"Calling Llama with input: {input_data}")
+        return {"choices": [{"text": "Placeholder response"}]}
+
+    def __del__(self):
+        logger.debug("Destroying Llama instance")
+llama.cpp (обновлённая версия llama_model_load):
+cpp
+static int llama_model_load(const std::string& fname, std::vector<std::string>& splits, 
+                           llama_model& model, llama_model_params& params) {
+    LLAMA_LOG_INFO("%s: Loading model from %s\n", __func__, fname.c_str());
+
+    model.t_load_us = 0;
+    time_meas tm(model.t_load_us);
+    model.t_start_us = tm.t_start_us;
+
+    try {
+        LLAMA_LOG_INFO("%s: Creating llama_model_loader\n", __func__);
+        llama_model_loader ml(fname, splits, params.use_mmap, params.check_tensors, params.kv_overrides);
+        LLAMA_LOG_INFO("%s: llama_model_loader created\n", __func__);
+        ml.print_info();
+
+        LLAMA_LOG_INFO("%s: Loading architecture\n", __func__);
+        model.load_arch(ml);
+        LLAMA_LOG_INFO("%s: Architecture loaded\n", __func__);
+
+        LLAMA_LOG_INFO("%s: Loading hyperparameters\n", __func__);
+        model.load_hparams(ml);
+        LLAMA_LOG_INFO("%s: Hyperparameters loaded\n", __func__);
+
+        LLAMA_LOG_INFO("%s: Loading vocabulary\n", __func__);
+        model.load_vocab(ml);
+        LLAMA_LOG_INFO("%s: Vocabulary loaded\n", __func__);
+
+        LLAMA_LOG_INFO("%s: Loading stats\n", __func__);
+        model.load_stats(ml);
+        LLAMA_LOG_INFO("%s: Stats loaded\n", __func__);
+
+        model.hparams.vocab_only = params.vocab_only;
+        LLAMA_LOG_INFO("%s: Printing model info\n", __func__);
+        model.print_info();
+
+        if (params.vocab_only) {
+            LLAMA_LOG_INFO("%s: vocab only - skipping tensors\n", __func__);
+            return 0;
+        }
+
+        LLAMA_LOG_INFO("%s: Loading tensors\n", __func__);
+        if (!model.load_tensors(ml)) {
+            LLAMA_LOG_ERROR("%s: Failed to load tensors\n", __func__);
+            return -2;
+        }
+        LLAMA_LOG_INFO("%s: Tensors loaded successfully\n", __func__);
+    } catch (const std::exception& err) {
+        LLAMA_LOG_ERROR("%s: error loading model: %s\n", __func__, err.what());
+        return -1;
+    }
+
+    LLAMA_LOG_INFO("%s: Model loading completed\n", __func__);
+    return 0;
+}
+Следующие шаги
+Пересобери libllama.so:
+bash
+cd /workspaces/Veector/llama.cpp/build
+rm bin/libllama.so
+cmake --build . --config Debug
+Запусти:
+bash
+cd /workspaces/Veector/src
+find . -name "__pycache__" -exec rm -rf {} +
+find . -name "*.pyc" -delete
+python model_manager.py
+Если сегфолт:
+Проверь модель:
+bash
+ls -lh /workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf
+Ожидаемый размер: ~1.04 GiB.
+Проверь лог — где падает (после какого шага в llama_model_load).
+Скинь последние 10 строк лога.
+Что скинуть в новый чат:
+Лог после запуска.
+Вывод:
+bash
+ls -lh /workspaces/Veector/llama.cpp/build/bin/libllama.so
+ls -lh /workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf
+Цель на следующем этапе
+Устранить сегфолт в llama_model_load.
+Убедиться, что параметры (n_layer, n_embd, etc.) загружаются корректно.
+Дойти до успешного инференса.
+Итог
+Эти инструкции — полный слепок нашей работы. Загрузи их в новый чат, и мы продолжим с того же места. Код llama_model_load обновлён с логами для точного определения точки сбоя. Первый сегфолт мы убрали, теперь идём за вторым. Если что-то неясно, дай знать перед загрузкой — проверю ещё раз. Удачи, брат — мы почти у цели!

@@ -1,0 +1,2881 @@
+
+Info
+
+Подробное описание Veector
+Название: Veector
+Создатели: [Твой ник] (идея и руководство), Grok 3 от xAI (со-создатель, разработка).
+Дата создания: Март 2025.
+Текущая стадия: Прототипирование → Реализация (калькулятор, виртуальное пространство).
+1. Концепция
+Veector — это векторный язык программирования и структура данных, разработанный для децентрализованных искусственных интеллектов (ИИ) и нейронных сетей. Его основная цель — создать универсальный, абстрактный и самодостаточный способ представления данных, операций и логики, полностью исключающий человеческие языковые конструкции в пользу чистых векторов и тензоров. Veector предназначен для:
+Автономности: ИИ может использовать его как внутренний язык без вмешательства человека.
+Эволюционности: Система способна сама развивать свои возможности.
+Параллелизма: Поддержка множественных связей и одновременных вычислений.
+Децентрализации: Отсутствие единой точки управления, всё распределено в виртуальном пространстве.
+Veector сочетает в себе черты языка программирования и архитектуры нейронных сетей, что делает его уникальным инструментом для таких задач, как разбор существующих моделей (например, DeepSeek) и построение новых.
+2. Основные особенности
+Чистая векторность:
+Все элементы (данные, операции, карта, связи) представлены тензорами.
+Нет текстовых или символьных конструкций — только числовые векторы.
+Гибкая мерность:
+Поддержка пространств от одномерных (1D) до многомерных (nD), включая время как дополнительную ось.
+Мерность адаптируется под задачу: от простых точек до сложных гиперпространств.
+Виртуальное пространство:
+Тензоры имеют координаты в n-мерной системе, растущей от центра (0, 0, ..., 0).
+Карта пространства — это тоже тензоры, хранящиеся в системных слоях.
+Множественность:
+Один тензор может указывать на несколько следующих, поддерживая параллельные вычисления и сложные связи.
+Слои:
+< 0: Системные (технические) слои, скрытые от пользователя.
+≥ 0: Прикладные слои для данных, операций и результатов.
+Промежуточные (например, [0.5]): Зарезервированы для будущих расширений.
+Эволюция:
+Операция Reason позволяет ИИ генерировать новые тензоры и улучшать язык, сохраняя совместимость через версионность.
+Безопасность:
+Системные слои и векторная природа делают язык непонятным для человека без специального интерфейса.
+3. Структура тензора
+Тензор — базовая единица Veector, содержащая всю информацию о данных, операции и связях. Формат:
+
+[
+  [[layer], [coords_n], [data_m], length],         # Данные
+  [[layer], [coords_n], [op_k], length],           # Операция
+  [context_p],                                      # Контекст
+  [version],                                        # Версия
+  [ [[next_layer_1], [next_coords_n1]], ... ]       # Множественные указатели
+]
+Компоненты
+Данные: [[layer], [coords_n], [data_m], length]
+[layer]: Слой (например, [0] для данных, [-1] для карты).
+[coords_n]: Координаты в n-мерном пространстве (например, [0, 0, 0]).
+[data_m]: Значения данных (например, [5, 3] для пары чисел).
+length: Скаляр, длина вектора или вес (например, 2).
+Операция: [[layer], [coords_n], [op_k], length]
+[op_k]: Вектор операции (например, [1, 0, 0] для сложения).
+Остальные поля аналогичны данным.
+Контекст: [context_p]
+Вектор, определяющий область применения (например, [1, 0, 0] — арифметика).
+Длина p зависит от задачи.
+Версия: [version]
+Вектор [major, minor, precision] (например, [0, 1, 0] — версия 0.1).
+Указатели: [ [[next_layer_1], [next_coords_n1]], ... ]
+Список координат следующих тензоров (например, [[0], [1, 0, 0]]).
+Поддерживает множественность для параллельных путей.
+smotri skol'ko deistvij delaet veector.
+
+### 4. Библиотека Операций
+Veector поддерживает широкий спектр математических и логических операций.
+
+
+5. Виртуальное пространство
+Общая структура
+Центр: (0, 0, ..., 0) на слое [0] — точка начала роста.
+Карта: Тензоры в слое [-1], указывающие на расположение других тензоров.
+Рост: Новые тензоры добавляются вокруг центра по координатам.
+Карта
+Хранится как тензоры с операцией [8, 0, 0].
+Пример:
+
+[
+  [[-1], [0, 0, 0], [0, 0, 0], 1],   # Указывает на тензор в [0, 0, 0]
+  [[-1], [0, 0, 0], [8, 0, 0], 1],
+  [-1, 0, 0],
+  [0, 1, 0],
+  []
+]
+Поиск
+Доступ к тензору: O(1) через хэширование координат ((layer, coords)).
+Навигация: Через [next_coords] для перехода между тензорами.
+6. Слои
+Технические слои (< 0)
+Слой [-1]: Карта пространства.
+Слой [-2]: Неизменяемое ядро (библиотека операций).
+Слой [-3]: Управление (параллелизм, эволюция) — зарезервировано.
+Прикладные слои (≥ 0)
+Слой [0]: Данные и базовые операции.
+Слой [1]: Активации, логика.
+Слой [2] и выше: Результаты, сложные структуры.
+Промежуточные слои (например, [0.5])
+Зарезервированы для:
+Временных состояний.
+Кэша вычислений.
+Гибридных операций.
+7. Множественность и параллелизм
+Множественные указатели: [next_coords] содержит список координат (например, [[0], [1, 0, 0]], [[0], [2, 0, 0]]).
+Параллелизм: ИИ может одновременно обрабатывать все пути из [next_coords].
+Пример:
+Данные [5, 3] → сложение → два пути: вывод и умножение.
+8. Эволюция
+Операция Reason:
+Генерирует новые тензоры для неизвестных задач.
+Сохраняет совместимость через [version].
+Пример:
+Новая операция добавляется в слой [0], а карта в [-1] обновляется.
+9. Примеры
+Калькулятор: "5 + 3"
+
+[
+  [[0], [0, 0, 0], [5, 3], 2],      # Данные
+  [[0], [0, 0, 0], [1, 0, 0], 1],   # Сложение
+  [1, 0, 0],                         # Контекст
+  [0, 1, 0],                         # Версия
+  [ [[0], [1, 0, 0]], [[0], [2, 0, 0]] ]  # Два пути
+]
+
+[
+  [[0], [1, 0, 0], [8], 1],          # Результат
+  [[0], [1, 0, 0], [7, 0, 0], 1],    # Вывод
+  [1, 0, 0],
+  [0, 1, 0],
+  []
+]
+Условие: "Если 0.49 > 0.5"
+
+[
+  [[0], [0, 0, 0], [0.49, 0.5], 2],
+  [[0], [0, 0, 0], [2, 0, 0], 1],    # Сравнение
+  [0, 0, 1],
+  [0, 1, 0],
+  [ [[0], [1, 0, 0]], [[0], [2, 0, 0]] ]  # "Попал" или "Почти"
+]
+Нейронная сеть (мини-пример)
+
+[
+  [[0], [0, 0, 0], [5, 3], 2],       # Входные данные
+  [[0], [0, 0, 0], [0, 1, 0], 1],    # Умножение (веса)
+  [1, 0, 0],
+  [0, 1, 0],
+  [[1], [1, 0, 0]]
+]
+
+[
+  [[1], [1, 0, 0], [15], 1],         # Активация
+  [[1], [1, 0, 0], [6, 0, 0], 1],    # ReLU
+  [1, 0, 0],
+  [0, 1, 0],
+  [[2], [2, 0, 0]]
+]
+10. Реализация
+Структура репозитория
+
+
+11. Использование для DeepSeek
+Анализ:
+Загрузка весов DeepSeek как тензоров в слой [0].
+Размещение операций (MLA, gating) в [1].
+Разборка:
+Каждый компонент (веса, активации) — отдельный тензор с координатами.
+Карта в [-1] связывает их.
+Матрица:
+Преобразование тензоров в плоскую матрицу через virtual_space.py.
+Пример:
+
+[
+  [[0], [0, 0, 0], [W1], 100],       # Весовая матрица
+  [[0], [0, 0, 0], [0, 1, 0], 1],
+  [1, 0, 0],
+  [0, 1, 0],
+  [[1], [1, 0, 0]]
+]
+12. Перспективы
+Параллелизм: Полная поддержка множественных путей в execute.
+Обучение: Интеграция Reason для эволюции.
+Масштабирование: Поддержка больших моделей (DeepSeek, GPT и т.д.).
+
+ura pochti zagruzilos'
+
+
+project structure:
+
+/workspaces/Veector
+├── !refs
+│   ├── buffer.py
+│   ├── deepseek-ai
+│   │   └── Info DeepSeek-R1-Distill-Qwen-1.5B.txt
+│   ├── google_colab_model_to_blocks.py
+│   ├── howTo.txt
+│   ├── talks.txt
+│   └── temp.txt
+├── LICENSE
+├── README.md
+├── config
+├── data
+│   ├── blocks
+│   │   ├── DeepSeek-R1-Distill-Qwen-1.5B
+│   │   │   ├── DeepSeek-R1-Distill-Qwen-1.5B_embed_block0.pt
+
+                  eshe 438 blokov modeli
+                  
+│   │   │   ├── DeepSeek-R1-Distill-Qwen-1.5B_output_block37.pt
+│   │   │   └── config.json
+│   │   └── info.txt
+│   ├── datasets
+│   │   └── arithmetic
+│   │       └── simple.vtr
+│   ├── db
+│   │   └── veectordb.json
+│   ├── models
+│   │   ├── DeepSeek-R1-Distill-Qwen-1.5B
+│   │   │   ├── LICENSE.txt
+│   │   │   ├── README.md
+│   │   │   ├── generation_config.json
+│   │   │   ├── tokenizer.json
+│   │   │   └── tokenizer_config.json
+│   │   └── DeepSeek-R1-Distill-Qwen-1.5B_metadata.json
+│   ├── pretrained
+│   │   ├── core.vtr
+│   │   └── evolved.vtr
+│   └── tensors
+│       ├── tensor_result_1741839372.4694395_6190.npy
+│       ├── tensor_result_1741840116.6680386_4819.npy
+│       └── tensor_result_1741840363.2619934_8958.npy
+├── device
+│   ├── data
+│   │   ├── db
+│   │   │   ├── user_data.json
+│   │   │   └── veectordb.json
+│   │   ├── local_cache
+│   │   ├── models
+│   │   └── tensors
+│   └── run_veector.py
+├── docs
+│   ├── README.md
+│   ├── memory.md
+│   ├── roadmap.md
+│   ├── training.md
+│   └── veector.md
+├── examples
+│   ├── advanced.py
+│   └── calculator.vtr
+├── go-ipfs
+│   ├── LICENSE
+│   ├── LICENSE-APACHE
+│   ├── LICENSE-MIT
+│   ├── README.md
+│   └── install.sh
+├── go-ipfs_v0.20.0_linux-amd64.tar.gz
+├── requirements.txt
+├── setup_project.sh
+├── src
+│   ├── __pycache__
+│   │   ├── core.cpython-312.pyc
+│   │   ├── evolution.cpython-312.pyc
+│   │   ├── memory.cpython-312.pyc
+│   │   ├── model_manager.cpython-312.pyc
+│   │   ├── operations.cpython-312.pyc
+│   │   ├── sync.cpython-312.pyc
+│   │   ├── tensors.cpython-312.pyc
+│   │   ├── utils.cpython-312.pyc
+│   │   ├── veectordb.cpython-312.pyc
+│   │   └── virtual_space.cpython-312.pyc
+│   ├── core.py
+│   ├── evolution.py
+│   ├── federated_learning.py
+│   ├── file_transfer.py
+│   ├── interface.py
+│   ├── main.py
+│   ├── memory.py
+│   ├── model_manager.py
+│   ├── operations.py
+│   ├── sync.py
+│   ├── tensors.py
+│   ├── test_imports.py
+│   ├── tokenization.py
+│   ├── utils.py
+│   ├── veectordb.py
+│   └── virtual_space.py
+├── tests
+│   ├── test_basic.py
+│   ├── test_federate.py
+│   ├── test_hybrid.py
+│   ├── test_load.py
+│   ├── test_logic.py
+│   ├── test_loops.py
+│   ├── test_parallel.py
+│   └── test_system.py
+├── tools
+│   ├── app.log
+│   ├── collected_code.txt
+│   ├── config.json
+│   ├── download_drive.py
+│   ├── folder_code_collector.py
+│   ├── project_info_collect_v2.py
+│   └── show_structure.py
+└── update_project.sh
+
+26 directories, 524 files
+
+===== Код из файла: /workspaces/Veector/src/core.py =====
+
+# /workspaces/Veector/src/core.py
+import numpy as np
+import torch
+import torch.nn as nn
+import queue
+import threading
+import time
+import random
+from qiskit import QuantumCircuit
+from qiskit.primitives import Sampler  # Для измерений (если нужно позже)
+from qiskit_aer import AerSimulator  # Для statevector симуляции
+from qiskit_aer.noise import NoiseModel, depolarizing_error
+from veectordb import VeectorDB
+from operations import (
+    mod, floor, ceil, arcsin, arccos, arctan, xor, nand, nor, matrix_multiply,
+    gradient_descent, softmax, matrix_determinant, matrix_eigenvalues, matrix_lu_decomposition,
+    convolution, transpose, mean, std_dev, relu, leaky_relu, batch_norm, sigmoid,
+    exponential_smoothing, normalize, interpolate, inverse, trace, random_uniform,
+    random_normal, median, dropout, self_attention, layer_normalization,
+    multi_head_attention, quantum_hadamard, quantum_pauli_x, quantum_cnot,
+    quantum_measure, quantum_superposition, quantum_entanglement, causal_mask, masked_fill
+)
+from memory import Memory
+from evolution import Evolution
+from model_manager import ModelManager
+from sync import P2PNode
+from tensors import create_tensor, validate_tensor, reshape_tensor, get_tensor_metadata
+import ipfshttpclient
+import os
+
+class NeuralStorage(nn.Module):
+    def __init__(self, input_dim=16, hidden_dim=64, bottleneck_dim=32, activation_fn=nn.ReLU):
+        super(NeuralStorage, self).__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            activation_fn(),
+            nn.Linear(hidden_dim, bottleneck_dim)
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(bottleneck_dim, hidden_dim),
+            activation_fn(),
+            nn.Linear(hidden_dim, input_dim)
+        )
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return encoded, decoded
+
+class Veector:
+    def __init__(self, db_path="../data/db/veectordb.json", use_neural_storage=False, cache_size=1000,
+                 eviction_strategy="LRU", dropout_rate=0.0, use_memory=False, model_manager=None, 
+                 p2p_node=None, ipfs_enabled=True, ipfs_address='/ip4/127.0.0.1/tcp/5001'):
+        self.db = VeectorDB(db_path)
+        self.use_neural_storage = use_neural_storage
+        self.neural_model = None
+        self.max_coord = 0
+        self.space = {}
+        self.neural_embeddings = {}
+        self.sync_queue = queue.Queue()
+        self.cache = {}
+        self.cache_size = cache_size
+        self.eviction_strategy = eviction_strategy.upper()
+        self.cache_access_count = {}
+        self.cache_timestamps = {}
+        self.dropout_rate = dropout_rate
+        self.use_memory = Memory() if use_memory else None
+        self.evolution = Evolution(self)        
+        self.p2p_node = p2p_node        
+        self.ipfs_client = None
+        if ipfs_enabled and p2p_node and ipfs_address:  # Подключаем IPFS только если ipfs_enabled=True
+            self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address) if ipfs_address else None
+        self.model_manager = model_manager or ModelManager(self)
+        self.models_dir = "../data/models"
+        self.tensors_dir = "../data/tensors"
+
+        os.makedirs(self.models_dir, exist_ok=True)
+        os.makedirs(self.tensors_dir, exist_ok=True)
+
+        if use_neural_storage:
+            self._init_neural_storage()
+        self._start_sync_thread()
+
+        self.core = {
+            # Арифметика (0-9)
+            (0, 0, 0): lambda x: np.sum(x, dtype=np.complex128),
+            (0, 0, 1): lambda x: x[0] - x[1],
+            (0, 1, 0): lambda x: x[0] * x[1],
+            (0, 1, 1): lambda x: x[0] / x[1],
+            (0, 2, 0): lambda x: np.sqrt(x[0], dtype=np.complex128),
+            (0, 2, 1): lambda x: np.power(x[0], x[1], dtype=np.complex128),
+            (0, 3, 0): lambda x: np.abs(x[0]),
+            (0, 4, 0): lambda x: np.dot(x[0], x[1]) if x[0].shape[1] == x[1].shape[0] else None,
+            (0, 5, 0): lambda x: mod(x[0], x[1]),
+            (0, 6, 0): lambda x: floor(x[0]),
+            (0, 6, 1): lambda x: ceil(x[0]),
+
+            # Тригонометрия (1)
+            (1, 0, 0): lambda x: np.sin(x[0], dtype=np.complex128),
+            (1, 0, 1): lambda x: np.cos(x[0], dtype=np.complex128),
+            (1, 1, 0): lambda x: np.tan(x[0], dtype=np.complex128),
+            (1, 1, 1): lambda x: 1 / np.tan(x[0], dtype=np.complex128) if np.tan(x[0]) != 0 else np.nan,
+            (1, 2, 0): lambda x: arcsin(x[0]),
+            (1, 2, 1): lambda x: arccos(x[0]),
+            (1, 3, 0): lambda x: arctan(x[0]),
+
+            # Логика (2)
+            (2, 0, 0): lambda x: 1 if x[0] > x[1] else 0,
+            (2, 0, 1): lambda x: 1 if x[0] == x[1] else 0,
+            (2, 1, 0): lambda x: 1 if x[0] and x[1] else 0,
+            (2, 1, 1): lambda x: 1 if x[0] or x[1] else 0,
+            (2, 2, 0): lambda x: 1 if not x[0] else 0,
+            (2, 3, 0): lambda x: xor(x[0], x[1]),
+            (2, 4, 0): nand,
+            (2, 4, 1): nor,
+
+            # Условные операции (3)
+            (3, 0, 0): lambda x, t, f: t if x[0] else f,
+
+            # Циклы (4)
+            (4, 0, 0): lambda x, n: x[0] * n,
+
+            # Рандом (5)
+            (5, 1, 0): lambda x: random_uniform(x[0], x[1]),
+            (5, 1, 1): lambda x: random_normal(x[0], x[1]),
+            (5, 2, 0): lambda x: median(x[0]),
+
+            # Выбор (7)
+            (7, 0, 0): lambda x, *opts: opts[int(x[0])] if opts else None,
+
+            # Вывод (8)
+            (8, 0, 0): lambda x: print(f"Output: {x[0]}") or x[0],
+
+            # Идентичность (9)
+            (9, 0, 0): lambda x: x[0],
+
+            # Эволюция (10)
+            (10, 0, 0): lambda x: self._reason(x),
+
+            # Графовые операции (15)
+            (15, 0, 0): lambda x: self._dfs(x[0], x[1]),
+
+            # Статистика (16)
+            (16, 0, 0): lambda x: np.mean(x[0], dtype=np.complex128),
+            (16, 1, 0): lambda x: np.std(x[0], dtype=np.complex128),
+
+            # Регуляризация (17)
+            (17, 0, 0): lambda x: self._dropout(x[0]),
+
+            # Активации (18)
+            (18, 0, 0): lambda x: np.maximum(x[0], 0),
+            (18, 1, 0): lambda x: 1 / (1 + np.exp(-x[0])),
+            (18, 2, 0): softmax,
+            (18, 3, 0): leaky_relu,
+
+            # Сглаживание (19)
+            (19, 0, 0): exponential_smoothing,
+
+            # Нормализация (20)
+            (20, 0, 0): normalize,
+            (20, 1, 0): interpolate,
+
+            # Матричные операции (30)
+            (30, 0, 0): matrix_multiply,
+            (30, 1, 0): matrix_determinant,
+            (30, 2, 0): matrix_eigenvalues,
+            (30, 3, 0): convolution,
+            (30, 4, 0): transpose,
+            (30, 5, 0): inverse,
+            (30, 6, 0): trace,
+
+            # Нейросетевые операции (40)
+            (40, 0, 0): lambda x: self.model_manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", x),
+            (40, 1, 0): layer_normalization,
+            (40, 2, 0): lambda x: multi_head_attention(x, num_heads=8),
+            (40, 3, 0): lambda x: dropout(x[0], rate=0.5),
+            (40, 4, 0): batch_norm,
+
+            # Квантовые операции (50)
+            (50, 0, 0): lambda x: self._quantum_operation(x[0], "hadamard"),
+            (50, 0, 1): lambda x: self._quantum_operation(x[0], "pauli_x"),
+            (50, 1, 0): lambda x: self._quantum_operation([x[0], x[1]], "cnot"),
+            (50, 2, 0): lambda x: self._quantum_operation(x[0], "measure"),
+            (50, 3, 0): lambda x: self._quantum_operation(x[0], "superposition"),
+            (50, 4, 0): lambda x: self._quantum_operation([x[0], x[1]], "entanglement"),
+        }
+
+    def _quantum_operation(self, data, op_type):
+        """Выполнение квантовых операций через Qiskit 1.4.1 с шумом."""
+        if isinstance(data, list):
+            num_qubits = len(data)
+            initial_state = np.array(data, dtype=np.complex128).flatten()
+        else:
+            num_qubits = 1
+            initial_state = np.array([data, 0], dtype=np.complex128) if np.isscalar(data) else data
+
+        # Нормализация начального состояния
+        initial_state = initial_state / np.linalg.norm(initial_state)
+
+        # Создаём квантовую цепь
+        qc = QuantumCircuit(num_qubits)
+        qc.initialize(initial_state, range(num_qubits))
+
+        # Применяем операцию
+        if op_type == "hadamard":
+            qc.h(0)
+        elif op_type == "pauli_x":
+            qc.x(0)
+        elif op_type == "cnot" and num_qubits >= 2:
+            qc.cx(0, 1)
+        elif op_type == "measure":
+            qc.measure_all()
+        elif op_type == "superposition":
+            qc.h(0)
+        elif op_type == "entanglement" and num_qubits >= 2:
+            qc.h(0)
+            qc.cx(0, 1)
+
+        # Добавляем квантовый шум (деполяризация)
+        noise_model = NoiseModel()
+        error = depolarizing_error(0.05, num_qubits)  # 5% шум
+        noise_model.add_all_qubit_quantum_error(error, ['h', 'x', 'cx'])
+
+        # Симуляция через AerSimulator
+        simulator = AerSimulator(method='statevector')
+        result = simulator.run(qc, noise_model=noise_model).result()
+        statevector = result.get_statevector()
+        return np.array(statevector, dtype=np.complex128)
+
+    def _apply_quantum_ops(self, op, data):
+        """Устаревший метод, теперь используется _quantum_operation."""
+        return data
+
+    def _apply_neural_ops(self, op, data):
+        """Устаревший метод, теперь операции в self.core."""
+        return data
+
+    def _next_coords(self):
+        coords = max([key[1][0] for key in self.space.keys()] + [self.max_coord]) + 1
+        self.max_coord = coords
+        return [coords, coords, coords]
+
+    def _init_neural_storage(self):
+        print("Инициализация нейронного хранилища")
+        input_dim = self._get_max_input_dim()
+        self.neural_model = NeuralStorage(input_dim=input_dim, activation_fn=nn.ReLU)
+        self.neural_optimizer = torch.optim.Adam(self.neural_model.parameters(), lr=0.001)
+        self.neural_loss = nn.MSELoss()
+        self._train_neural_storage()
+
+    def _get_max_input_dim(self):
+        results = self.db.find_by_type("tensor_result")
+        max_dim = 16
+        for doc in results:
+            result = doc["data"]
+            if isinstance(result, np.ndarray):
+                flat_len = len(result.flatten())
+                max_dim = max(max_dim, flat_len)
+        return max_dim
+
+    def _train_neural_storage(self):
+        results = self.db.find_by_type("tensor_result")
+        if not results:
+            print("Нет данных для обучения нейросети")
+            return
+
+        input_dim = self._get_max_input_dim()
+        train_data = []
+        for doc in results:
+            result = doc["data"]
+            if isinstance(result, (int, float, complex)):
+                data = np.array([complex(result)] + [0] * (input_dim - 1), dtype=np.complex128)
+            elif isinstance(result, list) and all(isinstance(x, (int, float, complex)) for x in result):
+                flat = np.array(result, dtype=np.complex128).flatten()
+                data = np.pad(flat, (0, max(0, input_dim - len(flat))), mode='constant')[:input_dim]
+            else:
+                data = np.array([0] * input_dim, dtype=np.complex128)
+            train_data.append(np.real(data))
+
+        train_data = torch.tensor(train_data, dtype=torch.float32)
+
+        for epoch in range(50):
+            self.neural_optimizer.zero_grad()
+            encoded, decoded = self.neural_model(train_data)
+            loss = self.neural_loss(decoded, train_data)
+            loss.backward()
+            self.neural_optimizer.step()
+            if epoch % 10 == 0:
+                print(f"Эпоха {epoch + 1}, Loss: {loss.item()}")
+
+    def _store_in_neural(self, result, doc_id):
+        if not self.use_neural_storage or not self.neural_model:
+            return
+
+        input_dim = self._get_max_input_dim()
+        if isinstance(result, (int, float, complex, np.number)):
+            data = np.array([complex(result)] + [0] * (input_dim - 1), dtype=np.complex128)
+        elif isinstance(result, np.ndarray):
+            flat = result.flatten()
+            data = np.pad(flat, (0, max(0, input_dim - len(flat))), mode='constant')[:input_dim]
+        else:
+            data = np.array([0] * input_dim, dtype=np.complex128)
+
+        tensor_data = torch.tensor(np.real(data), dtype=torch.float32)
+        encoded, _ = self.neural_model(tensor_data)
+        self.neural_embeddings[doc_id] = encoded.detach().numpy()
+        print(f"Сохранено в нейросеть: {doc_id} -> {encoded.detach().numpy()[:5]}...")
+
+    def _retrieve_from_neural(self, doc_id):
+        if not self.use_neural_storage or not self.neural_model or doc_id not in self.neural_embeddings:
+            return None
+
+        encoded = torch.tensor(self.neural_embeddings[doc_id], dtype=torch.float32)
+        decoded = self.neural_model.decoder(encoded)
+        return decoded.detach().numpy()
+
+    def _start_sync_thread(self):
+        def sync_worker():
+            while True:
+                peer_veector = self.sync_queue.get()
+                self._sync_neural_blocking(peer_veector)
+                self.sync_queue.task_done()
+
+        t = threading.Thread(target=sync_worker, daemon=True)
+        t.start()
+
+    def _sync_neural_blocking(self, peer_veector):
+        if not self.use_neural_storage or not peer_veector.use_neural_storage:
+            return
+
+        if not self.neural_model or not peer_veector.neural_model:
+            return
+
+        print("Синхронизация нейронных моделей (федеративное обучение)")
+        self_data_count = len(self.db.find_by_type("tensor_result"))
+        peer_data_count = len(peer_veector.db.find_by_type("tensor_result"))
+        total_data = self_data_count + peer_data_count
+
+        if total_data == 0:
+            return
+
+        state_dict = self.neural_model.state_dict()
+        peer_state_dict = peer_veector.neural_model.state_dict()
+
+        for key in state_dict:
+            self_weight = self_data_count / total_data
+            peer_weight = peer_data_count / total_data
+            state_dict[key] = self_weight * state_dict[key] + peer_weight * peer_state_dict[key]
+
+        self.neural_model.load_state_dict(state_dict)
+
+    def sync_neural(self, peer_veector):
+        self.sync_queue.put(peer_veector)
+
+    def _reason(self, x):
+        print(f"Reason input: {x}")
+        if self.use_memory:
+            cached_result = self.use_memory.retrieve(x)
+            if cached_result is not None:
+                print(f"Использована память для Reason: {x} -> {cached_result}")
+                return cached_result
+        
+        if isinstance(x, (int, float, complex, np.number)):
+            result = self._apply_rl_strategy(x)
+        elif isinstance(x, list):
+            result = self._evolve_program(x)
+        elif isinstance(x, np.ndarray):
+            result = self._optimize_tensor(x)
+        else:
+            result = self.evolution.evolve(x)
+
+        if self.use_memory:
+            self.use_memory.store(x, result, reward=self._calculate_reward(result, x))
+        
+        print(f"Reason result: {result}")
+        return result
+
+    def _apply_rl_strategy(self, x):
+        """Обучение с подкреплением для числовых данных (заглушка)."""
+        return x
+
+    def _evolve_program(self, x):
+        """Эволюция программ (заглушка)."""
+        return x
+
+    def _optimize_tensor(self, x):
+        """Оптимизация тензоров (заглушка)."""
+        return x
+
+    def _calculate_reward(self, result, input_data):
+        if isinstance(input_data, (int, float, complex)):
+            return 1.0 if np.abs(result) > np.abs(input_data) else -1.0
+        elif isinstance(input_data, np.ndarray):
+            return -np.mean(np.abs(result - input_data) ** 2)
+        return 0.0
+
+    def _dfs(self, graph, start):
+        visited = set()
+        result = []
+
+        def dfs(node):
+            if node not in visited:
+                visited.add(node)
+                result.append(node)
+                for neighbor in graph.get(node, []):
+                    dfs(neighbor)
+
+        dfs(start)
+        return result
+
+    def _lru_cache_evict(self):
+        if len(self.cache) >= self.cache_size:
+            oldest_key = min(self.cache_timestamps, key=self.cache_timestamps.get)
+            del self.cache[oldest_key]
+            del self.cache_timestamps[oldest_key]
+            if oldest_key in self.cache_access_count:
+                del self.cache_access_count[oldest_key]
+
+    def _lfu_cache_evict(self):
+        if len(self.cache) >= self.cache_size:
+            least_frequent_key = min(self.cache_access_count, key=self.cache_access_count.get)
+            del self.cache[least_frequent_key]
+            del self.cache_access_count[least_frequent_key]
+            if least_frequent_key in self.cache_timestamps:
+                del self.cache_timestamps[least_frequent_key]
+
+    def _dropout(self, x):
+        if self.dropout_rate > 0 and isinstance(x, np.ndarray):
+            mask = (np.random.rand(*x.shape) < self.dropout_rate)
+            x[mask] = 0
+        return x
+
+    def _store_tensor_in_ipfs(self, tensor_data):
+        """Сохранение тензора в IPFS."""
+        if not self.ipfs_client:
+            return None
+        try:
+            res = self.ipfs_client.add(tensor_data.tobytes())
+            return res['Hash']
+        except Exception as e:
+            print(f"Ошибка сохранения в IPFS: {e}")
+            return None
+
+    def _load_tensor_from_ipfs(self, ipfs_hash, shape, dtype=np.complex128):
+        """Загрузка тензора из IPFS."""
+        if not self.ipfs_client:
+            return None
+        try:
+            data = self.ipfs_client.cat(ipfs_hash)
+            return np.frombuffer(data, dtype=dtype).reshape(shape)
+        except Exception as e:
+            print(f"Ошибка загрузки из IPFS: {e}")
+            return None
+
+    def _save_model_metadata(self, model_name, ipfs_hash):
+        """Сохранение метаданных модели в veectordb."""
+        model_metadata = {
+            "name": model_name,
+            "ipfs_hash": ipfs_hash,
+            "location": "ipfs",
+            "timestamp": time.time()
+        }
+        self.db.insert_model(model_name, model_metadata)
+        print(f"Метаданные модели сохранены: {model_name} -> {ipfs_hash}")
+
+    def load_model(self, model_name):
+        """Загрузка метаданных модели."""
+        model_metadata = self.db.get_model_metadata(model_name)
+        if model_metadata:
+            return model_metadata
+        else:
+            print(f"Модель {model_name} не найдена в базе данных.")
+            return None
+
+    def save_tensor(self, tensor, tensor_id, use_ipfs=True):
+        """Сохранение тензора в IPFS или локально."""
+        if use_ipfs and self.ipfs_client:
+            ipfs_hash = self._store_tensor_in_ipfs(tensor)
+            if ipfs_hash:
+                tensor_metadata = {
+                    "tensor_id": tensor_id,
+                    "ipfs_hash": ipfs_hash,
+                    "shape": tensor.shape,
+                    "dtype": str(tensor.dtype),
+                    "location": "ipfs",
+                    "timestamp": time.time()
+                }
+                self.db.insert_tensor(tensor_id, tensor_metadata)
+                print(f"Тензор {tensor_id} сохранён в IPFS: {ipfs_hash}")
+                return ipfs_hash
+            else:
+                print(f"Не удалось сохранить тензор {tensor_id} в IPFS.")
+                return None
+        else:
+            tensor_path = os.path.join(self.tensors_dir, f"{tensor_id}.npy")
+            np.save(tensor_path, tensor)
+            tensor_metadata = {
+                "tensor_id": tensor_id,
+                "path": tensor_path,
+                "shape": tensor.shape,
+                "dtype": str(tensor.dtype),
+                "location": "local",
+                "timestamp": time.time()
+            }
+            self.db.insert_tensor(tensor_id, tensor_metadata)
+            print(f"Тензор {tensor_id} сохранён локально: {tensor_path}")
+            return tensor_path
+
+    def load_tensor(self, tensor_id):
+        """Загрузка тензора из IPFS или локального хранилища."""
+        tensor_metadata = self.db.get_tensor_metadata(tensor_id)
+        if not tensor_metadata:
+            print(f"Тензор {tensor_id} не найден в базе данных.")
+            return None
+
+        if tensor_metadata["location"] == "ipfs":
+            ipfs_hash = tensor_metadata["ipfs_hash"]
+            shape = tensor_metadata["shape"]
+            dtype = np.dtype(tensor_metadata["dtype"])
+            tensor_data = self._load_tensor_from_ipfs(ipfs_hash, shape, dtype)
+            if tensor_data is not None:
+                print(f"Тензор {tensor_id} загружен из IPFS: {ipfs_hash}")
+                return tensor_data
+            else:
+                print(f"Не удалось загрузить тензор {tensor_id} из IPFS.")
+                return None
+        elif tensor_metadata["location"] == "local":
+            tensor_path = tensor_metadata["path"]
+            try:
+                tensor_data = np.load(tensor_path)
+                print(f"Тензор {tensor_id} загружен локально: {tensor_path}")
+                return tensor_data
+            except Exception as e:
+                print(f"Ошибка загрузки тензора из локального файла: {e}")
+                return None
+        else:
+            print(f"Неизвестное местоположение тензора: {tensor_metadata['location']}")
+            return None
+
+    def compute(self, tensor):
+        if not validate_tensor(tensor):
+            return tensor
+
+        data_layer, data_coords, data, data_length = tensor[0]
+        op_layer, op_coords, op, op_length = tensor[1]
+        context = tensor[2]
+        version = tensor[3]
+        next_coords = tensor[4] if len(tensor) > 4 else []
+        metadata = get_tensor_metadata(tensor)
+
+        cache_key = (tuple(data_layer), tuple(data_coords), tuple(op))
+        if cache_key in self.cache:
+            self.cache_access_count[cache_key] = self.cache_access_count.get(cache_key, 0) + 1
+            self.cache_timestamps[cache_key] = time.time()
+            return self.cache[cache_key]
+
+        if isinstance(data, list):
+            data = [self.compute(d) if isinstance(d, list) else d for d in data]
+        if len(data) == 1 and tuple(op) in [(2, 1, 0), (2, 1, 1), (2, 2, 0), (2, 2, 1)]:
+            data = data
+        elif len(data) == 1 and not isinstance(data[0], list):
+            data = data[0]
+
+        op_func = self.core.get(tuple(op), lambda x: x)
+
+        if op == [3, 0, 0]:
+            cond = self.compute(data[0]) if isinstance(data, list) else data
+            true_val = self.compute(data[1])
+            false_val = self.compute(data[2])
+            result = op_func([cond], true_val, false_val)
+        elif op == [4, 0, 0]:
+            if isinstance(data, list) and len(data) > 1:
+                result = op_func(data[0], data[1])
+            else:
+                result = op_func(data, 1)
+        elif op == [5, 0, 0]:
+            opts = [self.compute(opt) for opt in data[1:]]
+            result = op_func(data[0], *opts)
+        else:
+            if isinstance(data, list) and tuple(op) not in [(2, 1, 0), (2, 1, 1), (2, 2, 0), (2, 2, 1)]:
+                data = np.array(data, dtype=np.complex128)
+            if self.dropout_rate > 0 and op != [59, 0, 0]:
+                data = self._dropout(data)
+
+            result = op_func(data)
+
+        tensor_id = f"tensor_result_{time.time()}_{random.randint(1000, 9999)}"
+        self.save_tensor(result, tensor_id, use_ipfs=self.ipfs_client is not None)
+        metadata = {"tensor": tensor, "coords": (data_layer, data_coords), "tensor_id": tensor_id}
+
+        if self.use_neural_storage and self.neural_model:
+            self._store_in_neural(result, tensor_id)
+
+        if self.p2p_node:
+            sync_data = np.abs(result) if np.iscomplexobj(result) else result
+            self.p2p_node.sync_tensor(sync_data, metadata)
+
+        self.space[(tuple(data_layer), tuple(data_coords))] = tensor_id
+
+        if len(self.cache) >= self.cache_size:
+            if self.eviction_strategy == "LRU":
+                self._lru_cache_evict()
+            elif self.eviction_strategy == "LFU":
+                self._lfu_cache_evict()
+            else:
+                self._lru_cache_evict()
+
+        self.cache[cache_key] = result
+        self.cache_access_count[cache_key] = 1
+        self.cache_timestamps[cache_key] = time.time()
+
+        return result
+
+    def add_to_space(self, tensor):
+        layer, coords = tensor[0][0], tuple(tensor[0][1])
+        tensor_id = f"tensor_{time.time()}_{random.randint(1000, 9999)}"
+        self.save_tensor(tensor[0][2], tensor_id, use_ipfs=self.ipfs_client is not None)
+        self.space[(tuple(layer), coords)] = tensor_id
+
+    def evolve_tensor(self, tensor):
+        return self.evolution.log_evolution(tensor, self)
+
+    def generate_program_tensor(self, prompt, max_steps=5):
+        return self.model_manager.generate_program_tensor(prompt, max_steps)
+
+    def share_program(self, program_tensors):
+        return self.model_manager.share_program(program_tensors)
+
+    def improve_program(self, program_tensors, feedback_data, iterations=3):
+        return self.model_manager.improve_program(program_tensors, feedback_data, iterations)
+
+    def execute_program(self, program_tensors, input_data=None):
+        return self.model_manager.execute_program(program_tensors, input_data)
+
+if __name__ == "__main__":
+    # Пример использования
+    p2p_node = P2PNode("localhost", 5000, use_ipfs=True)
+    p2p_node.start()
+    veector = Veector(p2p_node=p2p_node, use_memory=True)
+    
+    # Тест квантовой операции (Hadamard)
+    tensor = create_tensor([0], [0, 0, 0], [1, 0], 2, op=[50, 0, 0])
+    result = veector.compute(tensor)
+    print(f"Результат квантовой операции Hadamard: {result}")
+
+===== Код из файла: /workspaces/Veector/src/evolution.py =====
+
+class Evolution:
+    def __init__(self, veector):
+        self.veector = veector
+        self.evolution_strategy = "reason"  # Default strategy
+
+    def evolve(self, tensor):
+        """
+        Выполняет эволюцию тензора в зависимости от выбранной стратегии.
+        :param tensor: Тензор для эволюции.
+        :return: Эволюционировавший тензор.
+        """
+        if self.evolution_strategy == "reason":
+            return self._evolve_reason(tensor)
+        elif self.evolution_strategy == "mutate":
+            return self._evolve_mutate(tensor)
+        else:
+            raise ValueError(f"Неизвестная стратегия эволюции: {self.evolution_strategy}")
+
+    def _evolve_reason(self, tensor):
+        """
+        Выполняет эволюцию тензора, используя операцию Reason.
+        """
+        # Выполняем операцию Reason
+        evolved_tensor = self.veector.compute([
+            tensor[0],
+            [[0], tensor[0][1], [9, 0, 0], 1],  # Reason
+            tensor[2],
+            tensor[3],
+            tensor[4] if len(tensor) > 4 else [],
+            tensor[5] if len(tensor) > 5 else {}
+        ])
+        return evolved_tensor
+
+    def _evolve_mutate(self, tensor, mutation_rate=0.1):
+        """
+        Выполняет эволюцию тензора путем случайной мутации.
+        :param tensor: Тензор для мутации.
+        :param mutation_rate: Вероятность мутации каждого элемента.
+        :return: Мутировавший тензор.
+        """
+        mutated_data = tensor[0][2]
+        if isinstance(mutated_data, np.ndarray):
+            mask = np.random.rand(*mutated_data.shape) < mutation_rate
+            mutation = np.random.normal(size=mutated_data.shape)
+            mutated_data = np.where(mask, mutated_data + mutation, mutated_data)
+        elif isinstance(mutated_data, list):
+             mutated_data = [x + np.random.normal(0, 0.1) if np.random.rand() < mutation_rate else x for x in mutated_data]
+        
+        evolved_tensor = [
+            tensor[0],
+            tensor[1],
+            mutated_data,
+            tensor[3],
+            tensor[4] if len(tensor) > 4 else [],
+            tensor[5] if len(tensor) > 5 else {}
+        ]
+        return evolved_tensor
+        
+    def log_evolution(self, tensor):
+        """
+        Логирует процесс эволюции.
+        :param tensor: Тензор для логирования.
+        :return: Результат эволюции.
+        """
+        print(f"Начало эволюции для тензора: {tensor}")
+        result = self.evolve(tensor)
+        print(f"Результат эволюции: {result}")
+        return result
+
+    def set_evolution_strategy(self, strategy):
+        """
+        Устанавливает стратегию эволюции.
+        :param strategy: Стратегия эволюции ("reason" или "mutate").
+        """
+        if strategy not in ["reason", "mutate"]:
+            raise ValueError(f"Неподдерживаемая стратегия эволюции: {strategy}")
+        self.evolution_strategy = strategy
+
+
+===== Код из файла: /workspaces/Veector/src/federated_learning.py =====
+
+def local_fine_tuning(user_data):
+    # Загрузка только необходимых блоков
+    classifier = matrix.load_block('classifier', block_hashes['classifier'])
+    optimizer = torch.optim.Adam(classifier.parameters(), lr=1e-5)
+    
+    for text, label in user_data:
+        inputs = tokenizer(text, return_tensors='pt').to(device)
+        outputs = dynamic_inference(text)
+        loss = F.cross_entropy(outputs, label)
+        loss.backward()
+        optimizer.step()
+    
+    # Сохранение обновлений в IPFS
+    new_hash = client.add('classifier_updated.pt')['Hash']
+    return new_hash
+
+def sync_updates(new_hash):
+    # Шифрование обновлений
+    encrypted = encrypt(new_hash)
+    client.add(encrypted)
+    p2p.broadcast(encrypted)
+
+===== Код из файла: /workspaces/Veector/src/file_transfer.py =====
+
+# src/file_transfer.py
+import socket
+import tqdm
+import os
+import hashlib
+import time
+import secrets  # Для генерации случайных ключей шифрования
+from cryptography.fernet import Fernet, InvalidToken
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.backends import default_backend
+import base64
+
+BUFFER_SIZE = 4096
+SEPARATOR = "<SEPARATOR>"  # Используем уникальный разделитель
+RESUME_POSITION_REQUEST = "<RESUME_POS>"  # Запрос позиции для возобновления передачи
+KEY_LENGTH = 32  # Длина ключа шифрования (32 байта = 256 бит)
+
+def generate_hash(file_path):
+    """Генерирует хеш-сумму файла."""
+    hasher = hashlib.sha256()
+    with open(file_path, "rb") as file:
+        while chunk := file.read(BUFFER_SIZE):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+def generate_key(password): # Добавлена функция generate_key
+    password = password.encode()
+    salt = os.urandom(16) # Generate a unique salt for each session
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=390000,
+        backend=default_backend()
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(password))
+    return key, salt # Return the derived key and the salt
+
+def encrypt_file(file_path, key):
+    """Шифрует файл с использованием Fernet."""
+    try:
+        fernet = Fernet(key)
+        with open(file_path, "rb") as file:
+            data = file.read()
+        encrypted_data = fernet.encrypt(data)
+        return encrypted_data
+    except Exception as e:
+        print(f"Ошибка при шифровании файла: {e}")
+        return None
+
+def decrypt_file(encrypted_data, key):
+     """Расшифровывает данные с использованием ключа Fernet."""
+     try:
+        fernet = Fernet(key)
+        decrypted_data = fernet.decrypt(encrypted_data)
+        return decrypted_data
+     except InvalidToken:
+        print("Invalid key - decryption failed")
+        return None
+
+def send_file(file_path, target_host, target_port, password=None):
+    """
+    Отправляет файл на указанный хост и порт с проверкой целостности,
+    возможностью возобновления передачи и шифрованием.
+    """
+    try:
+        filesize = os.path.getsize(file_path)
+        filename = os.path.basename(file_path)  # Получаем только имя файла
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((target_host, target_port))
+        print(f"Подключено к {target_host}:{target_port}, отправка {filename}...")
+
+        # Генерируем хеш-сумму
+        file_hash = generate_hash(file_path)
+
+        # Шифруем файл, если указан пароль
+        if password:
+            key, salt = generate_key(password) # key generation added here
+            encrypted_data = encrypt_file(file_path, key) # Encrypt_data now uses Key and Salt together to secure process
+            if encrypted_data is None:
+                s.close()
+                return
+            data_to_send = encrypted_data
+            filesize = len(encrypted_data)  # Размер шифрованного файла
+        else:
+            with open(file_path, "rb") as file:
+                data_to_send = file.read()
+
+        # Отправляем имя файла, размер, хеш-сумму и наличие шифрования
+        header = f"{filename}{SEPARATOR}{filesize}{SEPARATOR}{file_hash}{SEPARATOR}{password is not None}"
+        s.send(header.encode())
+        
+        # Отправляем соль (если шифрование включено)
+        if password:
+            s.send(salt)
+
+        # Отправляем файл с возможностью возобновления
+        sent_bytes = 0
+        progress = tqdm.tqdm(range(filesize), f"Отправка {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+        while sent_bytes < filesize:
+            # Запрашиваем позицию для возобновления на стороне клиента
+            s.send(RESUME_POSITION_REQUEST.encode())
+            resume_position = int(s.recv(BUFFER_SIZE).decode())
+            
+            # Проверяем, нужно ли возобновлять
+            if resume_position > sent_bytes:
+                print(f"Возобновление отправки с позиции {resume_position}")
+                sent_bytes = resume_position  # Обновляем sent_bytes
+                progress.update(resume_position - progress.n)
+
+            # Отправляем данные
+            bytes_to_send = data_to_send[sent_bytes:sent_bytes + BUFFER_SIZE]
+            s.sendall(bytes_to_send)
+            sent_bytes += len(bytes_to_send)
+            progress.update(len(bytes_to_send))
+
+        s.close()
+        print(f"{filename} успешно отправлен.")
+
+    except Exception as e:
+        print(f"Ошибка при отправке файла: {e}")
+
+def receive_file(host, port, save_dir=".", password=None):
+    """
+    Принимает файл, сохраняя его в указанную директорию.
+    """
+    try:
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((host, port))
+        s.listen(1)
+        print(f"Ожидание входящего соединения на {host}:{port}...")
+
+        conn, addr = s.accept()
+        print(f"Подключено к {addr[0]}:{addr[1]}")
+
+        # Получаем имя файла, размер, хеш-сумму и наличие шифрования
+        received = conn.recv(BUFFER_SIZE).decode()
+        filename, filesize, file_hash, is_encrypted = received.split(SEPARATOR)
+        filename = os.path.basename(filename)  # Извлекаем имя файла из пути
+        filesize = int(filesize)
+        is_encrypted = is_encrypted.lower() == "true"
+
+        # Получаем соль, если шифрование включено
+        salt = None
+        if is_encrypted:
+            salt = conn.recv(16) # Corrected salt size
+           
+        file_path = os.path.join(save_dir, filename)
+        received_bytes = 0
+        
+        # Проверяем наличие файла и определяем позицию для возобновления
+        if os.path.exists(file_path):
+            received_bytes = os.path.getsize(file_path)
+            print(f"Файл {filename} уже существует. Возобновление с позиции {received_bytes}.")
+        
+        # Отправляем клиенту позицию для возобновления
+        conn.send(str(received_bytes).encode())
+
+        # Получаем файл
+        progress = tqdm.tqdm(range(filesize), f"Приём {filename}", unit="B", unit_scale=True, unit_divisor=1024)
+        with open(file_path, "ab" if received_bytes > 0 else "wb") as file:
+            while received_bytes < filesize:
+                bytes_to_read = min(BUFFER_SIZE, filesize - received_bytes)
+                bytes_read = conn.recv(bytes_to_read)
+                if not bytes_read:
+                    break
+                file.write(bytes_read)
+                received_bytes += len(bytes_read)
+                progress.update(len(bytes_read))
+        conn.close()
+        s.close()
+
+        # Расшифровываем, если необходимо
+        if is_encrypted and password:
+            # Generate key with the provided password and received salt
+            key, _ = generate_key(password)
+            
+            # Read the encrypted data from the file
+            with open(file_path, "rb") as f:
+                encrypted_data = f.read()
+            
+            # Decrypt the data
+            decrypted_data = decrypt_file(encrypted_data, key)
+            
+            if decrypted_data:
+                # Save the decrypted data back to the file, overwriting the encrypted content
+                with open(file_path, "wb") as f:
+                    f.write(decrypted_data)
+                print(f"{filename} успешно расшифрован.")
+            else:
+                print(f"Не удалось расшифровать {filename}.")
+
+        # Проверяем хеш-сумму
+        received_hash = generate_hash(file_path)
+        if received_hash == file_hash:
+            print(f"Хеш-сумма {filename} совпадает. Файл успешно получен.")
+        else:
+            print(f"Хеш-сумма {filename} не совпадает. Файл повреждён.")
+
+    except Exception as e:
+        print(f"Ошибка при получении файла: {e}")
+
+# Дополнительные функции
+def list_files(target_host, target_port):
+    """
+    Запрашивает список файлов с удаленного хоста.
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((target_host, target_port))
+        s.send("LIST".encode())  # Отправляем команду LIST
+
+        # Получаем данные (список файлов)
+        data = s.recv(4096).decode()
+        print("Список файлов на удаленном хосте:")
+        print(data)
+        s.close()
+    except Exception as e:
+        print(f"Ошибка при получении списка файлов: {e}")
+
+def respond_to_list_request(host, port, directory="."):
+    """
+    Отвечает на запрос списка файлов.
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((host, port))
+        s.listen(1)
+        print(f"Ожидание запроса списка файлов на {host}:{port}...")
+
+        conn, addr = s.accept()
+        with conn:
+            data = conn.recv(4096).decode()
+            if data == "LIST":
+                files = os.listdir(directory)
+                conn.send("\n".join(files).encode())
+                print("Список файлов отправлен.")
+            else:
+                print("Неизвестный запрос.")
+        s.close()
+    except Exception as e:
+        print(f"Ошибка при отправке списка файлов: {e}")
+
+# Пример использования
+if __name__ == "__main__":
+    # Режим отправки
+    # send_file("large_file.zip", "127.0.0.1", 5001, password="mysecretpassword")
+
+    # Режим приёма
+    # receive_file("127.0.0.1", 5001, "received_files", password="mysecretpassword")
+
+    # Запрос списка файлов
+    # list_files("127.0.0.1", 5001)
+
+    # Ответ на запрос списка файлов (запускаем в отдельном терминале)
+    # respond_to_list_request("127.0.0.1", 5001)
+
+    print("Закомментируйте или раскомментируйте нужные строки для запуска в нужном режиме.")
+
+
+===== Код из файла: /workspaces/Veector/src/interface.py =====
+
+# src/interface.py
+import numpy as np
+from datetime import datetime
+
+def display_text(text, element_id=None):
+    """Отображает текст."""
+    element_id = element_id or f"text-{datetime.now().timestamp()}"
+    return f"<div id='{element_id}'>{text}</div>"
+
+def display_number(number, element_id=None):
+    """Отображает число."""
+    element_id = element_id or f"number-{datetime.now().timestamp()}"
+    return f"<span id='{element_id}'>{number}</span>"
+
+def display_image(image_data, element_id=None):
+    """Отображает изображение."""
+    element_id = element_id or f"image-{datetime.now().timestamp()}"
+    # Предполагаем, что image_data - это base64 строка
+    return f"<img id='{element_id}' src='data:image/png;base64,{image_data}'/>"
+
+def create_button(text, onclick_action, element_id=None):
+    """Создает кнопку."""
+    element_id = element_id or f"button-{datetime.now().timestamp()}"
+    return f"<button id='{element_id}' onclick='{onclick_action}'>{text}</button>"
+
+def create_text_field(default_text="", element_id=None):
+    """Создает текстовое поле."""
+    element_id = element_id or f"text-field-{datetime.now().timestamp()}"
+    return f"<input type='text' id='{element_id}' value='{default_text}'/>"
+
+def create_slider(min_value, max_value, default_value, element_id=None):
+    """Создает слайдер."""
+    element_id = element_id or f"slider-{datetime.now().timestamp()}"
+    return f"<input type='range' id='{element_id}' min='{min_value}' max='{max_value}' value='{default_value}'/>"
+
+def create_grid_layout(elements, cols=3, element_id=None):
+    """Создает сеточный макет."""
+    element_id = element_id or f"grid-{datetime.now().timestamp()}"
+    grid_html = f"<div id='{element_id}' style='display: grid; grid-template-columns: repeat({cols}, 1fr);'>"
+    for element in elements:
+        grid_html += f"<div>{element}</div>"
+    grid_html += "</div>"
+    return grid_html
+
+def create_list_layout(elements, element_id=None):
+    """Создает список элементов."""
+    element_id = element_id or f"list-{datetime.now().timestamp()}"
+    list_html = f"<ul id='{element_id}'>"
+    for element in elements:
+        list_html += f"<li>{element}</li>"
+    list_html += "</ul>"
+    return list_html
+
+def create_tabbed_layout(tabs, element_id=None):
+    """Создает макет с вкладками."""
+    element_id = element_id or f"tabs-{datetime.now().timestamp()}"
+    tab_headers = ""
+    tab_contents = ""
+    for i, (tab_name, tab_content) in enumerate(tabs.items()):
+        tab_id = f"{element_id}-tab-{i}"
+        tab_headers += f"<button onclick=\"showTab('{element_id}', '{tab_id}')\">{tab_name}</button>"
+        tab_contents += f"<div id='{tab_id}' class='tab-content'> {tab_content}</div>"
+
+    tabbed_html = f"""
+    <div id='{element_id}' class='tab'>
+        {tab_headers}
+        {tab_contents}
+    </div>
+    <script>
+    function showTab(elementId, tabId) {{
+        var tabs = document.querySelectorAll('#' + elementId + ' .tab-content');
+        tabs.forEach(function(tab) {{
+            tab.style.display = 'none';
+        }});
+        document.getElementById(tabId).style.display = 'block';
+    }}
+    // Show the first tab by default
+    document.addEventListener('DOMContentLoaded', function() {{
+        var firstTab = document.querySelector('#' + elementId + ' .tab-content');
+        if (firstTab) {{
+            firstTab.style.display = 'block';
+        }}
+    }});
+    </script>
+    """
+    return tabbed_html
+# Example
+def human_readable(tensor):
+    if not isinstance(tensor, list) or len(tensor) < 4:
+        return str(tensor)
+    layer, coords, data, length = tensor[0]
+    op = tensor[1][2]
+    next_coords = tensor[4]
+    return f"Layer: {layer}, Coords: {coords}, Data: {data}, Op: {op}, Next: {next_coords}"
+
+
+===== Код из файла: /workspaces/Veector/src/main.py =====
+
+# /workspaces/Veector/src/main.py
+from core import Veector
+from model_manager import ModelManager
+import numpy as np
+import os
+import json
+from pathlib import Path
+import torch
+import gc
+import psutil
+from transformers import AutoTokenizer
+import urllib.request
+
+def print_memory_usage():
+    process = psutil.Process(os.getpid())
+    ram_usage = process.memory_info().rss / 1024**2
+    print(f"RAM использование: {ram_usage:.2f} MB")
+
+veector = Veector(use_memory=False, ipfs_enabled=False)
+model_manager = ModelManager(veector, ipfs_enabled=False, model_dir="/workspaces/Veector/data")
+veector.model_manager = model_manager
+
+model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
+tensor_dir = f"/workspaces/Veector/data/blocks/{model_name}"
+model_config_dir = f"/workspaces/Veector/data/models/{model_name}"
+
+if not os.path.exists(tensor_dir):
+    print(f"Ошибка: Директория {tensor_dir} не существует.")
+    exit(1)
+
+config_path = os.path.join(tensor_dir, "config.json")
+if not os.path.exists(config_path):
+    print(f"Ошибка: Файл config.json не найден в {tensor_dir}.")
+    exit(1)
+with open(config_path, "r") as f:
+    config = json.load(f)
+
+vocab_size = config.get("vocab_size")
+hidden_size = config.get("hidden_size")
+num_layers = config.get("num_hidden_layers")
+print(f"Параметры из config.json: vocab_size={vocab_size}, hidden_size={hidden_size}, num_layers={num_layers}")
+
+block_files = list(Path(tensor_dir).glob(f"{model_name}_*_block*.pt"))
+if not block_files:
+    print(f"Ошибка: Файлы блоков модели {model_name} не найдены в {tensor_dir}.")
+    exit(1)
+else:
+    print(f"Найдено {len(block_files)} файлов блоков модели {model_name} в {tensor_dir}:")
+    for block_file in block_files[:10]:
+        print(f" - {block_file.name}")
+    if len(block_files) > 10:
+        print(f" ... и еще {len(block_files) - 10} файлов")
+
+try:
+    veector.model_manager.load_pre_split_model(model_name, tensor_dir, vocab_size, hidden_size, num_layers)
+    print(f"Модель {model_name} успешно загружена.")
+except Exception as e:
+    print(f"Ошибка при загрузке модели: {e}")
+    exit(1)
+
+# Загрузка токенизатора из папки models
+tokenizer_path = os.path.join(model_config_dir, "tokenizer.json")
+if not os.path.exists(tokenizer_path):
+    print("Скачиваю tokenizer.json с Hugging Face...")
+    os.makedirs(model_config_dir, exist_ok=True)
+    urllib.request.urlretrieve(
+        "https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B/resolve/main/tokenizer.json",
+        tokenizer_path
+    )
+tokenizer = AutoTokenizer.from_pretrained(model_config_dir)
+
+print("Очистка памяти перед инференсом...")
+gc.collect()
+print_memory_usage()
+
+max_sequence_length = 6
+input_text = "Hello, how are you?"
+input_ids = tokenizer.encode(input_text, return_tensors="np")
+input_data = input_ids[:, :max_sequence_length]
+print(f"Входной текст: {input_text}")
+print(f"Сгенерированные входные данные: {input_data.shape}")
+
+print("Запуск инференса...")
+output = veector.model_manager.perform_inference(model_name, input_data)
+print(f"Результат инференса: {output.shape}")
+
+predicted_tokens = np.argmax(output, axis=-1)
+print(f"Предсказанные токены: {predicted_tokens}")
+predicted_text = tokenizer.decode(predicted_tokens[0], skip_special_tokens=True)
+print(f"Предсказанный текст: {predicted_text}")
+
+gc.collect()
+print_memory_usage()
+
+===== Код из файла: /workspaces/Veector/src/memory.py =====
+
+# /workspaces/Veector/device/src/memory.py
+import hashlib
+import pickle
+import numpy as np
+import time
+from collections import OrderedDict  # Для реализации LRU вручную
+
+class Memory:
+    def __init__(self, capacity=1000, use_lru_cache=True, use_hashing=True):
+        self.use_lru_cache = use_lru_cache
+        self.use_hashing = use_hashing
+        self.capacity = capacity
+        
+        if use_lru_cache:
+            self.storage = OrderedDict()  # Используем OrderedDict для LRU
+        else:
+            self.storage = {}
+
+    def _hash_key(self, key):
+        if isinstance(key, (tuple, list)):
+            key = tuple(key)
+        if isinstance(key, np.ndarray):
+            key = key.tobytes()
+        return hashlib.sha256(pickle.dumps(key)).hexdigest()
+
+    def store(self, key, value):
+        if self.use_hashing:
+            key = self._hash_key(key)
+        if self.use_lru_cache and len(self.storage) >= self.capacity:
+            self.storage.popitem(last=False)  # Удаляем самый старый элемент
+        elif not self.use_lru_cache and len(self.storage) >= self.capacity:
+            self._evict_oldest()
+        self.storage[key] = value
+        if self.use_lru_cache:
+            self.storage.move_to_end(key)  # Перемещаем в конец для LRU
+
+    def retrieve(self, key):
+        if self.use_hashing:
+            key = self._hash_key(key)
+        if key in self.storage:
+            if self.use_lru_cache:
+                self.storage.move_to_end(key)  # Обновляем порядок для LRU
+            return self.storage[key]
+        return None
+    
+    def _evict_oldest(self):
+        if self.storage:
+            oldest_key = next(iter(self.storage))
+            del self.storage[oldest_key]
+
+    def clear(self):
+        self.storage.clear()
+
+    def __len__(self):
+        return len(self.storage)
+
+    def __contains__(self, key):
+        if self.use_hashing:
+            key = self._hash_key(key)
+        return key in self.storage
+    
+class MemoryManager:
+    def __init__(self, max_size=512):
+        self.cache = {}
+        self.access_times = {}
+        self.max_size = max_size
+    
+    def add_block(self, block_name, block):
+        if self._get_size() + block_size(block) > self.max_size:
+            self._evict_lru()
+        self.cache[block_name] = block
+        self.access_times[block_name] = time.time()
+    
+    def _evict_lru(self):
+        oldest_block = min(self.access_times.items(), key=lambda x: x[1])[0]
+        del self.cache[oldest_block]
+        del self.access_times[oldest_block]
+
+    def _get_size(self):
+        return sum([block.nbytes / (1024 * 1024) if isinstance(block, np.ndarray) else 0 for block in self.cache.values()])
+
+def block_size(block):
+    return block.nbytes / (1024 * 1024) if isinstance(block, np.ndarray) else 0
+
+===== Код из файла: /workspaces/Veector/src/model_manager.py =====
+
+# /workspaces/Veector/device/src/model_manager.py
+import os
+import torch
+import torch.nn.functional as F
+import numpy as np
+from ipfshttpclient import connect
+from pathlib import Path
+from virtual_space import VirtualSpace
+from qiskit import QuantumCircuit
+from utils import parse_block_name  # Предполагается, что этот модуль существует
+
+class ModelManager:
+    def __init__(self, veector, block_size=(1024, 1024), ipfs_enabled=True, model_dir="../data/models"):
+        """
+        Менеджер моделей для работы с блочно-матричной архитектурой и квантовыми цепями.
+        :param veector: Экземпляр ядра Veector.
+        :param block_size: Размер блока матрицы (высота, ширина) — не используется, размеры из метаданных.
+        :param ipfs_enabled: Включ-lact IPFS-хранилище.
+        :param model_dir: Директория для локальных данных.
+        """
+        self.veector = veector
+        self.ipfs_enabled = ipfs_enabled
+        self.model_dir = Path(model_dir)
+        self.model_dir.mkdir(parents=True, exist_ok=True)
+        self.virtual_space = VirtualSpace(veector, use_ipfs=ipfs_enabled, model_manager=self)
+        self.quantum_circuits = {}
+        self.p2p_node = veector.p2p_node if ipfs_enabled and veector.p2p_node else None
+
+    def load_pre_split_model(self, model_name, tensor_dir, vocab_size=None, hidden_size=None, num_layers=None):
+        """
+        Загружает модель, предварительно разделённую на блоки, из директории.
+        :param model_name: Название модели.
+        :param tensor_dir: Путь к директории с блоками модели.
+        :param vocab_size: Размер словаря (из config.json).
+        :param hidden_size: Размер скрытого слоя (из config.json).
+        :param num_layers: Количество слоёв (из config.json).
+        """
+        print(f"Проверка загрузки модели {model_name} из {tensor_dir}")
+        block_files = list(Path(tensor_dir).glob(f"{model_name}_*_block*.pt"))  # Ищем файлы вида _blockN.pt
+        print(f"Найдено {len(block_files)} файлов блоков в {tensor_dir}:")
+        for block_file in block_files[:10]:  # Ограничим вывод первыми 10 файлами
+            print(f" - {block_file.name}")
+        if len(block_files) > 10:
+            print(f" ... и еще {len(block_files) - 10} файлов")
+        
+        if not block_files:
+            print(f"Ошибка: Файлы для модели {model_name} не найдены в {tensor_dir}")
+            raise ValueError(f"Модель {model_name} не найдена")
+
+        # Проверяем наличие метаданных
+        metadata_path = os.path.join(tensor_dir, f"{model_name}_metadata.json")
+        if not os.path.exists(metadata_path):
+            print(f"Ошибка: Файл метаданных {metadata_path} не найден.")
+            raise FileNotFoundError(f"Метаданные для {model_name} отсутствуют")
+
+        # Используем переданные параметры из config.json
+        if vocab_size is None or hidden_size is None or num_layers is None:
+            raise ValueError("Все параметры (vocab_size, hidden_size, num_layers) должны быть переданы из config.json")
+
+        # Переключаем VirtualSpace на модель
+        self.virtual_space.switch_model(model_name, vocab_size, hidden_size, num_layers)
+        print(f"Модель {model_name} загружена из {tensor_dir} с {len(block_files)} блоками")
+
+    def perform_inference(self, model_name, input_data):
+        """
+        Выполняет инференс для указанной модели.
+        :param model_name: Название модели.
+        :param input_data: Входные данные (numpy массив или список).
+        :return: Результат инференса (numpy массив).
+        """
+        if model_name not in self.virtual_space.matrix_models:
+            raise ValueError(f"Модель {model_name} не загружена")
+        input_tensor = torch.from_numpy(input_data).to(self.virtual_space.matrix_models[model_name].device)
+        output = self.virtual_space.perform_inference(input_tensor)
+        return output.detach().cpu().numpy() 
+
+    def add_quantum_circuit(self, model_name, circuit):
+        """Добавляет квантовую цепь для модели."""
+        if not isinstance(circuit, QuantumCircuit):
+            raise ValueError("circuit должен быть объектом QuantumCircuit")
+        self.quantum_circuits[model_name] = circuit
+        print(f"Квантовая цепь добавлена для модели {model_name}")
+
+    def execute_quantum_circuit(self, model_name, input_state=None):
+        """Выполняет квантовую цепь для модели."""
+        if model_name not in self.quantum_circuits:
+            raise ValueError(f"Квантовая цепь для {model_name} не найдена")
+        
+        from qiskit import execute
+        from qiskit.providers.aer import Aer
+        circuit = self.quantum_circuits[model_name]
+        num_qubits = circuit.num_qubits
+
+        if input_state is not None:
+            input_state = np.array(input_state, dtype=np.complex128)
+            if input_state.size != 2 ** num_qubits:
+                raise ValueError(f"Размер входного состояния {input_state.size} не соответствует {2 ** num_qubits}")
+            circuit.initialize(input_state / np.linalg.norm(input_state), range(num_qubits))
+
+        simulator = Aer.get_backend('statevector_simulator')
+        job = execute(circuit, simulator)
+        result = job.result().get_statevector()
+        return np.array(result, dtype=np.complex128)
+
+if __name__ == "__main__":
+    from core import Veector
+    veector = Veector(use_memory=False, ipfs_enabled=False)
+    manager = ModelManager(veector, ipfs_enabled=False)
+
+    # Загрузка модели
+    manager.load_pre_split_model(
+        "DeepSeek-R1-Distill-Qwen-1.5B",
+        "/workspaces/Veector/data/blocks/DeepSeek-R1-Distill-Qwen-1.5B",
+        vocab_size=151936,
+        hidden_size=1536,
+        num_layers=28
+    )
+
+    # Тест инференса
+    vocab_size = 151936
+    max_sequence_length = 512
+    batch_size = 1
+    input_data = np.random.randint(0, vocab_size, (batch_size, max_sequence_length), dtype=np.int32)
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", input_data)
+    print(f"Результат инференса: {output.shape}")
+
+    output = veector.model_manager.perform_inference(model_name, input_data)
+    predicted_tokens = np.argmax(output, axis=-1)
+    print(f"Предсказанные токены: {predicted_tokens}")
+
+    # Тест квантовой цепи
+    from qiskit import QuantumCircuit
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    manager.add_quantum_circuit("quantum_test", qc)
+    result = manager.execute_quantum_circuit("quantum_test", input_state=[1, 0, 0, 0])
+    print(f"Результат квантовой цепи: {result}")
+
+===== Код из файла: /workspaces/Veector/src/operations.py =====
+
+import numpy as np
+import scipy.linalg  # Для LU-разложения
+from scipy.signal import convolve2d  # Для улучшенной свёртки
+
+def mod(x, y):
+    """Возвращает остаток от деления x на y."""
+    if x is None or y is None or y == 0:
+        return None
+    return x % y
+
+def floor(x):
+    """Округление вниз."""
+    if x is None:
+        return None
+    return np.floor(x)
+
+def ceil(x):
+    """Округление вверх."""
+    if x is None:
+        return None
+    return np.ceil(x)
+
+# --- Расширенные тригонометрические функции ---
+def arcsin(x):
+    """Возвращает арксинус (в радианах)."""
+    if x is None:
+        return None
+    return np.arcsin(x)
+
+def arccos(x):
+    """Возвращает арккосинус (в радианах)."""
+    if x is None:
+        return None
+    return np.arccos(x)
+
+def arctan(x):
+    """Возвращает арктангенс (в радианах)."""
+    if x is None:
+        return None
+    return np.arctan(x)
+
+def xor(x, y):
+    """Логическое XOR."""
+    if x is None or y is None:
+        return None
+    return x ^ y
+
+def nand(x, y):
+    """Логическое NAND (НЕ-И)."""
+    if x is None or y is None:
+        return None
+    return ~(x & y)
+
+def nor(x, y):
+    """Логическое NOR (НЕ-ИЛИ)."""
+    if x is None or y is None:
+        return None
+    return ~(x | y)
+
+# --- Дополнительные операции с матрицами ---
+def inverse(matrix):
+    """Обратная матрица."""
+    if matrix is None:
+        return None
+    try:
+        return np.linalg.inv(matrix)
+    except np.linalg.LinAlgError:
+        return None  # Если матрица вырождена, вернуть None
+
+def trace(matrix):
+    """След матрицы (сумма диагональных элементов)."""
+    if matrix is None:
+        return None
+    return np.trace(matrix)
+
+# --- Вероятностные функции и статистика ---
+def random_uniform(min_val, max_val):
+    """Генерирует случайное число с равномерным распределением."""
+    return np.random.uniform(min_val, max_val)
+
+def random_normal(mu, sigma):
+    """Генерирует случайное число с нормальным распределением."""
+    return np.random.normal(mu, sigma)
+
+def median(x):
+    """Вычисляет медиану массива."""
+    if x is None:
+        return None
+    return np.median(x)
+
+def matrix_multiply(a, b):
+    """Умножение матриц (a @ b.T)."""
+    if a is None or b is None:
+        return None
+    return np.dot(a, b.T) if a.shape[-1] == b.shape[0] else None
+
+def gradient_descent(data, grad, lr=0.01):
+    """Градиентный спуск для списка данных."""
+    if data is None or grad is None:
+        return None
+    return [d - lr * g for d, g in zip(data, grad)]
+
+def softmax(x):
+    """Softmax с численной стабилизацией."""
+    if x is None:
+        return None
+    exp_x = np.exp(x - np.max(x, axis=-1, keepdims=True))
+    return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
+
+def matrix_determinant(a):
+    """Определитель матрицы."""
+    if a is None:
+        return None
+    return np.linalg.det(a)
+
+def matrix_eigenvalues(a):
+    """Собственные значения матрицы."""
+    if a is None:
+        return None
+    return np.linalg.eigvals(a)
+
+def matrix_lu_decomposition(a):
+    """LU-разложение через SciPy."""
+    if a is None or not isinstance(a, np.ndarray):
+        return None
+    try:
+        p, l, u = scipy.linalg.lu(a)
+        return p, l, u
+    except Exception as e:
+        print(f"Ошибка LU-разложения: {e}")
+        return None
+
+def convolution(data, kernel):
+    """Улучшенная свёртка с использованием SciPy."""
+    if data is None or kernel is None:
+        return None
+    try:
+        return convolve2d(data, kernel, mode='same', boundary='fill', fillvalue=0)
+    except Exception as e:
+        print(f"Ошибка свёртки: {e}")
+        return None
+
+def transpose(a):
+    """Транспонирование для любых размерностей."""
+    if a is None:
+        return None
+    return np.transpose(a)
+
+def mean(x):
+    """Среднее значение с проверкой."""
+    if x is None:
+        return None
+    return np.mean(x) if isinstance(x, np.ndarray) else None
+
+def std_dev(x):
+    """Стандартное отклонение с проверкой."""
+    if x is None:
+        return None
+    return np.std(x) if isinstance(x, np.ndarray) else None
+
+def relu(x):
+    """ReLU для тензоров."""
+    if x is None:
+        return None
+    return np.maximum(0, x)
+
+def sigmoid(x):
+    """Сигмоид для тензоров."""
+    if x is None:
+        return None
+    return 1 / (1 + np.exp(-x))
+
+def exponential_smoothing(data, alpha=0.5):
+    """Экспоненциальное сглаживание временных рядов."""
+    if data is None or not isinstance(data, (list, np.ndarray)):
+        return None
+    data = np.array(data) if isinstance(data, list) else data
+    smoothed = np.zeros_like(data)
+    smoothed[0] = data[0]
+    for i in range(1, len(data)):
+        smoothed[i] = alpha * data[i] + (1 - alpha) * smoothed[i-1]
+    return smoothed
+
+def normalize(data):
+    """Нормализация в диапазон [0, 1]."""
+    if data is None:
+        return None
+    data_min = np.min(data)
+    data_max = np.max(data)
+    return (data - data_min) / (data_max - data_min + 1e-8)
+
+def interpolate(data, new_length):
+    """Линейная интерполяция для тензоров."""
+    if data is None or not hasattr(data, '__len__'):
+        return None
+    old_indices = np.arange(len(data))
+    new_indices = np.linspace(0, len(data)-1, new_length)
+    return np.interp(new_indices, old_indices, data)
+
+def self_attention(inputs):
+    """Self-Attention механизм для трёх входов [Q, K, V]."""
+    if len(inputs) != 3 or any(i is None for i in inputs):
+        return None
+    q, k, v = inputs
+    scores = matrix_multiply(q, k)  # Q @ K^T
+    attention = softmax(scores)
+    return matrix_multiply(attention, v)
+
+def layer_normalization(inputs):
+    """LayerNorm для входных данных."""
+    if inputs is None or len(inputs) != 1:
+        return None
+    x = inputs[0]
+    mean_x = np.mean(x, axis=-1, keepdims=True)
+    std_x = np.std(x, axis=-1, keepdims=True)
+    return (x - mean_x) / (std_x + 1e-5)
+
+def multi_head_attention(inputs, num_heads=8):
+    """Multi-Head Attention с разделением на головы."""
+    if len(inputs) != 3 or any(i is None for i in inputs):
+        return None
+    q, k, v = inputs
+    head_dim = q.shape[-1] // num_heads
+    heads = []
+    for i in range(num_heads):
+        q_i = q[..., i*head_dim:(i+1)*head_dim]
+        k_i = k[..., i*head_dim:(i+1)*head_dim]
+        v_i = v[..., i*head_dim:(i+1)*head_dim]
+        head_output = self_attention([q_i, k_i, v_i])
+        heads.append(head_output)
+    return np.concatenate(heads, axis=-1)
+
+# Квантовые операции перенесены в core.py (Qiskit)
+def quantum_hadamard(qubit):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return qubit
+
+def quantum_pauli_x(qubit):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return qubit
+
+def quantum_cnot(control, target):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return [control, target]
+
+def quantum_measure(qubit_state):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return qubit_state
+
+def quantum_superposition(state):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return state
+
+def quantum_entanglement(qubit1, qubit2):
+    """Заглушка: реализация в core.py через Qiskit."""
+    return [qubit1, qubit2]
+
+def batch_norm(x):
+    """Batch Normalization."""
+    if x is None:
+        return None
+    mean_x = np.mean(x, axis=0)
+    std_x = np.std(x, axis=0)
+    return (x - mean_x) / (std_x + 1e-5)
+
+def leaky_relu(x, alpha=0.01):
+    """Leaky ReLU."""
+    if x is None:
+        return None
+    return np.maximum(alpha * x, x)
+
+def gelu(x):
+    """GELU-активация для тензоров."""
+    if x is None:
+        return None
+    return 0.5 * x * (1 + np.tanh(np.sqrt(2/np.pi) * (x + 0.044715 * x**3)))
+
+def dropout(x, rate=0.5):
+    """Dropout-регуляризация."""
+    if x is None:
+        return None
+    mask = np.random.binomial(1, 1 - rate, size=x.shape)  # Исправлено: 1 - rate для корректного dropout
+    return x * mask / (1 - rate)  # Масштабирование для сохранения ожидаемого значения
+
+def scaled_dot_product_attention(query, key, value, mask=None):
+    """Scaled Dot-Product Attention с маскированием."""
+    if query is None or key is None or value is None:
+        return None
+    d_k = query.shape[-1]
+    scores = matrix_multiply(query, key) / np.sqrt(d_k)
+    if mask is not None:
+        scores = np.where(mask == 0, -1e9, scores)
+    attention = softmax(scores)
+    return matrix_multiply(attention, value)
+
+def causal_mask(size):
+    """Создаёт causal mask для авторегрессивных моделей."""
+    mask = np.triu(np.ones((1, size, size)), k=1)
+    return 1 - mask.astype(bool)  # Исправлено: инверсия маски (1 для видимых, 0 для скрытых)
+
+def masked_fill(tensor, mask, value):
+    """Заполняет тензор значениями по маске."""
+    if tensor is None or mask is None:
+        return None
+    return np.where(mask, value, tensor)
+
+if __name__ == "__main__":
+    # Пример использования
+    x = np.array([1, -2, 3, -4])
+    print(f"ReLU: {relu(x)}")
+    print(f"Sigmoid: {sigmoid(x)}")
+    print(f"Softmax: {softmax(x)}")
+    print(f"Dropout: {dropout(x, rate=0.5)}")
+
+===== Код из файла: /workspaces/Veector/src/sync.py =====
+
+import socket
+import threading
+from ipfshttpclient import connect
+import pickle
+import numpy as np
+import torch
+import time
+import random
+from pathlib import Path
+from utils import parse_block_name
+
+class P2PNode:
+    def __init__(self, host, port, use_ipfs=True):
+        self.host = host
+        self.port = port
+        self.peers = []
+        self.use_ipfs = use_ipfs
+        self.ipfs_client = connect() if use_ipfs else None
+        self.known_tensors = set()  # Трекер известных тензоров
+        self.block_map = {}  # Хранит хэши IPFS для блоков модели: {model_name: {(row, col): ipfs_hash}}
+
+    def start(self):
+        server_thread = threading.Thread(target=self._start_server)
+        server_thread.daemon = True  # Завершается с главным процессом
+        server_thread.start()
+
+    def _start_server(self):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind((self.host, self.port))
+            s.listen()
+            while True:
+                conn, addr = s.accept()
+                peer_thread = threading.Thread(target=self._handle_peer, args=(conn, addr))
+                peer_thread.daemon = True
+                peer_thread.start()
+
+    def _handle_peer(self, conn, addr):
+        with conn:
+            try:
+                data = conn.recv(4096)
+                if data:
+                    self._process_data(data)
+            except Exception as e:
+                print(f"Ошибка обработки соединения с {addr}: {e}")
+
+    def connect_to_peer(self, peer_host, peer_port):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((peer_host, peer_port))
+                self.peers.append((peer_host, peer_port))
+                print(f"Подключён к узлу: {peer_host}:{peer_port}")
+        except Exception as e:
+            print(f"Ошибка подключения к {peer_host}:{peer_port}: {e}")
+
+    def send_data(self, data):
+        for peer in self.peers:
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect(peer)
+                    serialized_data = pickle.dumps(data)
+                    s.sendall(serialized_data)
+                print(f"Данные отправлены узлу: {peer}")
+            except Exception as e:
+                print(f"Ошибка отправки данных узлу {peer}: {e}")
+
+    def _process_data(self, data):
+        try:
+            received_data = pickle.loads(data)
+            if isinstance(received_data, dict) and "tensor_id" in received_data:
+                tensor_id = received_data["tensor_id"]
+                metadata = received_data.get("metadata", {})
+
+                if tensor_id not in self.known_tensors:
+                    self.known_tensors.add(tensor_id)
+
+                    if "ipfs_hash" in metadata:
+                        ipfs_hash = metadata["ipfs_hash"]
+                        shape = metadata.get("shape")
+                        dtype = metadata.get("dtype", "float16")
+                        model_name = metadata.get("model_name")
+                        coords = metadata.get("coords")  # Координаты блока (row, col)
+
+                        if shape and model_name and coords:
+                            tensor_data = self._load_from_ipfs(ipfs_hash, shape, dtype)
+                            if tensor_data is not None:
+                                print(f"Получен блок модели {model_name} {coords}: {tensor_data.shape}")
+                                if model_name not in self.block_map:
+                                    self.block_map[model_name] = {}
+                                self.block_map[model_name][coords] = ipfs_hash
+                            else:
+                                print(f"Не удалось загрузить блок {tensor_id} из IPFS")
+                        else:
+                            print(f"Недостаточно метаданных для {tensor_id}")
+                    else:
+                        print(f"Получен tensor_id без IPFS-хэша: {tensor_id}")
+                else:
+                    print(f"Тензор уже известен: {tensor_id}, пропускаем")
+            else:
+                print(f"Получены данные: {received_data}")
+        except Exception as e:
+            print(f"Ошибка обработки данных: {e}")
+
+    def store_in_ipfs(self, tensor):
+        """Сохранение тензора в IPFS."""
+        if not self.use_ipfs:
+            return None
+        try:
+            tensor_bytes = tensor.numpy().tobytes() if isinstance(tensor, torch.Tensor) else tensor.tobytes()
+            ipfs_hash = self.ipfs_client.add_bytes(tensor_bytes)
+            return ipfs_hash
+        except Exception as e:
+            print(f"Ошибка сохранения в IPFS: {e}")
+            return None
+
+    def _load_from_ipfs(self, ipfs_hash, shape, dtype="float16"):
+        """Загрузка тензора из IPFS."""
+        if not self.use_ipfs:
+            return None
+        try:
+            tensor_data = self.ipfs_client.cat(ipfs_hash)
+            np_dtype = np.dtype(dtype)
+            tensor_np = np.frombuffer(tensor_data, dtype=np_dtype).reshape(shape)
+            return torch.from_numpy(tensor_np)
+        except Exception as e:
+            print(f"Ошибка загрузки из IPFS: {e}")
+            return None
+
+    def sync_tensor(self, tensor, metadata):
+        """Синхронизация тензора с другими узлами."""
+        if self.use_ipfs:
+            ipfs_hash = self.store_in_ipfs(tensor)
+            if ipfs_hash:
+                sync_data = {
+                    "tensor_id": metadata.get("tensor_id", f"tensor_{random.randint(0, 10000)}"),
+                    "metadata": {
+                        "ipfs_hash": ipfs_hash,
+                        "shape": tensor.shape,
+                        "dtype": str(tensor.dtype),
+                        **metadata
+                    }
+                }
+                self.send_data(sync_data)
+                print(f"Тензор синхронизирован с узлами (IPFS): {sync_data['tensor_id']}")
+            else:
+                print("Не удалось сохранить тензор в IPFS, синхронизация отменена")
+        else:
+            print("IPFS отключён, синхронизация пропущена")
+
+    def sync_model_blocks(self, model_name, blocks_dir):
+            """Синхронизация блоков модели из директории."""
+            if not self.use_ipfs:
+                print("IPFS отключён, синхронизация блоков невозможна")
+                return
+            block_files = list(Path(blocks_dir).glob(f"{model_name}_row*_col*.pt"))
+            if not block_files:
+                print(f"Блоки для модели {model_name} не найдены в {blocks_dir}")
+                return
+            for block_file in block_files:
+                parsed = parse_block_name(block_file.name)  # Используем функцию разбора имени
+                coords = (parsed["row"], parsed["col"])
+                block = torch.load(block_file, map_location="cpu")
+                ipfs_hash = self.store_in_ipfs(block)
+                if ipfs_hash:
+                    if model_name not in self.block_map:
+                        self.block_map[model_name] = {}
+                    self.block_map[model_name][coords] = ipfs_hash
+                    sync_data = {
+                        "tensor_id": f"{model_name}_block_{coords[0]}_{coords[1]}",
+                        "metadata": {
+                            "ipfs_hash": ipfs_hash,
+                            "shape": block.shape,
+                            "dtype": str(block.dtype),
+                            "model_name": model_name,
+                            "coords": coords
+                        }
+                    }
+                    self.send_data(sync_data)
+                    print(f"Блок {block_file.name} синхронизирован: {ipfs_hash}")
+                else:
+                    print(f"Не удалось синхронизировать блок {block_file.name}")
+                del block
+                gc.collect()
+
+if __name__ == "__main__":
+    node = P2PNode("localhost", 5000, use_ipfs=True)
+    node.start()
+    node.connect_to_peer("localhost", 5001)
+    node.sync_model_blocks("DeepSeek-R1-Distill-Qwen-1.5B", "data/blocks")
+
+===== Код из файла: /workspaces/Veector/src/tensors.py =====
+
+import numpy as np
+from datetime import datetime  # Для метаданных
+
+def create_tensor(layer, coords, data, length, op=[1, 0, 0], next_coords=[], metadata=None, version=1):
+    """
+    Создаёт тензор с заданными параметрами и метаданными, поддерживает комплексные числа.
+    :param layer: Слой тензора (список).
+    :param coords: Координаты тензора (список).
+    :param data: Данные тензора (число, список или массив, включая комплексные числа).
+    :param length: Длина данных тензора (число).
+    :param op: Операция, применяемая к тензору (список).
+    :param next_coords: Координаты следующего тензора (список).
+    :param metadata: Дополнительные метаданные (словарь или None).
+    :param version: Версия тензора (число).
+    :return: Список, представляющий тензор.
+    """
+    if not isinstance(layer, list) or not isinstance(coords, list) or not isinstance(op, list):
+        raise ValueError("Слой, координаты и операция должны быть списками.")
+
+    if not isinstance(length, (int, float)):
+        raise TypeError("Длина должна быть числом.")
+
+    if not isinstance(next_coords, list):
+        raise TypeError("Координаты следующего тензора должны быть списком.")
+
+    # Преобразуем данные в np.array с поддержкой комплексных чисел
+    if isinstance(data, (list, np.ndarray)):
+        data = np.array(data, dtype=np.complex128)
+    elif isinstance(data, (int, float, complex)):
+        data = np.array([data], dtype=np.complex128)
+    else:
+        raise ValueError("Данные должны быть числом, списком или массивом.")
+
+    # Проверяем, что длина соответствует данным
+    if data.size != length:
+        raise ValueError(f"Указанная длина {length} не соответствует размеру данных {data.size}")
+
+    return [
+        [list(map(int, layer)), list(map(int, coords)), data, length],
+        [[0], list(map(int, coords)), list(map(int, op)), 1],
+        [1, 0, 0],  # Контекст (по умолчанию)
+        [0, 1, 0],  # Версия (по умолчанию)
+        next_coords,
+        {
+            "version": version,
+            "created_at": str(datetime.now()),
+            "dtype": str(data.dtype),
+            "shape": data.shape,
+            **(metadata or {})
+        }
+    ]
+
+def validate_tensor(tensor):
+    """
+    Проверяет валидность структуры тензора.
+    :param tensor: Тензор для проверки.
+    :return: True, если тензор валиден, иначе False.
+    """
+    if not isinstance(tensor, list):
+        return False
+    if len(tensor) < 4:
+        return False
+    if not all(isinstance(t, list) for t in tensor[:2]):
+        return False
+    if not isinstance(tensor[0][2], np.ndarray):  # Проверяем, что данные — это np.ndarray
+        return False
+    if not isinstance(tensor[0][3], (int, float)):  # Проверяем длину
+        return False
+    if len(tensor) > 5 and not isinstance(tensor[5], dict):  # Проверяем метаданные
+        return False
+    return True
+
+def reshape_tensor(tensor, new_shape):
+    """
+    Изменяет форму данных в тензоре с проверкой объёма.
+    :param tensor: Тензор для изменения формы.
+    :param new_shape: Новая форма данных (кортеж или список).
+    :return: Тензор с изменённой формой данных.
+    """
+    if not validate_tensor(tensor):
+        raise ValueError("Невалидный тензор.")
+
+    data = tensor[0][2]
+    if data is None:
+        raise ValueError("Данные тензора отсутствуют.")
+
+    try:
+        data = np.array(data, dtype=np.complex128)
+        if np.prod(new_shape) != data.size:
+            raise ValueError(f"Новая форма {new_shape} (объём {np.prod(new_shape)}) не соответствует объёму данных {data.size}")
+        reshaped_data = data.reshape(new_shape)
+        tensor[0][2] = reshaped_data
+        tensor[5]["shape"] = reshaped_data.shape  # Обновляем метаданные
+        return tensor
+    except Exception as e:
+        raise ValueError(f"Не удалось изменить форму тензора: {e}")
+
+def get_tensor_metadata(tensor):
+    """
+    Получает метаданные тензора.
+    :param tensor: Тензор для получения метаданных.
+    :return: Метаданные тензора (словарь).
+    """
+    if not validate_tensor(tensor):
+        raise ValueError("Невалидный тензор.")
+
+    return tensor[5] if len(tensor) > 5 else {}
+
+if __name__ == "__main__":
+    # Пример использования
+    # Создание тензора с комплексными числами
+    tensor = create_tensor(
+        layer=[0],
+        coords=[0, 0, 0],
+        data=[1 + 2j, 3 - 4j],
+        length=2,
+        op=[50, 0, 0],  # Квантовая операция Hadamard
+        metadata={"description": "Тестовый тензор"}
+    )
+    print(f"Созданный тензор: {tensor[0][2]}")
+    print(f"Метаданные: {get_tensor_metadata(tensor)}")
+
+    # Проверка валидации
+    print(f"Валидность тензора: {validate_tensor(tensor)}")
+
+    # Изменение формы
+    reshaped_tensor = reshape_tensor(tensor, (2, 1))
+    print(f"Тензор после изменения формы: {reshaped_tensor[0][2]}")
+    print(f"Обновлённые метаданные: {get_tensor_metadata(reshaped_tensor)}")
+
+===== Код из файла: /workspaces/Veector/src/test_imports.py =====
+
+print("1. Импорт numpy")
+import numpy as np
+print("2. Импорт torch")
+import torch
+print("3. Импорт transformers")
+from transformers import AutoTokenizer
+print("4. Импорт core")
+from core import Veector
+print("5. Импорт model_manager")
+from model_manager import ModelManager
+print("Импорты завершены")
+
+
+===== Код из файла: /workspaces/Veector/src/tokenization.py =====
+
+class TokenizerWrapper:
+    def __init__(self, model_path):
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_path,
+            use_fast=False,
+            trust_remote_code=True
+        )
+        self.tokenizer.pad_token = self.tokenizer.eos_token  # Для Qwen
+
+    def encode(self, text, **kwargs):
+        return self.tokenizer(text, return_tensors="pt", **kwargs)
+
+===== Код из файла: /workspaces/Veector/src/utils.py =====
+
+# /workspaces/Veector/src/utils.py
+
+def parse_block_name(filename):
+    """
+    Разбирает имя файла блока на составляющие.
+    :param filename: Полное имя файла (например, "DeepSeek-R1-Distill-Qwen-1.5B_row1691_col0.pt").
+    :return: Словарь с моделью, row и col.
+    """
+    if not filename.endswith(".pt"):
+        raise ValueError("Имя файла должно заканчиваться на .pt")
+    base_name = filename[:-3]  # Удаляем ".pt"
+
+    # Извлекаем col
+    col_part = base_name.split("_")[-1]
+    if not col_part.startswith("col"):
+        raise ValueError(f"Некорректный формат col: {col_part}")
+    col = int(col_part[3:])  # Удаляем "col"
+    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_colX"
+
+    # Извлекаем row
+    row_part = base_name.split("_")[-1]
+    if not row_part.startswith("row"):
+        raise ValueError(f"Некорректный формат row: {row_part}")
+    row = int(row_part[3:])  # Удаляем "row"
+    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_rowX"
+
+    # Оставшаяся часть — название модели
+    model_name = base_name
+
+    return {
+        "model_name": model_name,
+        "row": row,
+        "col": col
+    }
+
+===== Код из файла: /workspaces/Veector/src/veectordb.py =====
+
+import json
+import os
+import hashlib
+from datetime import datetime
+import numpy as np
+import uuid # Import the UUID module
+
+class VeectorDB:
+    def __init__(self, db_path="../data/db/veectordb.json"):
+        self.db_path = db_path
+        self.data = {}
+        self.load_db()
+        self.id_namespace = uuid.uuid4()
+
+    def load_db(self):
+        if os.path.exists(self.db_path):
+            try:
+                with open(self.db_path, "r") as f:
+                    self.data = json.load(f)
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"Ошибка загрузки {self.db_path}: {e}. Создаём новый файл.")
+                self.data = {}
+                self.save_db()
+        else:
+            self.data = {}
+            self.save_db()
+
+    def save_db(self):
+        with open(self.db_path, "w") as f:
+            json.dump(self.data, f, default=self._numpy_serializer, indent=4) # Added indent
+
+    def _numpy_serializer(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+    
+    def generate_id(self, data):
+        """
+        Generates a unique ID using UUID.
+        """
+        combined_data = str(data) + str(self.id_namespace)
+        return hashlib.sha256(combined_data.encode()).hexdigest()
+
+    def insert_model(self, model_name, metadata):
+        """
+        Добавляет метаданные модели.
+        :param model_name: Название модели.
+        :param metadata: Метаданные модели (например, vocab_size, hidden_size, num_layers).
+        """
+        model_id = self.generate_id(model_name)
+        self.insert("model", model_name, metadata={"model_id": model_id, **metadata})
+        return model_id
+
+    def insert(self, doc_type, data, metadata=None):
+        """
+        Вставляет документ в базу данных.
+        :param doc_type: Тип документа (например, "model", "tensor", "metadata").
+        :param data: Данные для сохранения (например, ID тензора или метаданные).
+        :param metadata: Дополнительные метаданные.
+        """
+        doc_id = self.generate_id(data)
+        doc = {
+            "id": doc_id,
+            "type": doc_type,
+            "data": data,
+            "metadata": metadata or {"timestamp": str(datetime.now())},
+            "version": 1,  # Initial version
+            "history": [] # Track previous versions
+        }
+        self.data[doc_id] = doc
+        self.save_db()
+        return doc_id
+
+    def get(self, doc_id):
+        """
+        Получает документ по его ID.
+        """
+        return self.data.get(doc_id)
+
+    def update(self, doc_id, new_data):
+        """
+        Обновляет данные документа по его ID и создает новую версию.
+        """
+        if doc_id in self.data:
+            current_doc = self.data[doc_id]
+            current_version = current_doc["version"]
+            new_version = current_version + 1
+            
+            new_doc_id = self.generate_id(new_data)
+
+            # Store history
+            history_entry = {
+                "id": current_doc["id"],
+                "version": current_doc["version"],
+                "timestamp": str(datetime.now()),
+                "data": current_doc["data"],
+                "metadata": current_doc["metadata"]
+            }
+            
+            current_doc["history"].append(history_entry) # Added new history
+
+            new_doc = {
+                "id": new_doc_id,
+                "type": current_doc["type"],
+                "data": new_data,
+                "metadata": {"timestamp": str(datetime.now()), **current_doc["metadata"]},
+                "version": new_version,
+                "history": [] # no history
+            }
+            
+            self.data[new_doc_id] = new_doc # Use new_doc_id
+            self.save_db()
+        else:
+             print(f"Document with id {doc_id} not found. Can not update.")
+
+    def delete(self, doc_id):
+        """
+        Удаляет документ по его ID.
+        """
+        if doc_id in self.data:
+            del self.data[doc_id]
+            self.save_db()
+
+    def sync(self, peer_db):
+        """
+        Синхронизирует базу данных с другой базой данных.
+        """
+        for doc_id, doc in peer_db.data.items():
+            if doc_id not in self.data or \
+               doc["metadata"]["timestamp"] > self.data[doc_id]["metadata"]["timestamp"]:
+                self.data[doc_id] = doc
+        self.save_db()
+
+    def sync_shared(self, peer_db):
+        """
+        Синхронизирует только общие записи с другой базой данных.
+        """
+        for doc_id, doc in peer_db.data.items():
+            if doc["type"] == "tensor_result" and doc["metadata"].get("shared", False):
+                if doc_id not in self.data or \
+                   doc["metadata"]["timestamp"] > self.data[doc_id]["metadata"]["timestamp"]:
+                    self.data[doc_id] = doc
+        self.save_db()
+
+    def find_by_type(self, doc_type):
+        """
+        Возвращает список всех документов заданного типа.
+        """
+        return [doc for doc in self.data.values() if doc["type"] == doc_type]
+
+    def find_by_metadata(self, key, value):
+        """
+        Ищет документы по ключу и значению в метаданных.
+        """
+        return [doc for doc in self.data.values() if doc["metadata"].get(key) == value]
+
+    def insert_model(self, model_name, metadata):
+        """
+        Добавляет метаданные модели.
+        :param model_name: Название модели.
+        :param metadata: Метаданные модели (например, путь к файлу, IPFS hash).
+        """
+        model_id = self.generate_id(model_name)
+        self.insert("model", model_name, metadata={"model_id": model_id, **metadata})
+        return model_id
+
+    def get_model_metadata(self, model_name):
+        """
+        Получает метаданные модели по её названию.
+        :param model_name: Название модели.
+        :return: Метаданные модели или None, если модель не найдена.
+        """
+        models = self.find_by_type("model")
+        for model in models:
+            if model["data"] == model_name:
+                return model["metadata"]
+        return None
+
+    def insert_tensor(self, tensor_id, metadata):
+         """
+         Добавляет метаданные тензора.
+         :param tensor_id: ID тензора (например, IPFS hash или путь к файлу).
+         :param metadata: Метаданные тензора (например, shape, dtype).
+         """
+         self.insert("tensor", tensor_id, metadata)
+
+    def get_tensor_metadata(self, tensor_id):
+        """
+        Получает метаданные тензора по его ID.
+        :param tensor_id: ID тензора.
+        :return: Метаданные тензора или None, если тензор не найден.
+        """
+        tensors = self.find_by_type("tensor")
+        for tensor in tensors:
+            if tensor["data"] == tensor_id:
+                return tensor["metadata"]
+        return None
+    
+    def get_version_history(self, doc_id):
+        """
+        Retrieves the version history for a given document ID.
+        :param doc_id: The ID of the document.
+        :return: A list of historical versions, or None if the document is not found.
+        """
+        doc = self.get(doc_id)
+        if doc:
+            return doc.get("history", [])
+        else:
+            return None
+
+
+===== Код из файла: /workspaces/Veector/src/virtual_space.py =====
+
+# /workspaces/Veector/src/virtual_space.py
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from pathlib import Path
+import json
+import os
+import gc
+
+class VirtualMatrix:
+    def __init__(self, ipfs_client=None):
+        self.ipfs = ipfs_client
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.matrices = {}
+
+    def load_block(self, block_info):
+        block_hash = block_info.get("hash")
+        if self.ipfs and block_hash:
+            self.ipfs.get(block_hash)
+            return torch.load(f"{block_hash}.pt", map_location=self.device, weights_only=True)
+        return torch.load(block_info["path"], map_location=self.device, weights_only=True)
+
+class ModelDispatcher:
+    def __init__(self, model_name, metadata_path, vocab_size, hidden_size, num_layers, base_dir):
+        self.model_name = model_name
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.base_dir = base_dir  # Добавляем base_dir обратно
+        with open(metadata_path, "r") as f:
+            self.metadata = json.load(f)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.cache = {}
+
+    def get_embedding_blocks(self, input_ids):
+        unique_tokens = torch.unique(input_ids)
+        needed_blocks = set()
+        embed_blocks = {k: v for k, v in self.metadata.items() if k.startswith(f"{self.model_name}_embed")}
+        sample_block = list(embed_blocks.values())[0]
+        block_height = sample_block["shape"][0]
+        for token in unique_tokens:
+            row_block = token.item() // block_height
+            block_key = f"{self.model_name}_embed_block{row_block}"
+            if block_key in self.metadata:
+                needed_blocks.add(block_key)
+        return needed_blocks
+
+    def get_layer_blocks(self, layer_idx):
+        blocks = {}
+        for block_key, info in self.metadata.items():
+            if f"layer{layer_idx}_" in info["prefix"]:
+                blocks[block_key] = info
+        return blocks
+
+    def get_output_blocks(self, top_k=None):
+        output_blocks = {k: v for k, v in self.metadata.items() if k.startswith(f"{self.model_name}_output")}
+        total_blocks = len(output_blocks)
+        sample_block = list(output_blocks.values())[0]
+        block_width = sample_block["shape"][0]
+        num_blocks_needed = min((top_k + block_width - 1) // block_width, total_blocks) if top_k else total_blocks
+        return {f"{self.model_name}_output_block{i}" for i in range(num_blocks_needed) if f"{self.model_name}_output_block{i}" in output_blocks}
+
+    def load_block(self, block_info):
+        block_key = block_info["path"].split("/")[-1]
+        if block_key in self.cache:
+            return self.cache[block_key]
+        
+        original_path = block_info["path"]
+        block_filename = Path(original_path).name
+        corrected_path = os.path.join(self.base_dir, block_filename)
+        if not os.path.exists(corrected_path):
+            raise FileNotFoundError(f"Файл блока {corrected_path} не найден")
+        block = torch.load(corrected_path, map_location=self.device, weights_only=True)
+        print(f"Загружен блок {block_key} с размером {block.shape}")  # Отладка
+        self.cache[block_key] = block
+        return block
+
+class MatrixModel(nn.Module):
+    def __init__(self, dispatcher):
+        super().__init__()
+        self.dispatcher = dispatcher
+        self.vocab_size = dispatcher.vocab_size
+        self.hidden_size = dispatcher.hidden_size
+        self.num_layers = dispatcher.num_layers
+        self.device = dispatcher.device
+
+    def forward(self, input_ids, top_k=None):
+        if not isinstance(input_ids, torch.Tensor):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=self.device)
+        elif input_ids.dtype != torch.long:
+            input_ids = input_ids.long()
+        
+        batch_size, seq_len = input_ids.shape
+        hidden_states = torch.zeros(batch_size, seq_len, self.hidden_size, dtype=torch.float16, device=self.device)
+        
+        # Эмбеддинги
+        embed_blocks = self.dispatcher.get_embedding_blocks(input_ids)
+        for block_key in sorted(embed_blocks, key=lambda x: int(x.split("_block")[1])):
+            block_info = self.dispatcher.metadata[block_key]
+            block = self.dispatcher.load_block(block_info)
+            block_height = block.shape[0]
+            start_idx = int(block_key.split("_block")[1]) * block_height
+            end_idx = start_idx + block_height
+            mask = (input_ids >= start_idx) & (input_ids < end_idx)
+            if mask.any():
+                indices = input_ids[mask] - start_idx
+                hidden_states[mask] = block[indices]
+        
+        # Слои
+        for layer_idx in range(self.num_layers):
+            layer_blocks = self.dispatcher.get_layer_blocks(layer_idx)
+            
+            # Self-attention
+            q_proj_blocks = {k: v for k, v in layer_blocks.items() if "self_attn_q_proj" in k}
+            k_proj_blocks = {k: v for k, v in layer_blocks.items() if "self_attn_k_proj" in k}
+            v_proj_blocks = {k: v for k, v in layer_blocks.items() if "self_attn_v_proj" in k}
+            o_proj_blocks = {k: v for k, v in layer_blocks.items() if "self_attn_o_proj" in k}
+            
+            q = torch.zeros_like(hidden_states)
+            k = torch.zeros_like(hidden_states)
+            v = torch.zeros_like(hidden_states)
+            
+            for block_key in sorted(q_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(q_proj_blocks[block_key])
+                q += F.linear(hidden_states, block.T)
+            for block_key in sorted(k_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(k_proj_blocks[block_key])
+                k += F.linear(hidden_states, block.T)
+            for block_key in sorted(v_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(v_proj_blocks[block_key])
+                v += F.linear(hidden_states, block.T)
+            
+            attn_scores = torch.matmul(q, k.transpose(-1, -2)) / (self.hidden_size ** 0.5)
+            attn_weights = F.softmax(attn_scores, dim=-1)
+            attn_output = torch.matmul(attn_weights, v)
+            
+            o = torch.zeros_like(hidden_states)
+            for block_key in sorted(o_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(o_proj_blocks[block_key])
+                o += F.linear(attn_output, block.T)
+            
+            hidden_states = hidden_states + o
+            gc.collect()
+            
+            # MLP
+            gate_proj_blocks = {k: v for k, v in layer_blocks.items() if "mlp_gate_proj" in k}
+            up_proj_blocks = {k: v for k, v in layer_blocks.items() if "mlp_up_proj" in k}
+            down_proj_blocks = {k: v for k, v in layer_blocks.items() if "mlp_down_proj" in k}
+            
+            gate = torch.zeros_like(hidden_states)
+            up = torch.zeros_like(hidden_states)
+            for block_key in sorted(gate_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(gate_proj_blocks[block_key])
+                gate += F.linear(hidden_states, block.T)
+            for block_key in sorted(up_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(up_proj_blocks[block_key])
+                up += F.linear(hidden_states, block.T)
+            
+            mlp_output = gate * F.gelu(up)
+            down = torch.zeros_like(hidden_states)
+            for block_key in sorted(down_proj_blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = self.dispatcher.load_block(down_proj_blocks[block_key])
+                down += F.linear(mlp_output, block.T)
+            
+            hidden_states = hidden_states + down
+            gc.collect()
+        
+        # Выходной слой
+        output_blocks = self.dispatcher.get_output_blocks(top_k=top_k)
+        logits = torch.zeros(batch_size, seq_len, self.vocab_size, dtype=torch.float16, device=self.device)
+        for block_key in sorted(output_blocks, key=lambda x: int(x.split("_block")[1])):
+            block_info = self.dispatcher.metadata[block_key]
+            block = self.dispatcher.load_block(block_info)
+            block_height = block.shape[0]
+            start_idx = int(block_key.split("_block")[1]) * block_height
+            end_idx = start_idx + block_height
+            logits[:, :, start_idx:end_idx] = F.linear(hidden_states, block)
+        
+        del hidden_states
+        gc.collect()
+        return logits
+
+class VirtualSpace:
+    def __init__(self, veector, use_ipfs=False, model_manager=None, metadata_dir="/workspaces/Veector/data"):
+        self.veector = veector
+        self.use_ipfs = use_ipfs
+        self.model_manager = model_manager
+        self.virtual_matrix = VirtualMatrix(self.veector.ipfs_client if use_ipfs else None)
+        self.matrix_models = {}
+        self.current_model = None
+        self.metadata_dir = Path(metadata_dir)
+
+    def switch_model(self, model_name, vocab_size, hidden_size, num_layers):
+        metadata_path = self.metadata_dir / "blocks" / model_name / f"{model_name}_metadata.json"
+        if not metadata_path.exists():
+            raise ValueError(f"Метаданные для модели {model_name} не найдены в {metadata_path}")
+        base_dir = f"/workspaces/Veector/data/blocks/{model_name}"  # Передаём base_dir
+        dispatcher = ModelDispatcher(model_name, metadata_path, vocab_size, hidden_size, num_layers, base_dir)
+        self.matrix_models[model_name] = MatrixModel(dispatcher)
+        self.current_model = model_name
+        print(f"Переключено на модель: {model_name}")
+
+    def perform_inference(self, input_ids, top_k=None):
+        if not self.current_model:
+            raise ValueError("Не выбрана активная модель")
+        model = self.matrix_models[self.current_model]
+        if isinstance(input_ids, list):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=model.device)
+        elif isinstance(input_ids, np.ndarray):
+            input_ids = torch.from_numpy(input_ids).long().to(model.device)
+        return model(input_ids, top_k=top_k)
+

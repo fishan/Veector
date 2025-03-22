@@ -1,0 +1,880 @@
+My s toboj delaem proekt, decentralizovannogo II sostojashego iz mnozhestve agentov II dlja mobil'nyh ustrojstv. sejchas my rabotaet nad tem, chto by polozit' celuju model' v virtual'noe prostranstvo i razdelit' ego na bloki, dlja togo, chto by programma dumala chto model' zagruzhena polnostju v pamjat', no na samom dele tol'ko nuchnye chasti. zagruzhu tebe faily proekta, nado kotorymi seichas rabotaem. virtual_space.py: # /workspaces/Veector/src/virtual_space.py
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from pathlib import Path
+import os
+import gc
+import logging
+from gguf import GGUFReader
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+def format_size(bytes_size):
+    if bytes_size >= 1024**3:
+        return f"{bytes_size / (1024**3):.2f} GiB"
+    elif bytes_size >= 1024**2:
+        return f"{bytes_size / (1024**2):.2f} MiB"
+    else:
+        return f"{bytes_size / 1024:.2f} KiB"
+
+class VirtualMatrix:
+    def __init__(self, dispatcher):
+        self.dispatcher = dispatcher
+        self.device = dispatcher.device
+        self.cache = {}
+        self.block_size = dispatcher.block_size
+
+    def get_block(self, block_key):
+        """Получает блок из диспетчера и кэширует его."""
+        if block_key not in self.cache:
+            self.cache[block_key] = self.dispatcher.load_block(block_key)
+        return self.cache[block_key]
+
+    def clear_cache(self):
+        """Очищает кэш и освобождает память."""
+        total_size = sum(t.nbytes for t in self.cache.values()) if self.cache else 0
+        self.cache.clear()
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        logger.info(f"Cache cleared, freed: {format_size(total_size)}")
+
+class VirtualDispatcher:
+    def __init__(self, gguf_reader, metadata, block_size=4096):
+        """
+        Диспетчер для работы с виртуальными блоками gguf-тензоров.
+        :param gguf_reader: GGUFReader для чтения gguf-файла.
+        :param metadata: Словарь метаданных виртуальных блоков.
+        :param block_size: Размер блока для разбиения.
+        """
+        self.reader = gguf_reader
+        self.metadata = metadata
+        self.block_size = block_size
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.cache = {}
+
+    def get_needed_blocks(self, input_ids):
+        """Определяет, какие блоки нужны для заданных input_ids."""
+        if not isinstance(input_ids, torch.Tensor):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=self.device)
+        
+        needed = set()
+        unique_tokens = torch.unique(input_ids)
+        for token in unique_tokens:
+            token_id = token.item()
+            block_idx = token_id // self.block_size
+            block_key = f"token_embd.weight_block{block_idx}"
+            if block_key in self.metadata:
+                needed.add(block_key)
+        return needed
+
+    def load_block(self, block_key):
+        """Загружает блок из gguf-файла с учётом квантизации."""
+        if block_key in self.cache:
+            return self.cache[block_key]
+
+        if block_key not in self.metadata:
+            raise ValueError(f"Block {block_key} not found in metadata")
+
+        meta = self.metadata[block_key]
+        tensor_name = meta["tensor_name"]
+        
+        tensor_idx = None
+        for i, tensor in enumerate(self.reader.tensors):
+            if tensor.name == tensor_name:
+                tensor_idx = i
+                break
+        if tensor_idx is None:
+            raise ValueError(f"Tensor {tensor_name} not found in GGUF file")
+        
+        tensor = self.reader.get_tensor(tensor_idx)
+        start = int(meta["offset"])
+        shape = meta["shape"]  # [block_height, width], например [4096, 1536]
+        n_elements = np.prod(shape)
+        
+        if tensor.tensor_type == 12:  # Q4_K
+            group_size = 32
+            n_groups = n_elements // group_size
+            q_bytes_per_element = 0.5  # 4 бита на элемент
+            meta_bytes_per_group = 4   # 2 float16 (d и m) на группу
+            expected_q_bytes = int(n_elements * q_bytes_per_element)
+            expected_meta_bytes = n_groups * meta_bytes_per_group
+            total_size = expected_q_bytes + expected_meta_bytes
+            if start + total_size > len(tensor.data):
+                logger.warning(f"Block {block_key} offset {start} + size {total_size} exceeds tensor size {len(tensor.data)}")
+                total_size = len(tensor.data) - start
+        else:
+            itemsize = 2 if tensor.tensor_type == 1 else 4  # FP16 или FP32
+            total_size = n_elements * itemsize
+        
+        raw_data = tensor.data[start:start + total_size]
+        logger.debug(f"Block {block_key}: n_elements={n_elements}, total_size={total_size}, raw_data size={len(raw_data)}")
+
+        if tensor.tensor_type == 12:  # Q4_K
+            if len(raw_data) < total_size:
+                logger.warning(f"Invalid Q4_K data size for {block_key}: {len(raw_data)} bytes, expected {total_size}")
+                return torch.zeros(shape, dtype=torch.float16, device=self.device)
+
+            q_data = np.frombuffer(raw_data[:expected_q_bytes], dtype=np.uint8)
+            meta_data = np.frombuffer(raw_data[expected_q_bytes:expected_q_bytes + expected_meta_bytes], dtype=np.float16)
+            if len(q_data) * 2 < n_elements or len(meta_data) < 2 * n_groups:
+                logger.warning(f"Insufficient data for Q4_K in {block_key}: q_data={len(q_data)}, meta_data={len(meta_data)}")
+                return torch.zeros(shape, dtype=torch.float16, device=self.device)
+
+            d_values = meta_data[0::2]  # Масштаб
+            m_values = meta_data[1::2]  # Смещение
+            q_values = np.zeros(n_elements, dtype=np.float16)
+
+            for i in range(len(q_data)):
+                q_values[2*i] = (q_data[i] & 0x0F)
+                if 2*i + 1 < n_elements:
+                    q_values[2*i + 1] = (q_data[i] >> 4)
+
+            result = np.zeros(n_elements, dtype=np.float16)
+            for g in range(n_groups):
+                if g < len(d_values) and g < len(m_values):
+                    d = d_values[g]
+                    m = m_values[g]
+                    for i in range(group_size):
+                        idx = g * group_size + i
+                        if idx < n_elements:
+                            result[idx] = d * (q_values[idx] - m)
+
+            block = result.reshape(shape)
+        else:
+            block = np.frombuffer(raw_data, dtype=np.float16 if tensor.tensor_type == 1 else np.float32).reshape(shape)
+
+        block_tensor = torch.from_numpy(block).to(torch.float16).to(self.device)
+        self.cache[block_key] = block_tensor
+        logger.info(f"Loaded block {block_key}, shape: {block_tensor.shape}, size: {format_size(block_tensor.nbytes)}")
+        return block_tensor
+
+class VirtualSpace:
+    def __init__(self, veector, use_ipfs=False, model_manager=None, block_size=4096):
+        """
+        Виртуальное пространство для работы с gguf-моделями.
+        :param veector: Экземпляр ядра Veector.
+        :param use_ipfs: Использовать IPFS для хранения блоков.
+        :param model_manager: Экземпляр ModelManager.
+        :param block_size: Размер виртуального блока.
+        """
+        self.veector = veector
+        self.use_ipfs = use_ipfs
+        self.model_manager = model_manager
+        self.block_size = block_size
+        self.dispatchers = {}
+        self.current_model = None
+        self.tokenizer = None
+
+    def switch_model(self, model_name, metadata):
+        """Переключает модель, используя метаданные и gguf-reader."""
+        if model_name not in self.model_manager.models:
+            raise ValueError(f"Модель {model_name} не загружена в ModelManager")
+        
+        reader = self.model_manager.models[model_name]["reader"]
+        self.dispatchers[model_name] = VirtualDispatcher(reader, metadata, self.block_size)
+        self.current_model = model_name
+        logger.info(f"Switched to model: {model_name}")
+
+    def set_tokenizer(self, tokenizer):
+        """Устанавливает токенизатор для преобразования текста в токены."""
+        self.tokenizer = tokenizer
+        logger.info("Tokenizer set")
+
+    def perform_inference(self, input_ids, max_tokens=200):
+        """
+        Выполняет инференс через llama.cpp с использованием виртуальных блоков.
+        :param input_ids: Входные токены (список, numpy массив или тензор).
+        :param max_tokens: Максимальное количество токенов в ответе.
+        :return: Результат инференса.
+        """
+        if not self.current_model:
+            raise ValueError("No active model selected")
+        
+        llama = self.model_manager.llama_instances[self.current_model]
+        dispatcher = self.dispatchers[self.current_model]
+
+        # Преобразуем входные данные
+        if isinstance(input_ids, np.ndarray):
+            input_ids = torch.from_numpy(input_ids).long().to(dispatcher.device)
+        elif isinstance(input_ids, list):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=dispatcher.device)
+        else:
+            input_ids = input_ids.long().to(dispatcher.device)
+
+        # Подгружаем нужные блоки
+        needed_blocks = dispatcher.get_needed_blocks(input_ids)
+        for block_key in needed_blocks:
+            dispatcher.load_block(block_key)
+
+        # Выполняем инференс через llama.cpp
+        response = llama(input_ids.tolist(), max_tokens=max_tokens)
+        return torch.tensor([int(x) for x in response["choices"][0]["text"]], dtype=torch.long)
+
+    def forward(self, input_text, top_k=None):
+        """Преобразует текст в токены и выполняет инференс."""
+        if not self.tokenizer:
+            raise ValueError("Tokenizer not set")
+        if not self.current_model:
+            raise ValueError("No active model selected")
+
+        input_ids = self.tokenizer.encode(input_text, return_tensors="pt").to(self.dispatchers[self.current_model].device)
+        logits = self.perform_inference(input_ids, max_tokens=200 if top_k is None else top_k)
+        if top_k:
+            values, indices = torch.topk(logits, k=top_k, dim=-1)
+            logger.info(f"Top-k logits: {values.shape}, indices: {indices.shape}")
+            return values, indices
+        logger.info(f"Logits: {logits.shape}")
+        return logits, None
+
+if __name__ == "__main__":
+    from transformers import AutoTokenizer
+    from core import Veector
+    from model_manager import ModelManager
+
+    veector = Veector(use_memory=False, ipfs_enabled=False)
+    manager = ModelManager(veector, ipfs_enabled=False)
+    manager.load_gguf_model(
+        "DeepSeek-R1-Distill-Qwen-1.5B",
+        "/workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf"
+    )
+
+    virtual_space = VirtualSpace(veector, model_manager=manager)
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-1.5B-Instruct")
+    virtual_space.set_tokenizer(tokenizer)
+    virtual_space.switch_model("DeepSeek-R1-Distill-Qwen-1.5B", manager.models["DeepSeek-R1-Distill-Qwen-1.5B"]["metadata"])
+
+    input_text = "Привет, как дела?"
+    logits, indices = virtual_space.forward(input_text, top_k=10)
+    print(f"Logits shape: {logits.shape}, Indices shape: {indices.shape if indices is not None else 'None'}")
+
+
+ model_manager.py: 
+ 
+# /workspaces/Veector/src/model_manager.py
+import os
+import torch
+import numpy as np
+from gguf import GGUFReader
+from ipfshttpclient import connect
+from pathlib import Path
+from virtual_space import VirtualSpace
+from qiskit import QuantumCircuit
+from qiskit_aer import AerSimulator  # Новый импорт для qiskit-aer
+from llama_cpp_local import Llama
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+logger.debug(f"Imported Llama from module: {Llama.__module__}")
+logger.debug(f"Llama defined in: {Llama.__init__.__code__.co_filename}")
+
+class ModelManager:
+    def __init__(self, veector, block_size=4096, ipfs_enabled=True, model_dir="../data/models"):
+        self.veector = veector
+        self.block_size = block_size
+        self.ipfs_enabled = ipfs_enabled
+        self.model_dir = Path(model_dir)
+        self.model_dir.mkdir(parents=True, exist_ok=True)
+        self.virtual_space = VirtualSpace(veector, use_ipfs=ipfs_enabled, model_manager=self)
+        self.models = {}
+        self.llama_instances = {}
+        self.quantum_circuits = {}
+        self.p2p_node = veector.p2p_node if ipfs_enabled and veector.p2p_node else None
+
+    def load_gguf_model(self, model_name, gguf_path, n_threads=4, n_ctx=2048, n_batch=512):
+        if not os.path.exists(gguf_path):
+            raise FileNotFoundError(f"Файл {gguf_path} не найден")
+        
+        logger.debug(f"Loading GGUF model: {model_name} from {gguf_path}")
+        reader = GGUFReader(gguf_path)
+        metadata = {}
+        for tensor in reader.tensors:
+            name = tensor.name
+            shape = tensor.shape
+            if len(shape) == 2:
+                height, width = shape
+                itemsize = 0.5 if tensor.tensor_type == 12 else 2  # Q4_K или FP16
+                for i in range(0, height, self.block_size):
+                    block_height = min(self.block_size, height - i)
+                    block_key = f"{name}_block{i // self.block_size}"
+                    # Корректируем offset для Q4_K: учитываем группы и метаданные
+                    if tensor.tensor_type == 12:
+                        n_elements = block_height * width
+                        n_groups = n_elements // 32
+                        q_bytes = n_elements // 2  # 4 бита на элемент
+                        meta_bytes = n_groups * 4  # 2 float16 на группу
+                        offset = i * width // 2 + (i * width // 32) * 4
+                    else:
+                        offset = i * width * itemsize
+                    metadata[block_key] = {
+                        "tensor_name": name,
+                        "shape": [block_height, width],
+                        "offset": int(offset),
+                        "path": gguf_path,
+                        "tensor_type": tensor.tensor_type
+                    }
+                    logger.debug(f"Block {block_key}: shape={metadata[block_key]['shape']}, offset={metadata[block_key]['offset']}")
+
+        self.models[model_name] = {"reader": reader, "metadata": metadata}
+        self.virtual_space.switch_model(model_name, metadata)
+        
+        logger.debug(f"Creating Llama instance for {model_name}")
+        llama = Llama(model_path=gguf_path, n_threads=n_threads, n_ctx=n_ctx, n_batch=n_batch)
+        logger.debug(f"Setting virtual dispatcher for {model_name}")
+        llama.set_virtual_dispatcher(self.virtual_space.dispatchers[model_name])
+        self.llama_instances[model_name] = llama
+        
+        logger.info(f"Модель {model_name} загружена в виртуальное пространство из {gguf_path}")
+
+    def perform_inference(self, model_name, input_data, max_tokens=200):
+        if model_name not in self.models:
+            raise ValueError(f"Модель {model_name} не загружена")
+        llama = self.llama_instances[model_name]
+        if isinstance(input_data, str):
+            response = llama(input_data, max_tokens=max_tokens)
+            print(f"Результат инференса: {response['choices'][0]['text']}")  # Для отладки
+            return response["choices"][0]["text"]
+        elif isinstance(input_data, np.ndarray):
+            input_tensor = torch.from_numpy(input_data).long()
+        elif isinstance(input_data, list):
+            input_tensor = torch.tensor(input_data, dtype=torch.long)
+        else:
+            input_tensor = input_data.long()
+
+        dispatcher = self.virtual_space.dispatchers[model_name]
+        blocks = dispatcher.get_needed_blocks(input_tensor)
+        for block in blocks:
+            dispatcher.load_block(block)
+        
+        response = llama(input_tensor.tolist(), max_tokens=max_tokens)
+        return torch.tensor(response["choices"][0]["text"], dtype=torch.long)  # Ожидаем список чисел
+
+    def add_quantum_circuit(self, model_name, circuit):
+        if not isinstance(circuit, QuantumCircuit):
+            raise ValueError("circuit должен быть объектом QuantumCircuit")
+        self.quantum_circuits[model_name] = circuit
+        print(f"Квантовая цепь добавлена для модели {model_name}")
+
+    def execute_quantum_circuit(self, model_name, input_state):
+        if model_name not in self.quantum_circuits:
+            raise ValueError(f"Квантовая цепь для модели {model_name} не найдена")
+        circuit = self.quantum_circuits[model_name]
+        try:
+            from qiskit import QuantumCircuit
+            from qiskit_aer import AerSimulator  # Используем AerSimulator вместо BasicAer
+        except ImportError as e:
+            logger.error(f"Не удалось импортировать qiskit: {e}")
+            raise
+        
+        # Инициализируем симулятор
+        backend = AerSimulator(method='statevector')
+        # Привязываем начальное состояние (если нужно)
+        if input_state:
+            circuit.initialize(input_state, circuit.qubits)
+        # Выполняем симуляцию
+        job = backend.run(circuit)
+        result = job.result()
+        statevector = result.get_statevector(circuit)
+        logger.info(f"Результат квантовой цепи: {statevector}")
+        return statevector
+
+if __name__ == "__main__":
+    from core import Veector
+    veector = Veector(use_memory=False, ipfs_enabled=False)
+    manager = ModelManager(veector, ipfs_enabled=False)
+
+    manager.load_gguf_model(
+        "DeepSeek-R1-Distill-Qwen-1.5B",
+        "/workspaces/Veector/data/models/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf"
+    )
+
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", "Hello, world!")
+    print(f"Результат инференса: {output}")
+
+    input_data = np.array([0, 1, 2, 3, 4, 5], dtype=np.int32)
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", input_data)
+    print(f"Результат инференса с токенами: {output}")
+
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    manager.add_quantum_circuit("quantum_test", qc)
+    result = manager.execute_quantum_circuit("quantum_test", input_state=[1, 0, 0, 0])
+    print(f"Результат квантовой цепи: {result}") 
+    
+    --------------------------------------------------------------
+llama_cpp_local.py: 
+
+import ctypes
+from ctypes import CFUNCTYPE, c_char_p, c_void_p, POINTER, Structure, c_int
+import logging
+import os
+import numpy as np  # Добавляем импорт
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+logger.debug("Loading libllama.so")
+lib_path = "/workspaces/Veector/llama.cpp/build/bin/libllama.so"
+logger.debug(f"Library path: {lib_path}, modified: {os.path.getmtime(lib_path)}")
+_lib = ctypes.CDLL(lib_path)
+logger.debug("libllama.so loaded successfully")
+
+class VirtualDispatcher(Structure):
+    _fields_ = [
+        ("gguf_path", c_char_p),
+        ("load_block", CFUNCTYPE(c_void_p, c_char_p, c_void_p)),
+        ("user_data", c_void_p)
+    ]
+
+class llama_model_params(Structure):
+    _fields_ = [
+        ("n_gpu_layers", c_int),
+        ("split_mode", c_int),
+        ("main_gpu", c_int),
+        ("devices", POINTER(c_void_p)),
+        ("use_mmap", c_int),
+        ("check_tensors", c_int),
+        ("kv_overrides", c_void_p),
+        ("vocab_only", c_int),
+        ("progress_callback", c_void_p),
+        ("progress_callback_user_data", c_void_p)
+    ]
+
+_lib.llama_set_virtual_dispatcher.argtypes = [POINTER(VirtualDispatcher)]
+_lib.llama_model_load_from_file.argtypes = [c_char_p, POINTER(llama_model_params)]
+_lib.llama_model_load_from_file.restype = c_void_p
+
+class Llama:
+    def __init__(self, model_path, n_threads=4, n_ctx=2048, n_batch=512):
+        logger.debug(f"ENTERING Llama.__init__ with model_path: {model_path}, n_threads: {n_threads}, n_ctx: {n_ctx}, n_batch: {n_batch}")
+        params = llama_model_params(
+            n_gpu_layers=0,
+            split_mode=0,
+            main_gpu=0,
+            devices=ctypes.cast(None, POINTER(c_void_p)),
+            use_mmap=1,
+            check_tensors=0,
+            kv_overrides=None,
+            vocab_only=c_int(0),
+            progress_callback=None,
+            progress_callback_user_data=None
+        )
+        logger.debug(f"params: n_gpu_layers={params.n_gpu_layers}, split_mode={params.split_mode}, main_gpu={params.main_gpu}, devices={params.devices}, use_mmap={params.use_mmap}, check_tensors={params.check_tensors}, vocab_only={params.vocab_only}")
+        logger.debug("Calling llama_model_load_from_file")
+        self._llama = _lib.llama_model_load_from_file(model_path.encode("utf-8"), ctypes.byref(params))
+        if not self._llama:
+            logger.error("Failed to load llama model")
+            raise RuntimeError("Failed to load llama model")
+        logger.debug("Llama model loaded successfully")
+
+    def set_virtual_dispatcher(self, dispatcher):
+        logger.debug("Setting virtual dispatcher")
+        @CFUNCTYPE(c_void_p, c_char_p, c_void_p)
+        def load_block(block_key, user_data):
+            key = block_key.decode("utf-8")
+            logger.debug(f"Calling load_block for key: {key}")
+            block = dispatcher.load_block(key)
+            result = block.ctypes.data_as(c_void_p) if block else None
+            logger.debug(f"load_block result: {result}")
+            return result
+        c_dispatcher = VirtualDispatcher()
+        gguf_path = getattr(dispatcher, "gguf_path", "")
+        c_dispatcher.gguf_path = gguf_path.encode("utf-8")
+        c_dispatcher.load_block = load_block
+        c_dispatcher.user_data = None
+        logger.debug("Calling llama_set_virtual_dispatcher")
+        _lib.llama_set_virtual_dispatcher(ctypes.byref(c_dispatcher))
+        logger.debug("Virtual dispatcher set successfully")
+
+    def __call__(self, input_data, max_tokens=200):
+        logger.debug(f"Calling Llama with input: {input_data}")
+        # Временное решение: возвращаем список случайных чисел
+        response_nums = np.random.randint(0, 1000, size=max_tokens).tolist()
+        return {"choices": [{"text": response_nums}]}
+
+    def __del__(self):
+        logger.debug("Destroying Llama instance")
+
+
+        
+// /workspaces/Veector/llama.cpp/src/llama.cpp
+#include "llama-impl.h"
+#include "llama.h"
+#include "llama-chat.h"
+#include "llama-mmap.h"
+#include "llama-vocab.h"
+#include "llama-model-loader.h"
+#include "llama-model.h"
+#include "ggml.h"
+#include "ggml-backend.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+#include <unordered_map>
+#include <string>
+#include <vector>
+#include <memory>
+#include <cassert>
+
+#if defined(_MSC_VER)
+#pragma warning(disable: 4244 4267) // possible loss of data
+#endif
+
+// Структура виртуального диспетчера
+struct VirtualDispatcher {
+    const char* gguf_path;              // Путь к GGUF-файлу
+    void* (*load_block)(const char* block_key, void* user_data); // Callback для загрузки блока
+    void* user_data;                    // Пользовательские данные
+
+    ggml_tensor* get_tensor(const char* name, const int* input_ids, int n_ids) {
+        std::string key = std::string(name) + "_block" + get_block_id(input_ids, n_ids);
+        void* block_data = load_block(key.c_str(), user_data);
+        if (!block_data) {
+            LLAMA_LOG_ERROR("%s: Failed to load block %s\n", __func__, key.c_str());
+            return nullptr;
+        }
+        return reinterpret_cast<ggml_tensor*>(block_data);
+    }
+
+    std::string get_block_id(const int* input_ids, int n_ids) {
+        if (n_ids > 0) {
+            return std::to_string(input_ids[0] / 4096);
+        }
+        return "0";
+    }
+};
+
+// Глобальная переменная для диспетчера
+static VirtualDispatcher* g_virtual_dispatcher = nullptr;
+
+// Функция установки диспетчера
+extern "C" LLAMA_API void llama_set_virtual_dispatcher(VirtualDispatcher* dispatcher) {
+    g_virtual_dispatcher = dispatcher;
+    LLAMA_LOG_INFO("%s: Virtual dispatcher set\n", __func__);
+}
+
+// Модифицированная функция ggml_get_tensor
+struct ggml_tensor* ggml_get_tensor(struct ggml_context* ctx, const char* name) {
+    if (g_virtual_dispatcher) {
+        int dummy_ids[] = {0};
+        int n_ids = 1;
+        ggml_tensor* tensor = g_virtual_dispatcher->get_tensor(name, dummy_ids, n_ids);
+        if (tensor) {
+            return tensor;
+        }
+        LLAMA_LOG_WARN("%s: Virtual dispatcher failed for %s, falling back to original\n", __func__, name);
+    }
+    // Проверяем, существует ли оригинальная функция в ggml.h
+    #ifdef GGML_GET_TENSOR_BY_NAME
+    return ggml_get_tensor_by_name(ctx, name);
+    #else
+    LLAMA_LOG_ERROR("%s: ggml_get_tensor_by_name not available, no fallback implemented\n", __func__);
+    return nullptr;
+    #endif
+}
+
+// Интерфейсные функции
+struct llama_sampler_chain_params llama_sampler_chain_default_params() {
+    struct llama_sampler_chain_params result = {
+        /*.no_perf =*/ true,
+    };
+    return result;
+}
+
+size_t llama_max_devices(void) {
+    return 16;
+}
+
+bool llama_supports_mmap(void) {
+    return llama_mmap::SUPPORTED;
+}
+
+bool llama_supports_mlock(void) {
+    return llama_mlock::SUPPORTED;
+}
+
+bool llama_supports_gpu_offload(void) {
+    return ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_GPU) != nullptr || llama_supports_rpc();
+}
+
+bool llama_supports_rpc(void) {
+    return ggml_backend_reg_by_name("RPC") != nullptr;
+}
+
+void llama_backend_init(void) {
+    ggml_time_init();
+    struct ggml_init_params params = { 0, nullptr, false };
+    struct ggml_context* ctx = ggml_init(params);
+    ggml_free(ctx);
+}
+
+void llama_numa_init(enum ggml_numa_strategy numa) {
+    if (numa != GGML_NUMA_STRATEGY_DISABLED) {
+        auto* dev = ggml_backend_dev_by_type(GGML_BACKEND_DEVICE_TYPE_CPU);
+        GGML_ASSERT(dev && "CPU backend is not loaded");
+        auto* reg = ggml_backend_dev_backend_reg(dev);
+        auto* numa_init_fn = (decltype(ggml_numa_init)*) ggml_backend_reg_get_proc_address(reg, "ggml_backend_cpu_numa_init");
+        numa_init_fn(numa);
+    }
+}
+
+void llama_backend_free(void) {
+    ggml_quantize_free();
+}
+
+int64_t llama_time_us(void) {
+    return ggml_time_us();
+}
+
+// Загрузка модели
+static int llama_model_load(const std::string& fname, std::vector<std::string>& splits, 
+                           llama_model& model, llama_model_params& params) {
+    LLAMA_LOG_INFO("%s: Loading model from %s\n", __func__, fname.c_str());
+
+    model.t_load_us = 0;
+    time_meas tm(model.t_load_us);
+    model.t_start_us = tm.t_start_us;
+
+    try {
+        LLAMA_LOG_INFO("%s: Creating llama_model_loader\n", __func__);
+        llama_model_loader ml(fname, splits, params.use_mmap, params.check_tensors, params.kv_overrides);
+        LLAMA_LOG_INFO("%s: llama_model_loader created\n", __func__);
+        ml.print_info();
+
+        LLAMA_LOG_INFO("%s: Loading architecture\n", __func__);
+        model.load_arch(ml);
+        LLAMA_LOG_INFO("%s: Architecture loaded\n", __func__);
+
+        LLAMA_LOG_INFO("%s: Loading hyperparameters\n", __func__);
+        model.load_hparams(ml);
+        LLAMA_LOG_INFO("%s: Hyperparameters loaded\n", __func__);
+
+        LLAMA_LOG_INFO("%s: Loading vocabulary\n", __func__);
+        model.load_vocab(ml);
+        LLAMA_LOG_INFO("%s: Vocabulary loaded\n", __func__);
+
+        LLAMA_LOG_INFO("%s: Loading stats\n", __func__);
+        model.load_stats(ml);
+        LLAMA_LOG_INFO("%s: Stats loaded\n", __func__);
+
+        model.hparams.vocab_only = params.vocab_only;
+        LLAMA_LOG_INFO("%s: vocab_only set to %d\n", __func__, model.hparams.vocab_only);
+        LLAMA_LOG_INFO("%s: Printing model info\n", __func__);
+        model.print_info();
+
+        if (params.vocab_only) {
+            LLAMA_LOG_INFO("%s: vocab only - skipping tensors\n", __func__);
+            return 0;
+        }
+
+        LLAMA_LOG_INFO("%s: Loading tensors\n", __func__);
+        if (!model.load_tensors(ml)) {
+            LLAMA_LOG_ERROR("%s: Failed to load tensors\n", __func__);
+            return -2;
+        }
+        LLAMA_LOG_INFO("%s: Tensors loaded successfully\n", __func__);
+    } catch (const std::exception& err) {
+        LLAMA_LOG_ERROR("%s: error loading model: %s\n", __func__, err.what());
+        return -1;
+    }
+
+    LLAMA_LOG_INFO("%s: Model loading completed\n", __func__);
+    return 0;
+}
+
+static struct llama_model* llama_model_load_from_file_impl(
+    const std::string& path_model,
+    std::vector<std::string>& splits,
+    struct llama_model_params params) {
+    LLAMA_LOG_INFO("%s: Starting model load from %s\n", __func__, path_model.c_str());
+
+    llama_backend_init();
+    LLAMA_LOG_INFO("%s: Backend initialized\n", __func__);
+
+    unsigned cur_percentage = 0;
+    if (params.progress_callback == nullptr) {
+        params.progress_callback_user_data = &cur_percentage;
+        params.progress_callback = [](float progress, void* ctx) {
+            unsigned* cur_percentage_p = (unsigned*) ctx;
+            unsigned percentage = (unsigned) (100 * progress);
+            while (percentage > *cur_percentage_p) {
+                *cur_percentage_p = percentage;
+                LLAMA_LOG_CONT(".");
+                if (percentage >= 100) {
+                    LLAMA_LOG_CONT("\n");
+                }
+            }
+            return true;
+        };
+    }
+
+    LLAMA_LOG_INFO("%s: Allocating llama_model\n", __func__);
+    llama_model* model = new llama_model(params);
+    if (!model) {
+        LLAMA_LOG_ERROR("%s: Failed to allocate llama_model\n", __func__);
+        return nullptr;
+    }
+    LLAMA_LOG_INFO("%s: llama_model allocated successfully\n", __func__);
+
+    LLAMA_LOG_INFO("%s: Setting up devices\n", __func__);
+    model->devices.clear();
+    if (params.devices != nullptr) {
+        LLAMA_LOG_INFO("%s: Devices provided, adding to model\n", __func__);
+        ggml_backend_dev_t* dev = params.devices;
+        if ((uintptr_t)dev < 0x1000) {
+            LLAMA_LOG_ERROR("%s: Invalid devices pointer (0x%lx), using CPU instead\n", __func__, (uintptr_t)dev);
+        } else {
+            try {
+                while (*dev) {
+                    model->devices.push_back(*dev);
+                    ++dev;
+                }
+            } catch (...) {
+                LLAMA_LOG_ERROR("%s: Exception while processing devices, using CPU instead\n", __func__);
+                model->devices.clear();
+            }
+        }
+    }
+
+    if (params.split_mode == LLAMA_SPLIT_MODE_NONE && !model->devices.empty()) {
+        if (params.main_gpu < 0 || params.main_gpu >= (int)model->devices.size()) {
+            LLAMA_LOG_ERROR("%s: invalid value for main_gpu: %d (available devices: %d)\n", 
+                __func__, params.main_gpu, (int)model->devices.size());
+            llama_model_free(model);
+            return nullptr;
+        }
+        ggml_backend_dev_t main_gpu = model->devices[params.main_gpu];
+        model->devices.clear();
+        model->devices.push_back(main_gpu);
+    }
+
+    if (!model->devices.empty()) {
+        for (auto* dev : model->devices) {
+            size_t free, total;
+            ggml_backend_dev_memory(dev, &free, &total);
+            LLAMA_LOG_INFO("%s: using device %s (%s) - %zu MiB free\n", 
+                __func__, ggml_backend_dev_name(dev), ggml_backend_dev_description(dev), free/1024/1024);
+        }
+    } else {
+        LLAMA_LOG_INFO("%s: No devices assigned, assuming CPU\n", __func__);
+    }
+
+    LLAMA_LOG_INFO("%s: Calling llama_model_load\n", __func__);
+    const int status = llama_model_load(path_model, splits, *model, params);
+    GGML_ASSERT(status <= 0);
+    if (status < 0) {
+        if (status == -1) {
+            LLAMA_LOG_ERROR("%s: failed to load model\n", __func__);
+        } else if (status == -2) {
+            LLAMA_LOG_INFO("%s: cancelled model load\n", __func__);
+        }
+        llama_model_free(model);
+        return nullptr;
+    }
+
+    LLAMA_LOG_INFO("%s: Model loaded successfully\n", __func__);
+    return model;
+}
+
+extern "C" LLAMA_API struct llama_model* llama_load_model_from_file(const char* path_model, 
+                                                                  struct llama_model_params params) {
+    return llama_model_load_from_file(path_model, params);
+}
+
+extern "C" LLAMA_API struct llama_model* llama_model_load_from_file(const char* path_model, 
+                                                                  struct llama_model_params params) {
+    std::vector<std::string> splits = {};
+    return llama_model_load_from_file_impl(path_model, splits, params);
+}
+
+extern "C" LLAMA_API struct llama_model* llama_model_load_from_splits(const char** paths, 
+                                                                    size_t n_paths, 
+                                                                    struct llama_model_params params) {
+    std::vector<std::string> splits;
+    if (n_paths == 0) {
+        LLAMA_LOG_ERROR("%s: list of splits is empty\n", __func__);
+        return nullptr;
+    }
+    for (size_t i = 0; i < n_paths; ++i) {
+        splits.push_back(paths[i]);
+    }
+    return llama_model_load_from_file_impl(splits.front(), splits, params);
+}
+
+int32_t llama_chat_apply_template(const char* tmpl, const struct llama_chat_message* chat, 
+                                 size_t n_msg, bool add_ass, char* buf, int32_t length) {
+    const std::string curr_tmpl(tmpl == nullptr ? "chatml" : tmpl);
+    std::vector<const llama_chat_message*> chat_vec(n_msg);
+    for (size_t i = 0; i < n_msg; i++) {
+        chat_vec[i] = &chat[i];
+    }
+
+    std::string formatted_chat;
+    llm_chat_template detected_tmpl = llm_chat_detect_template(curr_tmpl);
+    if (detected_tmpl == LLM_CHAT_TEMPLATE_UNKNOWN) {
+        return -1;
+    }
+    int32_t res = llm_chat_apply_template(detected_tmpl, chat_vec, formatted_chat, add_ass);
+    if (res < 0) {
+        return res;
+    }
+    if (buf && length > 0) {
+        strncpy(buf, formatted_chat.c_str(), length);
+    }
+    return res;
+}
+
+int llama_split_path(char* split_path, size_t maxlen, const char* path_prefix, int split_no, int split_count) {
+    static const char* const SPLIT_PATH_FORMAT = "%s-%05d-of-%05d.gguf";
+    if (snprintf(split_path, maxlen, SPLIT_PATH_FORMAT, path_prefix, split_no + 1, split_count)) {
+        return strlen(split_path);
+    }
+    return 0;
+}
+
+int llama_split_prefix(char* split_prefix, size_t maxlen, const char* split_path, int split_no, int split_count) {
+    std::string str_split_path(split_path);
+    char postfix[32];
+    snprintf(postfix, 32, "-%05d-of-%05d.gguf", split_no + 1, split_count);
+    std::string str_postfix(postfix);
+
+    int size_prefix = str_split_path.size() - str_postfix.size();
+    if (size_prefix > 0 && str_split_path.find(str_postfix, size_prefix) != std::string::npos) {
+        snprintf(split_prefix, std::min((size_t) size_prefix + 1, maxlen), "%s", split_path);
+        return size_prefix;
+    }
+    return 0;
+}
+
+const char* llama_print_system_info(void) {
+    static std::string s;
+    s.clear();
+
+    for (size_t i = 0; i < ggml_backend_reg_count(); i++) {
+        auto* reg = ggml_backend_reg_get(i);
+        auto* get_features_fn = (ggml_backend_get_features_t) ggml_backend_reg_get_proc_address(reg, "ggml_backend_get_features");
+        if (get_features_fn) {
+            ggml_backend_feature* features = get_features_fn(reg);
+            s += ggml_backend_reg_name(reg);
+            s += " : ";
+            for (; features->name; features++) {
+                s += features->name;
+                s += " = ";
+                s += features->value;
+                s += " | ";
+            }
+        }
+    }
+    return s.c_str();
+}

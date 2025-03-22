@@ -1,0 +1,1392 @@
+struktura proekta.
+/workspaces/Veector/
+├── !refs
+│   ├── buffer.py
+│   ├── deepseek-ai
+│   │   └── Info DeepSeek-R1-Distill-Qwen-1.5B.txt
+│   ├── google_colab_model_to_blocks.py
+│   ├── howTo.txt
+│   ├── talks.txt
+│   └── temp.txt
+├── LICENSE
+├── README.md
+├── config
+├── data
+│   ├── blocks
+│   │   ├── DeepSeek-R1-Distill-Qwen-1.5B
+│   │   │   ├── DeepSeek-R1-Distill-Qwen-1.5B_embed_block0.pt
+................................
+│   │   │   ├── DeepSeek-R1-Distill-Qwen-1.5B_output_block37.pt
+│   │   │   └── config.json
+│   │   └── info.txt
+│   ├── datasets
+│   │   └── arithmetic
+│   │       └── simple.vtr
+│   ├── db
+│   │   └── veectordb.json
+│   ├── models
+│   │   ├── DeepSeek-R1-Distill-Qwen-1.5B
+│   │   │   ├── LICENSE.txt
+│   │   │   ├── README.md
+│   │   │   ├── generation_config.json
+│   │   │   ├── tokenizer.json
+│   │   │   └── tokenizer_config.json
+│   │   └── DeepSeek-R1-Distill-Qwen-1.5B_metadata.json
+│   ├── pretrained
+│   │   ├── core.vtr
+│   │   └── evolved.vtr
+│   └── tensors
+│       ├── tensor_result_1741839372.4694395_6190.npy
+│       ├── tensor_result_1741840116.6680386_4819.npy
+│       └── tensor_result_1741840363.2619934_8958.npy
+├── device
+│   ├── data
+│   │   ├── db
+│   │   │   ├── user_data.json
+│   │   │   └── veectordb.json
+│   │   ├── local_cache
+│   │   ├── models
+│   │   └── tensors
+│   └── run_veector.py
+├── docs
+│   ├── README.md
+│   ├── memory.md
+│   ├── roadmap.md
+│   ├── training.md
+│   └── veector.md
+├── examples
+│   ├── advanced.py
+│   └── calculator.vtr
+├── go-ipfs
+│   ├── LICENSE
+│   ├── LICENSE-APACHE
+│   ├── LICENSE-MIT
+│   ├── README.md
+│   └── install.sh
+├── go-ipfs_v0.20.0_linux-amd64.tar.gz
+├── requirements.txt
+├── setup_project.sh
+├── src
+│   ├── obsevatory.py
+│   ├── core.py
+│   ├── evolution.py
+│   ├── federated_learning.py
+│   ├── file_transfer.py
+│   ├── interface.py
+│   ├── main.py
+│   ├── memory.py
+│   ├── model_manager.py
+│   ├── operations.py
+│   ├── sync.py
+│   ├── tensors.py
+│   ├── test_imports.py
+│   ├── tokenization.py
+│   ├── utils.py
+│   ├── veectordb.py
+│   └── virtual_space.py
+├── tests
+│   ├── test_basic.py
+│   ├── test_federate.py
+│   ├── test_hybrid.py
+│   ├── test_load.py
+│   ├── test_logic.py
+│   ├── test_loops.py
+│   ├── test_parallel.py
+│   └── test_system.py
+├── tools
+│   ├── app.log
+│   ├── collected_code1.txt
+│   ├── collected_code2.txt
+│   ├── config.json
+│   ├── download_drive.py
+│   ├── folder_code_collector.py
+│   ├── project_info_collect_v2.py
+│   ├── show_structure.py
+│   └── veector.txt
+└── update_project.sh
+
+my pishem decentralizovannyj II dlja mobil'nyh ustrojstv.
+sobrali vse rabotaet, krome otvetov, oni ne pravil'nye.
+ja reshil smenit' stategiju. tak kak sejchas my vse pereprobovali i na samom dele my vybrali ne prvil'nuju taktiku sledit' za vhodnymi tokenami.
+v tom to i delo, chto na vyhode po faktu nikogda ne budet takogo otveta kak sam vopros zhe voprosa, sam posmotri, kogda ja tebja sprashivaju, to tvoj otvet nikogda ne budet nachinat'sja s voprosa, kotoryj ja tebe zadal. vot pochemu sledja za vhodjashim tokenom v itoge o prohozhdeniju cherez model' v nem sobiraetsja v konce nesvjaznyj musor, potomu chto on otrabotal svoe, vopros perevarili i on ne vozbuzhdaet uzhe polozhitel'nuju dejatel'nost', to est' skoree vsego vhodnoj sloi zadaet napravlenie, a v possledujuchih vhodjashij token mozhet tol'ko dobavit' melochi i to kak vidno mozhet nesushestvennye, hotja inogda popadalis' smailiki, chto vpolne moglo byt' v konechnom otvete. tak chto raschirjaem koncepciju, esto kak komanda spionov, kotoraja sledit za tokenami, eto kak slezhka za subjektom, predstavim, po tvoej analogii s gorodom i 28 raionami. vhodjashij sloj, eto kak doroga kotoraja vedet v gorod, i etih dorog mnogo, eto kak na kakuju temu vhodjashie tokeny, subjecty vjezzhajut v gorod, za nimi sledujut shpiony naruzhnoj slezhki :),  suvjecty popadajut v pervyj rajon (sloj vnimanija), v etom sloe oni nahinajut obshatsja s drugimi tokenami, k tem kto bolee znachim  tak che podstavljajutsja shpiony, potom daleee i dalee po slojam, kstati, mozhno kak to otslezhivat' sami vhodjashie tokeny, kak oni terjajut znachimost'? po suti vhodjashie tokeny eto agenty, kotoryje peredajut informaciju i dalee po cepochke informacija obrastaet svoimi osobennostjami i popadaet na stol adresaty kotorj pishet otvet obratno tomu kto poslal emu agentov.
+
+eto informacija s oficial'nogo saita:
+
+za osnovu my vzjali DeepSeek R1 Distill Qwen -1.5B
+ego config.json
+{
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151643,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 131072,
+  "max_window_layers": 21,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_theta": 10000,
+  "sliding_window": 4096,
+  "tie_word_embeddings": false,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.44.0",
+  "use_cache": true,
+  "use_mrope": false,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+Usage Recommendations
+We recommend adhering to the following configurations when utilizing the DeepSeek-R1 series models, including benchmarking, to achieve the expected performance:
+
+Set the temperature within the range of 0.5-0.7 (0.6 is recommended) to prevent endless repetitions or incoherent outputs.
+Avoid adding a system prompt; all instructions should be contained within the user prompt.
+For mathematical problems, it is advisable to include a directive in your prompt such as: "Please reason step by step, and put your final answer within \boxed{}."
+When evaluating model performance, it is recommended to conduct multiple tests and average the results.
+Additionally, we have observed that the DeepSeek-R1 series models tend to bypass thinking pattern (i.e., outputting "<think>\n\n</think>") when responding to certain queries, which can adversely affect the model's performance. To ensure that the model engages in thorough reasoning, we recommend enforcing the model to initiate its response with "<think>\n" at the beginning of every output.
+
+posmotri kod i budem ego obnovljat'.
+
+////////////////// main.py
+
+import logging
+import os
+import json
+from pathlib import Path
+import torch
+import gc
+import psutil
+from transformers import AutoTokenizer
+from model_manager import ModelManager
+from virtual_space import VirtualSpace
+from observatory import Observer  # Последняя версия без UserAdapter
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+def print_memory_usage():
+    process = psutil.Process(os.getpid())
+    ram_usage = process.memory_info().rss / 1024**2
+    logger.info(f"RAM использование: {ram_usage:.2f} MB")
+
+def main():
+    # Параметры модели
+    model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
+    tensor_dir = f"/workspaces/Veector/data/blocks/{model_name}"
+    model_config_dir = f"/workspaces/Veector/data/models/{model_name}"
+
+    # Проверка директории с блоками
+    if not os.path.exists(tensor_dir):
+        print(f"Ошибка: Директория {tensor_dir} не существует.")
+        exit(1)
+
+    # Загрузка конфига
+    config_path = os.path.join(tensor_dir, "config.json")
+    if not os.path.exists(config_path):
+        print(f"Ошибка: Файл config.json не найден в {tensor_dir}.")
+        exit(1)
+
+    with open(config_path, "r") as f:
+        config = json.load(f)
+        vocab_size = config["vocab_size"]
+        hidden_size = config["hidden_size"]
+        num_layers = config["num_hidden_layers"]
+        num_attention_heads = config["num_attention_heads"]
+        intermediate_size = config["intermediate_size"]
+        key_dim = config.get("key_dim", 256)
+        num_key_value_heads = config["num_key_value_heads"]
+
+    # Загрузка токенизатора
+    tokenizer = AutoTokenizer.from_pretrained(model_config_dir)
+    logger.info(f"Переключено на модель: {model_name}")
+
+    # Инициализация VirtualSpace
+    virtual_space = VirtualSpace(tokenizer, use_ipfs=False)
+    virtual_space.switch_model(model_name, vocab_size, hidden_size, num_layers, num_attention_heads, intermediate_size, key_dim, num_key_value_heads)
+
+    # Проверка блоков
+    block_files = list(Path(tensor_dir).glob(f"{model_name}_*_block*.pt"))
+    if not block_files:
+        print(f"Ошибка: Файлы блоков модели {model_name} не найдены в {tensor_dir}.")
+        exit(1)
+    else:
+        logger.info(f"Найдено {len(block_files)} файлов блоков модели {model_name} в {tensor_dir}:")
+        for block_file in block_files[:10]:
+            logger.info(f" - {block_file.name}")
+        if len(block_files) > 10:
+            logger.info(f" ... и еще {len(block_files) - 10} файлов")
+
+    # Инициализация Observer с токенизатором
+    observer = Observer(virtual_space.dispatcher, tokenizer, max_layers=28, top_k=10)
+
+    # Очистка памяти перед началом
+    print("Очистка памяти перед инференсом...")
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    print_memory_usage()
+
+    print("\nНачинаем чат с Observer (для выхода нажмите Ctrl+C)")
+    try:
+        while True:
+            prompt = input("Вы: ")
+            if not prompt.strip():
+                print("Пожалуйста, введите текст.")
+                continue
+
+            # Генерация прямо через Observer
+            messages = [{"role": "user", "content": prompt}, {"role": "assistant", "content": None}]
+            formatted_input = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+            input_ids = tokenizer.encode(formatted_input, add_special_tokens=False, return_tensors="pt").to(observer.device)
+            logger.info(f"Input IDs shape: {input_ids.shape}")
+
+            generated_ids, confidence = observer(input_ids, temperature=1.5, max_length=50)
+            response = tokenizer.decode(generated_ids[0].tolist(), skip_special_tokens=True)
+            logger.info(f"Generated response: {response}, Confidence: {confidence}")
+
+            print(f"Veector: {response} (Confidence: {confidence:.2f})")
+            print_memory_usage()
+
+    except KeyboardInterrupt:
+        print("\nЧат завершен.")
+        observer.clear_memory()
+    except Exception as e:
+        logger.error(f"Ошибка в процессе: {str(e)}", exc_info=True)
+        print("Проверь логи выше или пришли мне полный traceback!")
+        observer.clear_memory()
+
+if __name__ == "__main__":
+    main()
+
+//////////////////// observatory.py
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import logging
+import gc
+import psutil
+from typing import List, Tuple
+
+logger = logging.getLogger(__name__)
+
+class TokenTracker:
+    def __init__(self, vocab_size: int, max_active_tokens: int = 5, max_streams: int = 10, temp_threshold: float = 0.6):
+        self.vocab_size = vocab_size
+        self.max_streams = max_streams
+        self.temp_threshold = temp_threshold
+        self.cumulative_weights = [torch.zeros(vocab_size) for _ in range(max_streams)]
+        self.streams = [[] for _ in range(max_streams)]
+        self.device = torch.device("cpu")
+        self.max_active_tokens = max_active_tokens
+        self.max_streams = max_streams   
+
+    def update(self, token_scores: torch.Tensor, parent_stream_idx: int) -> List[int]:
+        num_active = min(self.max_active_tokens, token_scores.shape[0])
+        _, top_indices = torch.topk(token_scores, num_active)
+        active_tokens = top_indices.tolist()
+        logger.info(f"Updated active tokens: {active_tokens}")
+        return active_tokens
+
+class Observer(nn.Module):
+    def __init__(self, dispatcher, tokenizer, max_layers: int = 28, top_k: int = 10, temp_threshold: float = 0.1):
+        super().__init__()
+        self.dispatcher = dispatcher
+        self.tokenizer = tokenizer
+        self.device = torch.device("cpu")
+        self.hidden_size = dispatcher.hidden_size
+        self.vocab_size = dispatcher.vocab_size
+        self.num_layers = min(dispatcher.num_layers, max_layers)
+        self.num_attention_heads = dispatcher.num_attention_heads
+        self.key_dim = dispatcher.key_dim
+        self.num_key_value_heads = dispatcher.num_key_value_heads
+        self.top_k = top_k
+        self.temperature_decay = 0.95
+        self.query_scorer = nn.Linear(self.hidden_size, 3, dtype=torch.float16).to(self.device)
+        self.layer_scorer = nn.Linear(self.hidden_size, self.num_layers, dtype=torch.float16).to(self.device)
+        self.room_scorer = nn.Linear(self.hidden_size, self.hidden_size // 256, dtype=torch.float16).to(self.device)
+        self.attn_scorer = nn.Linear(self.hidden_size, 1, dtype=torch.float16).to(self.device)
+        self.token_tracker = TokenTracker(self.vocab_size, max_streams=10, temp_threshold=temp_threshold)
+        self.block_cache = {}
+        self.to(self.device)
+
+    def _embed_input(self, input_ids: torch.Tensor) -> torch.Tensor:
+        batch_size, seq_len = input_ids.shape
+        hidden_states = torch.zeros(batch_size, seq_len, self.hidden_size, device=self.device, dtype=torch.float16)
+        
+        block_size = 4096
+        num_blocks = (self.vocab_size + block_size - 1) // block_size
+        
+        for i in range(num_blocks):
+            block_key = f"{self.dispatcher.model_name}_embed_block{i}"
+            block = self._load_block_with_cache(block_key)
+            start_idx = i * block_size
+            end_idx = min((i + 1) * block_size, self.vocab_size)
+            
+            mask = (input_ids >= start_idx) & (input_ids < end_idx)
+            if mask.any():
+                local_ids = (input_ids - start_idx).clamp(min=0, max=block.shape[0] - 1)
+                local_embed = block[local_ids]
+                hidden_states[mask] = local_embed[mask]
+        
+        if torch.isnan(hidden_states).any():
+            logger.error(f"NaN in embedded hidden_states: {hidden_states[:, :5, :5]}")
+            hidden_states = torch.nan_to_num(hidden_states, nan=0.0)
+        
+        logger.info(f"Embedded input shape: {hidden_states.shape}, values: {hidden_states[:, :5, :5]}")
+        return hidden_states
+
+    def classify_query(self, hidden_states: torch.Tensor) -> str:
+        pooled = hidden_states.mean(dim=[0, 1])
+        scores = self.query_scorer(pooled).softmax(dim=-1)
+        entropy = -(scores * torch.log(scores + 1e-10)).sum().item()
+        strategy = "deep" if entropy > 2.0 else "medium" if entropy > 1.0 else "light"
+        logger.info(f"Classified as {strategy} strategy (entropy: {entropy:.2f})")
+        return strategy
+
+    def select_layers(self, hidden_states: torch.Tensor, strategy: str) -> List[int]:
+        layer_scores = self.layer_scorer(hidden_states.mean(dim=1)).sigmoid().squeeze(0)
+        num_active = {"light": 3, "medium": 5, "deep": 7}[strategy]
+        critical_layers = [0, self.num_layers//2, self.num_layers-1]
+        active_layers = torch.argsort(layer_scores, descending=True)[:num_active].tolist()
+        for layer in critical_layers:
+            if layer not in active_layers:
+                active_layers.append(layer)
+        logger.info(f"Selected layers: {active_layers} for {strategy} strategy")
+        self.selected_layers = active_layers  # Сохраняем для forward
+        return active_layers
+
+    def dynamic_threshold(self, relevance: torch.Tensor, layer_idx: int) -> float:
+        sorted_rel = torch.sort(relevance, descending=True)[0]
+        if len(sorted_rel) == 0:
+            return 0.0
+        base_percent = 0.3 + (layer_idx / self.num_layers) * 0.2
+        threshold_index = int(len(sorted_rel) * base_percent)
+        return sorted_rel[threshold_index].item()
+
+    def _process_layer_with_rooms(self, hidden_states: torch.Tensor, layer_idx: int, threshold: float) -> torch.Tensor:
+        active_rooms = self.select_rooms(hidden_states)
+        attn_output, attn_weights = self.apply_attention(hidden_states, layer_idx, active_rooms)
+        
+        token_scores = attn_weights.sum(dim=(0, 1, 2))
+        logger.info(f"Token scores: {token_scores}")
+        active_tokens = self.token_tracker.update(token_scores, parent_stream_idx=layer_idx % self.token_tracker.max_streams)
+        logger.info(f"Active tokens: {active_tokens}")
+        
+        return attn_output
+
+    def apply_attention(self, hidden_states: torch.Tensor, layer_idx: int, active_rooms: List[int] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        # Загрузка блоков проекций
+        q_block = self._load_block_with_cache(f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_q_proj_weight_block0")
+        k_block = self._load_block_with_cache(f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_k_proj_weight_block0")
+        v_block = self._load_block_with_cache(f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_v_proj_weight_block0")
+        o_block = self._load_block_with_cache(f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_o_proj_weight_block0")
+        
+        batch_size, seq_len, hidden_size = hidden_states.shape
+        num_q_heads = 12  # Количество голов для query
+        num_kv_heads = 2  # Количество голов для key/value
+        head_dim = hidden_size // num_q_heads  # 128
+        
+        if torch.isnan(hidden_states).any():
+            logger.error(f"NaN in hidden_states before layer {layer_idx}: {hidden_states[:, :5, :5]}")
+            hidden_states = torch.nan_to_num(hidden_states, nan=0.0)
+        
+        # Проекции
+        q = torch.matmul(hidden_states, q_block.t())
+        k = torch.matmul(hidden_states, k_block.t())
+        v = torch.matmul(hidden_states, v_block.t())
+        
+        q = q.view(batch_size, seq_len, num_q_heads, head_dim).transpose(1, 2)
+        head_dim_kv = 256 // num_kv_heads
+        k = k.view(batch_size, seq_len, num_kv_heads, head_dim_kv).transpose(1, 2)
+        v = v.view(batch_size, seq_len, num_kv_heads, head_dim_kv).transpose(1, 2)
+        
+        # Заглушка для active_rooms (будем использовать позже)
+        if active_rooms is not None:
+            logger.info(f"Active rooms placeholder: {active_rooms} (not implemented yet)")
+            # TODO: Ограничить q, k, v по active_rooms после обучения нейронки на головы
+        
+        # Rotary Positional Encoding
+        positions = torch.arange(seq_len, device=hidden_states.device).unsqueeze(0)
+        theta = 10000 ** (-2 * (torch.arange(head_dim // 2, device=hidden_states.device) / head_dim))
+        angles = positions.unsqueeze(-1) * theta.unsqueeze(0)
+        cos = torch.cos(angles).unsqueeze(1).to(hidden_states.dtype)
+        sin = torch.sin(angles).unsqueeze(1).to(hidden_states.dtype)
+        
+        q_0, q_1 = q[..., :head_dim//2], q[..., head_dim//2:]
+        q = torch.cat([q_0 * cos - q_1 * sin, q_0 * sin + q_1 * cos], dim=-1)
+        k_0, k_1 = k[..., :head_dim_kv//2], k[..., head_dim_kv//2:]
+        k = torch.cat([k_0 * cos - k_1 * sin, k_0 * sin + k_1 * cos], dim=-1)
+        
+        k = k.repeat_interleave(num_q_heads // num_kv_heads, dim=1)
+        v = v.repeat_interleave(num_q_heads // num_kv_heads, dim=1)
+        
+        # Расчёт attention scores
+        attn_scores = torch.matmul(q, k.transpose(-2, -1)) / (head_dim ** 0.5)
+        attn_scores = attn_scores / 10.0  # Уменьшение масштаба
+        
+        # Causal маска
+        mask = torch.triu(torch.ones(seq_len, seq_len, device=hidden_states.device), diagonal=1).bool()
+        attn_scores = attn_scores.masked_fill(mask.unsqueeze(0).unsqueeze(1), float('-inf'))
+        
+        # Отбор "горячих" токенов по температуре
+        temp_threshold = -5.0  # Порог температуры
+        hot_mask = attn_scores > temp_threshold
+        attn_scores = attn_scores.masked_fill(~hot_mask, float('-inf'))
+        
+        if torch.isnan(attn_scores).any() or torch.isinf(attn_scores).any():
+            logger.error(f"NaN or Inf in attn_scores layer {layer_idx}: {attn_scores[:, :, :5, :5]}")
+            attn_scores = torch.nan_to_num(attn_scores, nan=0.0, posinf=10.0, neginf=-10.0)
+        
+        logger.info(f"Attention scores shape: {attn_scores.shape}, values: {attn_scores[:, :, :5, :5]}")
+        
+        # Softmax
+        attn_weights = F.softmax(attn_scores, dim=-1).to(hidden_states.dtype)
+        if torch.isnan(attn_weights).any():
+            logger.error(f"NaN in attn_weights layer {layer_idx}: {attn_weights[:, :, :5, :5]}")
+            attn_weights = torch.nan_to_num(attn_weights, nan=0.0)
+        
+        logger.info(f"Attention weights shape: {attn_weights.shape}, values: {attn_weights[:, :, :5, :5]}")
+        logger.info(f"Attention weights before matmul: {attn_weights[:, :, :5, :5]}")
+        
+        # Выход внимания
+        attn_output = torch.matmul(attn_weights, v)
+        logger.info(f"Attention output after matmul: {attn_output[:, :, :5, :5]}")
+        
+        if torch.isnan(attn_output).any():
+            logger.error(f"NaN in attn_output layer {layer_idx}: {attn_output[:, :, :5, :5]}")
+            attn_output = torch.nan_to_num(attn_output, nan=0.0)
+        
+        attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, seq_len, hidden_size)
+        attn_output = torch.matmul(attn_output, o_block.t())
+        
+        return attn_output, attn_weights
+
+    def forward(self, input_ids: torch.Tensor, temperature: float = 1.0, max_length: int = 50) -> Tuple[torch.Tensor, float]:
+        batch_size = input_ids.shape[0]
+        hidden_states = self._embed_input(input_ids)
+        generated_ids = input_ids.clone()
+        confidence = 0.0
+        
+        strategy = self.classify_query(hidden_states)
+        self.select_layers(hidden_states, strategy)
+        logger.info(f"Selected layers: {self.selected_layers}")
+        
+        eos_token_id = self.tokenizer.eos_token_id or 2
+        max_steps = min(max_length - input_ids.shape[1], 5)
+        
+        for step in range(max_steps):
+            next_hidden = hidden_states
+            for layer_idx in self.selected_layers:
+                next_hidden, attn_weights = self.apply_attention(next_hidden, layer_idx, active_rooms=[0])
+                next_hidden = self._process_layer_with_rooms(next_hidden, layer_idx, threshold=0.1)
+            
+            if torch.isnan(next_hidden).any():
+                logger.error(f"NaN in next_hidden step {step}: {next_hidden[:, -1:, :10]}")
+                next_hidden = torch.nan_to_num(next_hidden, nan=0.0)
+            
+            logits = self._calculate_logits(next_hidden[:, -1:, :]) * 5.0  # Уменьшили масштаб с 10 до 5
+            if torch.all(logits == 0):
+                logger.warning("Logits are all zeros, adding noise")
+                logits = logits + torch.randn_like(logits) * 0.1
+            logits = logits / temperature
+            
+            if torch.isnan(logits).any():
+                logger.error(f"NaN in logits step {step}: {logits[0, 0, :10]}")
+                logits = torch.nan_to_num(logits, nan=0.0)
+            
+            repeat_penalty = 1.2
+            for token_id in generated_ids[0]:
+                if token_id < logits.shape[-1]:
+                    logits[0, 0, token_id] /= repeat_penalty
+            
+            probs = F.softmax(logits, dim=-1)
+            next_token = torch.multinomial(probs[0, 0], num_samples=1)
+            confidence += probs[0, 0, next_token].item()
+            
+            generated_ids = torch.cat([generated_ids, next_token.unsqueeze(0)], dim=1)
+            hidden_states = self._embed_input(generated_ids)
+            
+            token_str = self.tokenizer.decode([next_token.item()])
+            logger.info(f"Step {step}: Logits: {logits[0, 0, :10]}, Probs: {probs[0, 0, :10]}, Token '{token_str}' (ID: {next_token.item()}), Confidence: {confidence:.4f}, Temp: {temperature:.2f}")
+            
+            if next_token.item() == eos_token_id:
+                break
+        
+        return generated_ids, confidence
+    
+    def _calculate_logits(self, hidden_states: torch.Tensor, output_blocks: List[str] = None) -> torch.Tensor:
+        if output_blocks is None:
+            output_blocks = self.dispatcher.get_output_blocks(top_k=5)
+        
+        last_hidden = hidden_states[:, -1:, :]
+        logger.info(f"Last hidden shape: {last_hidden.shape}")
+        logger.info(f"Last hidden values: {last_hidden}")
+        
+        full_logits = []
+        for block_key in output_blocks:
+            block = self._load_block_with_cache(block_key)
+            if block is None:
+                logger.warning(f"Блок {block_key} не загружен")
+                continue
+            block_logits = torch.matmul(last_hidden.to(block.dtype), block.t())
+            logger.info(f"Block {block_key} logits: {block_logits}")
+            full_logits.append(block_logits)
+        
+        if not full_logits:
+            logger.error("Не удалось загрузить ни один блок для вычисления логитов")
+            return torch.zeros(hidden_states.shape[0], 1, self.vocab_size, device=self.device)
+        
+        logits = torch.cat(full_logits, dim=-1)
+        logger.info(f"Logits shape: {logits.shape}")
+        return logits
+
+    def _load_block_with_cache(self, block_key: str) -> torch.Tensor:
+        if block_key not in self.block_cache:
+            self.block_cache[block_key] = self.dispatcher.load_block(block_key)
+            logger.info(f"Loaded block {block_key} with shape {self.block_cache[block_key].shape}")
+        return self.block_cache[block_key]
+
+    def analyze_states(self, hidden_states: torch.Tensor) -> torch.Tensor:
+        hidden_states = hidden_states.to(torch.float16)
+        hidden_states = F.layer_norm(hidden_states, normalized_shape=[hidden_states.shape[-1]])
+        scores = self.attn_scorer(hidden_states).sigmoid()
+        if torch.isnan(scores).any():
+            logger.warning("Обнаружены NaN в attention scores!")
+            scores = torch.nan_to_num(scores, nan=0.0)
+        return hidden_states * scores
+
+    def select_rooms(self, hidden_states: torch.Tensor) -> List[int]:
+        scores = self.room_scorer(hidden_states.mean(dim=1)).sigmoid().squeeze(0)
+        num_rooms = self.hidden_size // 256
+        active_rooms = torch.argsort(scores, descending=True)[:self.top_k].tolist()
+        return list(set(active_rooms + [0, 1]))
+
+    def clear_memory(self):
+        self.block_cache.clear()
+        self.dispatcher.virtual_matrix.clear_cache()
+        gc.collect()
+        logger.info(f"Memory cleared, RAM: {psutil.Process().memory_info().rss / 1024**2:.2f} MB")
+
+    def reset(self):
+        self.token_tracker = TokenTracker(self.vocab_size, max_streams=10, temp_threshold=0.6)
+        self.block_cache.clear()
+        self.clear_memory()
+
+/////////////////////// virtual_space.py
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from pathlib import Path
+import json
+import os
+import gc
+import logging
+from observatory import Observer  # Обновлённый импорт
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+class VirtualMatrix:
+    def __init__(self, dispatcher):
+        self.dispatcher = dispatcher
+        self.device = dispatcher.device
+        self.metadata = dispatcher.metadata
+        self.cache = {}
+
+    def get_block(self, block_key):
+        if block_key not in self.cache:
+            self.cache[block_key] = self.dispatcher.load_block(block_key)  # Передаём строку block_key
+        return self.cache[block_key]
+
+    def embedding(self, input_ids, prefix):
+        batch_size, seq_len = input_ids.shape
+        hidden_size = self.dispatcher.hidden_size
+        output = torch.zeros(batch_size, seq_len, hidden_size, dtype=torch.float16, device=self.device)
+
+        unique_tokens = torch.unique(input_ids)
+        block_height = self.metadata[f"{prefix}_block0"]["shape"][0]
+
+        for token in unique_tokens:
+            block_idx = token.item() // block_height
+            block_key = f"{prefix}_block{block_idx}"
+            if block_key not in self.metadata:
+                continue
+            
+            block = self.get_block(block_key)
+            local_idx = token.item() % block_height
+            token_embedding = block[local_idx]
+            mask = (input_ids == token)
+            output[mask] = token_embedding.to(self.device)
+        
+        self.clear_cache()
+        return output
+
+    def linear(self, input, prefix, output_size, input_size, top_k=None):
+        batch_size, seq_len, in_features = input.shape
+        assert in_features == input_size, f"Input size mismatch: {in_features} != {input_size}"
+        
+        block_keys = [k for k in self.metadata.keys() if k.startswith(prefix)]
+        block_keys = sorted(block_keys, key=lambda x: int(x.split("_block")[1]))
+
+        if prefix.endswith("_output") and top_k is not None:
+            # Шаг 1: Грубая оценка на основе первых нескольких блоков
+            coarse_logits = torch.zeros(batch_size, seq_len, 4096 * 2, dtype=torch.float16, device=self.device)  # Первые 2 блока (8192 токена)
+            for block_key in block_keys[:2]:  # Используем только block0 и block1 для оценки
+                block = self.get_block(block_key)
+                block_out_size, block_in_size = block.shape
+                block_idx = int(block_key.split("_block")[1])
+                start_row = block_idx * block_out_size
+                end_row = start_row + block_out_size
+                coarse_logits[..., start_row:end_row] = torch.matmul(input, block.t())
+                del block
+                self.clear_cache()
+
+            # Выбираем top_k кандидатов
+            coarse_values, coarse_indices = torch.topk(coarse_logits, k=top_k, dim=-1)
+
+            # Шаг 2: Уточняем логиты только для выбранных токенов
+            output = torch.zeros(batch_size, seq_len, top_k, dtype=torch.float16, device=self.device)
+            vocab_per_block = 4096  # Предполагаем, что большинство блоков по 4096 строк
+
+            for b in range(batch_size):
+                for s in range(seq_len):
+                    token_ids = coarse_indices[b, s].cpu().numpy()  # Индексы кандидатов
+                    for token_id in token_ids:
+                        block_idx = token_id // vocab_per_block
+                        block_key = f"{prefix}_block{block_idx}"
+                        if block_key not in self.metadata:
+                            continue
+                        block = self.get_block(block_key)
+                        local_idx = token_id % vocab_per_block
+                        output[b, s, token_ids.tolist().index(token_id)] = torch.matmul(input[b, s:s+1], block[local_idx:local_idx+1].t())
+                        del block
+                        self.clear_cache()
+
+            return output, coarse_indices  # Возвращаем логиты и индексы токенов
+        else:
+            output = torch.zeros(batch_size, seq_len, output_size, dtype=torch.float16, device=self.device)
+            for block_key in block_keys:
+                block = self.get_block(block_key)
+                block_out_size, block_in_size = block.shape
+                block_idx = int(block_key.split("_block")[1])
+
+                if block_out_size == output_size:  # Сборка по столбцам
+                    start_col = block_idx * block_in_size
+                    end_col = min(start_col + block_in_size, input_size)
+                    input_slice = input[..., start_col:end_col]
+                    output += torch.matmul(input_slice, block.t())
+                else:  # Сборка по строкам
+                    start_row = block_idx * block_out_size
+                    end_row = start_row + block_out_size
+                    output[..., start_row:end_row] = torch.matmul(input, block.t())
+            
+            self.clear_cache()
+            return output
+
+    def clear_cache(self):
+        self.cache.clear()
+        gc.collect()
+
+class ModelDispatcher:
+    def __init__(self, model_name, metadata_path, vocab_size, hidden_size, num_layers, num_attention_heads, intermediate_size, key_dim, num_key_value_heads):
+        self.model_name = model_name
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.num_attention_heads = num_attention_heads
+        self.intermediate_size = intermediate_size
+        self.key_dim = key_dim
+        self.num_key_value_heads = num_key_value_heads
+        with open(metadata_path, "r") as f:
+            self.metadata = json.load(f)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.cache = {}
+        self.base_dir = f"/workspaces/Veector/data/blocks/{model_name}"
+        self.block_cache = {}
+        self.virtual_matrix = None  # Будет установлено позже
+        self.tokenizer = None  # Будет установлено позже
+
+    def get_embedding_blocks(self, input_ids):
+        unique_tokens = torch.unique(input_ids)
+        needed_blocks = set()
+        embed_blocks = {k: v for k, v in self.metadata.items() if k.startswith(f"{self.model_name}_embed")}
+        if not embed_blocks:
+            raise ValueError("Нет блоков эмбеддингов в метаданных!")
+        sample_block = list(embed_blocks.values())[0]
+        block_height = sample_block["shape"][0]
+
+        for token in unique_tokens:
+            row_block = token.item() // block_height
+            block_key = f"{self.model_name}_embed_block{row_block}"
+            if block_key in self.metadata:
+                needed_blocks.add(block_key)
+        return needed_blocks
+
+    def get_layer_blocks(self, layer_idx, component):
+        blocks = set()
+        for block_key, info in self.metadata.items():
+            if f"layer{layer_idx}_{component}" in block_key:  # Исправлено на проверку по block_key
+                blocks.add(block_key)
+        return blocks
+
+    def get_output_blocks(self, top_k=None):
+        output_blocks = {k: v for k, v in self.metadata.items() if k.startswith(f"{self.model_name}_output")}
+        if not output_blocks:
+            raise ValueError("Нет блоков выходного слоя в метаданных!")
+        
+        total_blocks = len(output_blocks)
+        sample_block = list(output_blocks.values())[0]
+        block_height = sample_block["shape"][0]
+
+        if top_k:
+            num_blocks_needed = min((top_k + block_height - 1) // block_height, total_blocks)
+        else:
+            num_blocks_needed = total_blocks
+
+        needed_blocks = {f"{self.model_name}_output_block{i}" for i in range(num_blocks_needed) if f"{self.model_name}_output_block{i}" in output_blocks}
+        return needed_blocks
+
+    def load_block(self, block_name):
+        if block_name not in self.metadata:
+            logger.error(f"‼️ Блок {block_name} отсутствует в метаданных!")
+            raise ValueError(f"Блок {block_name} не найден")
+        # Проверка размера загруженного блока
+        block = torch.load(corrected_path, map_location=self.device)
+        expected_shape = tuple(self.metadata[block_name]["shape"])
+        if block.shape != expected_shape:
+            logger.error(f"Несоответствие размера блока {block_name}: {block.shape} vs {expected_shape}")
+            raise ValueError("Некорректный размер блока")
+
+    def load_block(self, block_name):
+        if block_name in self.block_cache:
+            return self.block_cache[block_name]
+        
+        if block_name not in self.metadata:
+            raise ValueError(f"Блок {block_name} не найден в метаданных")
+        
+        block_info = self.metadata[block_name]
+        block_hash = block_info.get("hash")
+        
+        if block_hash and hasattr(self, 'ipfs') and self.ipfs:
+            self.ipfs.get(block_hash)
+            block = torch.load(f"{block_hash}.pt", map_location=self.device, weights_only=True)
+        else:
+            original_path = block_info["path"]
+            block_filename = Path(original_path).name
+            corrected_path = os.path.join(self.base_dir, block_filename)
+            if not os.path.exists(corrected_path):
+                raise FileNotFoundError(f"Файл блока {corrected_path} не найден")
+            block = torch.load(corrected_path, map_location=self.device, weights_only=True)
+        
+        self.block_cache[block_name] = block
+        logger.info(f"Loaded block {corrected_path} with shape {block.shape}")
+        return block
+
+    def assemble_tensor(self, block_keys, target_shape):
+        if not block_keys:
+            raise ValueError("Нет блоков для сборки тензора")
+
+        sorted_keys = sorted(block_keys, key=lambda x: int(x.split("_block")[1]))
+        blocks_info = [self.metadata[key] for key in sorted_keys]
+
+        total_height = sum(info["shape"][0] for info in blocks_info)
+        total_width = sum(info["shape"][1] for info in blocks_info)
+        first_height = blocks_info[0]["shape"][0]
+        first_width = blocks_info[0]["shape"][1]
+
+        if total_height == target_shape[0] and all(info["shape"][1] == first_width for info in blocks_info):
+            dim = 0
+            if target_shape[1] != first_width:
+                raise ValueError(f"Ширина блоков {first_width} не совпадает с целевой шириной {target_shape[1]}")
+        elif total_width == target_shape[1] and all(info["shape"][0] == first_height for info in blocks_info):
+            dim = 1
+            if target_shape[0] != first_height:
+                raise ValueError(f"Высота блоков {first_height} не совпадает с целевой высотой {target_shape[0]}")
+        else:
+            raise ValueError(f"Невозможно собрать тензор с целевой формой {target_shape} из блоков: "
+                             f"суммарная высота={total_height}, ширина={total_width}")
+
+        tensor = torch.zeros(target_shape, dtype=torch.float16, device=self.device)
+
+        if dim == 0:
+            current_row = 0
+            for block_key in sorted_keys:
+                block = self.load_block(block_key)
+                block_height = block.shape[0]
+                tensor[current_row:current_row + block_height, :] = block
+                current_row += block_height
+                del block
+                gc.collect()
+        else:
+            current_col = 0
+            for block_key in sorted_keys:
+                block = self.load_block(block_key)
+                block_width = block.shape[1]
+                tensor[:, current_col:current_col + block_width] = block
+                current_col += block_width
+                del block
+                gc.collect()
+
+        logger.info(f"Assembled tensor with shape {tensor.shape} (dim={dim})")
+        return tensor
+
+class MatrixModel(nn.Module):
+    def __init__(self, dispatcher):
+        super().__init__()
+        self.dispatcher = dispatcher
+        self.virtual_matrix = VirtualMatrix(dispatcher)
+        self.vocab_size = dispatcher.vocab_size
+        self.hidden_size = dispatcher.hidden_size
+        self.num_layers = dispatcher.num_layers
+        self.num_attention_heads = dispatcher.num_attention_heads
+        self.intermediate_size = dispatcher.intermediate_size
+        self.key_dim = dispatcher.key_dim
+        self.num_key_value_heads = dispatcher.num_key_value_heads
+        self.device = dispatcher.device
+
+    def forward(self, input_ids, top_k=None):
+        if not isinstance(input_ids, torch.Tensor):
+            input_ids = torch.tensor(input_ids, dtype=torch.long, device=self.device)
+        elif input_ids.dtype != torch.long:
+            input_ids = input_ids.long()
+        
+        if torch.any(input_ids >= self.vocab_size):
+            raise ValueError(f"Входные данные содержат значения, превышающие vocab_size ({self.vocab_size})")
+        
+        batch_size, seq_len = input_ids.shape
+        hidden_states = self.virtual_matrix.embedding(input_ids, f"{self.dispatcher.model_name}_embed")
+        logger.info(f"Embeddings shape: {hidden_states.shape}")
+
+        for layer_idx in range(self.num_layers):
+            logger.info(f"Processing layer {layer_idx}")
+
+            q = self.virtual_matrix.linear(hidden_states, f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_q_proj_weight", self.hidden_size, self.hidden_size)
+            k = self.virtual_matrix.linear(hidden_states, f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_k_proj_weight", self.key_dim, self.hidden_size)
+            v = self.virtual_matrix.linear(hidden_states, f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_v_proj_weight", self.key_dim, self.hidden_size)
+
+            head_dim = self.hidden_size // self.num_attention_heads
+            key_head_dim = self.key_dim // self.num_key_value_heads
+            heads_per_group = self.num_attention_heads // self.num_key_value_heads
+
+            q = q.view(batch_size, seq_len, self.num_attention_heads, head_dim)
+            q = q.view(batch_size, seq_len, self.num_key_value_heads, heads_per_group, head_dim)
+            q = q.permute(0, 2, 3, 1, 4)
+
+            k = k.view(batch_size, seq_len, self.num_key_value_heads, key_head_dim)
+            k = k.permute(0, 2, 1, 3)
+
+            v = v.view(batch_size, seq_len, self.num_key_value_heads, key_head_dim)
+            v = v.permute(0, 2, 1, 3)
+
+            scores = torch.einsum('bhgsd,bhqd->bhgsq', q, k) / (head_dim ** 0.5)
+            attn_weights = F.softmax(scores, dim=-1)
+
+            v_expanded = v.unsqueeze(2).expand(-1, -1, heads_per_group, -1, -1)
+            attn_output = torch.einsum('bhgsq,bhgsd->bhgsd', attn_weights, v_expanded)
+
+            attn_output = attn_output.permute(0, 3, 1, 2, 4).contiguous()
+            attn_output = attn_output.view(batch_size, seq_len, self.hidden_size)
+            hidden_states = self.virtual_matrix.linear(attn_output, f"{self.dispatcher.model_name}_layer{layer_idx}_self_attn_o_proj_weight", self.hidden_size, self.hidden_size)
+
+            gate = self.virtual_matrix.linear(hidden_states, f"{self.dispatcher.model_name}_layer{layer_idx}_mlp_gate_proj_weight", self.intermediate_size, self.hidden_size)
+            up = self.virtual_matrix.linear(hidden_states, f"{self.dispatcher.model_name}_layer{layer_idx}_mlp_up_proj_weight", self.intermediate_size, self.hidden_size)
+            mlp_output = gate * up
+            hidden_states = self.virtual_matrix.linear(mlp_output, f"{self.dispatcher.model_name}_layer{layer_idx}_mlp_down_proj_weight", self.hidden_size, self.intermediate_size)
+
+        gc.collect()
+        output = self.virtual_matrix.linear(hidden_states, f"{self.dispatcher.model_name}_output", self.vocab_size, self.hidden_size, top_k=top_k)
+        
+        if top_k is not None and top_k < self.vocab_size:
+            logits, indices = output
+            logger.info(f"Final logits shape: {logits.shape}, indices shape: {indices.shape}")
+        else:
+            logits = output
+            indices = None
+            logger.info(f"Final logits shape: {logits.shape}")
+        
+        return logits, indices
+
+class VirtualSpace:
+    def __init__(self, veector, use_ipfs: bool = False, model_manager=None, metadata_dir: str = "/workspaces/Veector/data"):
+        """
+        Инициализация VirtualSpace для виртуализации модели.
+        
+        :param veector: Экземпляр Veector.
+        :param use_ipfs: Включение IPFS.
+        :param model_manager: Экземпляр ModelManager для управления моделью.
+        :param metadata_dir: Путь к директории с метаданными.
+        """
+        self.veector = veector
+        self.use_ipfs = use_ipfs
+        self.model_manager = model_manager  # Связь с ModelManager
+        self.matrix_models = {}  # Хранилище виртуализированных моделей
+        self.current_model = None
+        self.metadata_dir = Path(metadata_dir)
+        self.virtual_matrix = None
+        self.dispatcher = None
+        self.tokenizer = None  # Токенизатор устанавливается позже
+
+    def switch_model(self, model_name: str, vocab_size: int, hidden_size: int, num_layers: int, num_attention_heads: int, intermediate_size: int, key_dim: int, num_key_value_heads: int = 2):
+        """
+        Переключение на модель с виртуализацией блоков.
+        
+        :param model_name: Название модели.
+        :param vocab_size: Размер словаря.
+        :param hidden_size: Размер скрытого слоя.
+        :param num_layers: Количество слоёв.
+        :param num_attention_heads: Количество голов внимания.
+        :param intermediate_size: Размер промежуточного слоя.
+        :param key_dim: Размер ключей.
+        :param num_key_value_heads: Количество голов для ключей и значений.
+        """
+        metadata_path = self.metadata_dir / "blocks" / model_name / f"{model_name}_metadata.json"
+        if not metadata_path.exists():
+            raise ValueError(f"Метаданные для модели {model_name} не найдены в {metadata_path}")
+        
+        self.dispatcher = ModelDispatcher(model_name, metadata_path, vocab_size, hidden_size, num_layers, num_attention_heads, intermediate_size, key_dim, num_key_value_heads)
+        self.virtual_matrix = VirtualMatrix(self.dispatcher)
+        self.dispatcher.virtual_matrix = self.virtual_matrix
+        self.dispatcher.tokenizer = self.tokenizer  # Устанавливаем токенизатор
+        
+        self.current_model = model_name
+        self.matrix_models[model_name] = self.virtual_matrix  # Сохраняем виртуализированную матрицу
+        logger.info(f"Переключено на модель: {model_name}")
+
+    def get_matrix(self):
+        """Возвращает текущую виртуализированную матрицу."""
+        if not self.current_model:
+            raise ValueError("Не выбрана активная модель")
+        return self.virtual_matrix
+
+    def clear_memory(self):
+        """Очистка памяти."""
+        if self.virtual_matrix:
+            self.virtual_matrix.clear_cache()
+        logger.info("Memory cleared in VirtualSpace")
+
+if __name__ == "__main__":
+    # Тестовый запуск
+    from transformers import AutoTokenizer
+    from core import Veector
+    from model_manager import ModelManager
+
+    veector = Veector(use_memory=False, ipfs_enabled=False)
+    model_manager = ModelManager(veector, ipfs_enabled=False)
+    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-1.5B-Instruct")
+    
+    virtual_space = VirtualSpace(veector, use_ipfs=False, model_manager=model_manager)
+    virtual_space.tokenizer = tokenizer
+    
+    virtual_space.switch_model(
+        model_name="DeepSeek-R1-Distill-Qwen-1.5B",
+        vocab_size=151936,
+        hidden_size=1536,
+        num_layers=28,
+        num_attention_heads=12,
+        intermediate_size=8960,
+        key_dim=256,
+        num_key_value_heads=2
+    )
+
+    # Тест загрузки эмбеддингов
+    input_ids = tokenizer.encode("Привет, как дела?", return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
+    matrix = virtual_space.get_matrix()
+    embeddings = matrix.embedding(input_ids, f"{virtual_space.current_model}_embed")
+    print(f"Embeddings shape: {embeddings.shape}")
+
+
+//////////// model_manager.py
+
+# /workspaces/Veector/src/model_manager.py
+import os
+import torch
+import torch.nn.functional as F
+import numpy as np
+from ipfshttpclient import connect
+from pathlib import Path
+from virtual_space import VirtualSpace
+from qiskit import QuantumCircuit
+
+class ModelManager:
+    def __init__(self, veector, block_size=(1024, 1024), ipfs_enabled=True, model_dir="../data/models"):
+        """
+        Менеджер моделей для работы с блочно-матричной архитектурой и квантовыми цепями.
+        :param veector: Экземпляр ядра Veector.
+        :param block_size: Размер блока матрицы (высота, ширина) — не используется, размеры из метаданных.
+        :param ipfs_enabled: Включить IPFS-хранилище.
+        :param model_dir: Директория для локальных данных.
+        """
+        self.veector = veector
+        self.ipfs_enabled = ipfs_enabled
+        self.model_dir = Path(model_dir)
+        self.model_dir.mkdir(parents=True, exist_ok=True)
+        self.virtual_space = VirtualSpace(veector, use_ipfs=ipfs_enabled, model_manager=self)
+        self.quantum_circuits = {}
+        self.p2p_node = veector.p2p_node if ipfs_enabled and veector.p2p_node else None
+
+    def load_pre_split_model(self, model_name, tensor_dir, vocab_size=None, hidden_size=None, num_layers=None, 
+                             num_attention_heads=None, intermediate_size=None, key_dim=None, num_key_value_heads=None):
+        """
+        Загружает модель, предварительно разделённую на блоки, из директории.
+        :param model_name: Название модели.
+        :param tensor_dir: Путь к директории с блоками модели.
+        :param vocab_size: Размер словаря (из config.json).
+        :param hidden_size: Размер скрытого слоя (из config.json).
+        :param num_layers: Количество слоёв (из config.json).
+        :param num_attention_heads: Количество голов внимания (из config.json).
+        :param intermediate_size: Размер промежуточного слоя в MLP (из config.json).
+        :param key_dim: Размер ключей и значений для GQA (из config.json или вычисляется).
+        :param num_key_value_heads: Количество голов для ключей и значений в GQA (из config.json).
+        """
+        if not os.path.exists(tensor_dir):
+            raise ValueError(f"Директория {tensor_dir} не существует")
+
+        block_files = list(Path(tensor_dir).glob(f"{model_name}_*_block*.pt"))
+        if not block_files:
+            raise ValueError(f"Файлы блоков модели {model_name} не найдены в {tensor_dir}")
+        
+        print(f"Проверка загрузки модели {model_name} из {tensor_dir}")
+        print(f"Найдено {len(block_files)} файлов блоков в {tensor_dir}:")
+        for block_file in block_files[:10]:
+            print(f" - {block_file.name}")
+        if len(block_files) > 10:
+            print(f" ... и еще {len(block_files) - 10} файлов")
+
+        # Проверяем наличие метаданных
+        metadata_path = os.path.join(tensor_dir, f"{model_name}_metadata.json")
+        if not os.path.exists(metadata_path):
+            raise FileNotFoundError(f"Метаданные для {model_name} отсутствуют по пути {metadata_path}")
+
+        # Проверяем обязательные параметры
+        required_params = [vocab_size, hidden_size, num_layers, num_attention_heads, intermediate_size]
+        param_names = ["vocab_size", "hidden_size", "num_layers", "num_attention_heads", "intermediate_size"]
+        for param, name in zip(required_params, param_names):
+            if param is None:
+                raise ValueError(f"Параметр {name} должен быть передан из config.json")
+
+        # Устанавливаем значения по умолчанию, если не указаны
+        if key_dim is None:
+            key_dim = (hidden_size // num_attention_heads) * (num_key_value_heads or 2)  # Например, 1536 / 12 * 2 = 256
+            print(f"key_dim не указан, вычислен как {key_dim}")
+        if num_key_value_heads is None:
+            num_key_value_heads = 2  # Умолчание из config.json
+            print(f"num_key_value_heads не указан, используется значение по умолчанию: {num_key_value_heads}")
+
+        # Переключаем VirtualSpace на модель с полным набором параметров
+        self.virtual_space.switch_model(
+            model_name, vocab_size, hidden_size, num_layers, num_attention_heads, intermediate_size, key_dim, num_key_value_heads
+        )
+        print(f"Модель {model_name} загружена из {tensor_dir} с {len(block_files)} блоками")
+
+    def perform_inference(self, model_name, input_data):
+        """
+        Выполняет инференс для указанной модели.
+        :param model_name: Название модели.
+        :param input_data: Входные данные (numpy массив, список или PyTorch тензор).
+        :return: Результат инференса (PyTorch тензор).
+        """
+        if not hasattr(self.virtual_space, 'current_model') or self.virtual_space.current_model != model_name:
+            raise ValueError(f"Модель {model_name} не загружена или не активна")
+        
+        # Преобразуем входные данные в PyTorch тензор
+        if isinstance(input_data, np.ndarray):
+            input_tensor = torch.from_numpy(input_data).to(self.virtual_space.matrix_models[model_name].device)
+        elif isinstance(input_data, list):
+            input_tensor = torch.tensor(input_data, device=self.virtual_space.matrix_models[model_name].device)
+        else:
+            input_tensor = input_data
+        
+        output = self.virtual_space.perform_inference(input_tensor)
+        return output
+
+    def add_quantum_circuit(self, model_name, circuit):
+        """Добавляет квантовую цепь для модели."""
+        if not isinstance(circuit, QuantumCircuit):
+            raise ValueError("circuit должен быть объектом QuantumCircuit")
+        self.quantum_circuits[model_name] = circuit
+        print(f"Квантовая цепь добавлена для модели {model_name}")
+
+    def execute_quantum_circuit(self, model_name, input_state=None):
+        """Выполняет квантовую цепь для модели."""
+        if model_name not in self.quantum_circuits:
+            raise ValueError(f"Квантовая цепь для {model_name} не найдена")
+        
+        from qiskit import execute
+        from qiskit.providers.aer import Aer
+        circuit = self.quantum_circuits[model_name]
+        num_qubits = circuit.num_qubits
+
+        if input_state is not None:
+            input_state = np.array(input_state, dtype=np.complex128)
+            if input_state.size != 2 ** num_qubits:
+                raise ValueError(f"Размер входного состояния {input_state.size} не соответствует {2 ** num_qubits}")
+            circuit.initialize(input_state / np.linalg.norm(input_state), range(num_qubits))
+
+        simulator = Aer.get_backend('statevector_simulator')
+        job = execute(circuit, simulator)
+        result = job.result().get_statevector()
+        return np.array(result, dtype=np.complex128)
+
+if __name__ == "__main__":
+    from core import Veector
+    veector = Veector(use_memory=False, ipfs_enabled=False)
+    manager = ModelManager(veector, ipfs_enabled=False)
+
+    # Загрузка модели
+    manager.load_pre_split_model(
+        "DeepSeek-R1-Distill-Qwen-1.5B",
+        "/workspaces/Veector/data/blocks/DeepSeek-R1-Distill-Qwen-1.5B",
+        vocab_size=151936,
+        hidden_size=1536,
+        num_layers=28,
+        num_attention_heads=12,
+        intermediate_size=8960,
+        key_dim=256,
+        num_key_value_heads=2
+    )
+
+    # Тест инференса
+    vocab_size = 151936
+    max_sequence_length = 6
+    batch_size = 1
+    input_data = np.random.randint(0, vocab_size, (batch_size, max_sequence_length), dtype=np.int32)
+    output = manager.perform_inference("DeepSeek-R1-Distill-Qwen-1.5B", input_data)
+    print(f"Результат инференса: {output.shape}")
+
+    predicted_tokens = torch.argmax(output, dim=-1)
+    print(f"Предсказанные токены: {predicted_tokens}")
+
+    # Тест квантовой цепи
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    manager.add_quantum_circuit("quantum_test", qc)
+    result = manager.execute_quantum_circuit("quantum_test", input_state=[1, 0, 0, 0])
+    print(f"Результат квантовой цепи: {result}")
+
+    ///////////////////////////////veectordb.py
+
+    import json
+import os
+import hashlib
+from datetime import datetime
+import numpy as np
+import uuid # Import the UUID module
+
+class VeectorDB:
+    def __init__(self, db_path="../data/db/veectordb.json"):
+        self.db_path = db_path
+        self.data = {}
+        self.load_db()
+        self.id_namespace = uuid.uuid4()
+
+    def load_db(self):
+        if os.path.exists(self.db_path):
+            try:
+                with open(self.db_path, "r") as f:
+                    self.data = json.load(f)
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"Ошибка загрузки {self.db_path}: {e}. Создаём новый файл.")
+                self.data = {}
+                self.save_db()
+        else:
+            self.data = {}
+            self.save_db()
+
+    def save_db(self):
+        with open(self.db_path, "w") as f:
+            json.dump(self.data, f, default=self._numpy_serializer, indent=4) # Added indent
+
+    def _numpy_serializer(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+    
+    def generate_id(self, data):
+        """
+        Generates a unique ID using UUID.
+        """
+        combined_data = str(data) + str(self.id_namespace)
+        return hashlib.sha256(combined_data.encode()).hexdigest()
+
+    def insert_model(self, model_name, metadata):
+        """
+        Добавляет метаданные модели.
+        :param model_name: Название модели.
+        :param metadata: Метаданные модели (например, vocab_size, hidden_size, num_layers).
+        """
+        model_id = self.generate_id(model_name)
+        self.insert("model", model_name, metadata={"model_id": model_id, **metadata})
+        return model_id
+
+    def insert(self, doc_type, data, metadata=None):
+        """
+        Вставляет документ в базу данных.
+        :param doc_type: Тип документа (например, "model", "tensor", "metadata").
+        :param data: Данные для сохранения (например, ID тензора или метаданные).
+        :param metadata: Дополнительные метаданные.
+        """
+        doc_id = self.generate_id(data)
+        doc = {
+            "id": doc_id,
+            "type": doc_type,
+            "data": data,
+            "metadata": metadata or {"timestamp": str(datetime.now())},
+            "version": 1,  # Initial version
+            "history": [] # Track previous versions
+        }
+        self.data[doc_id] = doc
+        self.save_db()
+        return doc_id
+
+    def get(self, doc_id):
+        """
+        Получает документ по его ID.
+        """
+        return self.data.get(doc_id)
+
+    def update(self, doc_id, new_data):
+        """
+        Обновляет данные документа по его ID и создает новую версию.
+        """
+        if doc_id in self.data:
+            current_doc = self.data[doc_id]
+            current_version = current_doc["version"]
+            new_version = current_version + 1
+            
+            new_doc_id = self.generate_id(new_data)
+
+            # Store history
+            history_entry = {
+                "id": current_doc["id"],
+                "version": current_doc["version"],
+                "timestamp": str(datetime.now()),
+                "data": current_doc["data"],
+                "metadata": current_doc["metadata"]
+            }
+            
+            current_doc["history"].append(history_entry) # Added new history
+
+            new_doc = {
+                "id": new_doc_id,
+                "type": current_doc["type"],
+                "data": new_data,
+                "metadata": {"timestamp": str(datetime.now()), **current_doc["metadata"]},
+                "version": new_version,
+                "history": [] # no history
+            }
+            
+            self.data[new_doc_id] = new_doc # Use new_doc_id
+            self.save_db()
+        else:
+             print(f"Document with id {doc_id} not found. Can not update.")
+
+    def delete(self, doc_id):
+        """
+        Удаляет документ по его ID.
+        """
+        if doc_id in self.data:
+            del self.data[doc_id]
+            self.save_db()
+
+    def sync(self, peer_db):
+        """
+        Синхронизирует базу данных с другой базой данных.
+        """
+        for doc_id, doc in peer_db.data.items():
+            if doc_id not in self.data or \
+               doc["metadata"]["timestamp"] > self.data[doc_id]["metadata"]["timestamp"]:
+                self.data[doc_id] = doc
+        self.save_db()
+
+    def sync_shared(self, peer_db):
+        """
+        Синхронизирует только общие записи с другой базой данных.
+        """
+        for doc_id, doc in peer_db.data.items():
+            if doc["type"] == "tensor_result" and doc["metadata"].get("shared", False):
+                if doc_id not in self.data or \
+                   doc["metadata"]["timestamp"] > self.data[doc_id]["metadata"]["timestamp"]:
+                    self.data[doc_id] = doc
+        self.save_db()
+
+    def find_by_type(self, doc_type):
+        """
+        Возвращает список всех документов заданного типа.
+        """
+        return [doc for doc in self.data.values() if doc["type"] == doc_type]
+
+    def find_by_metadata(self, key, value):
+        """
+        Ищет документы по ключу и значению в метаданных.
+        """
+        return [doc for doc in self.data.values() if doc["metadata"].get(key) == value]
+
+    def insert_model(self, model_name, metadata):
+        """
+        Добавляет метаданные модели.
+        :param model_name: Название модели.
+        :param metadata: Метаданные модели (например, путь к файлу, IPFS hash).
+        """
+        model_id = self.generate_id(model_name)
+        self.insert("model", model_name, metadata={"model_id": model_id, **metadata})
+        return model_id
+
+    def get_model_metadata(self, model_name):
+        """
+        Получает метаданные модели по её названию.
+        :param model_name: Название модели.
+        :return: Метаданные модели или None, если модель не найдена.
+        """
+        models = self.find_by_type("model")
+        for model in models:
+            if model["data"] == model_name:
+                return model["metadata"]
+        return None
+
+    def insert_tensor(self, tensor_id, metadata):
+         """
+         Добавляет метаданные тензора.
+         :param tensor_id: ID тензора (например, IPFS hash или путь к файлу).
+         :param metadata: Метаданные тензора (например, shape, dtype).
+         """
+         self.insert("tensor", tensor_id, metadata)
+
+    def get_tensor_metadata(self, tensor_id):
+        """
+        Получает метаданные тензора по его ID.
+        :param tensor_id: ID тензора.
+        :return: Метаданные тензора или None, если тензор не найден.
+        """
+        tensors = self.find_by_type("tensor")
+        for tensor in tensors:
+            if tensor["data"] == tensor_id:
+                return tensor["metadata"]
+        return None
+    
+    def get_version_history(self, doc_id):
+        """
+        Retrieves the version history for a given document ID.
+        :param doc_id: The ID of the document.
+        :return: A list of historical versions, or None if the document is not found.
+        """
+        doc = self.get(doc_id)
+        if doc:
+            return doc.get("history", [])
+        else:
+            return None

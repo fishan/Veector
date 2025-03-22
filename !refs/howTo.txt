@@ -1,0 +1,136 @@
+pip install torch transformers numpy qiskit qiskit-aer
+
+Введи в GitHub Codespaces следующую команду, чтобы загрузить файл напрямую:
+
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=19fry4tZoWwW8EFe6_E7iUMkTNIlkoLUX' -O file.zip
+
+Если wget не работает, попробуй gdown:
+
+pip install gdown  # если не установлен
+gdown --id 1z2FjRdCEXjE7iYwqnFJ2E-kj3t1a5ccq
+
+https://drive.google.com/file/d/1z2FjRdCEXjE7iYwqnFJ2E-kj3t1a5ccq/view?usp=drivesdk
+
+После загрузки можешь разархивировать (unzip file.zip) и использовать файл.
+
+ls -lh
+
+
+
+Убедись, что IPFS-демон запущен (если используешь IPFS):
+bash
+
+///run ipfs
+ipfs daemon &
+
+
+/// checks
+//memory
+free -h
+
+//pifs
+ps aux | grep ipfs
+ipfs swarm peers
+
+//// stoping ipfs
+pkill -f "ipfs daemon"
+rm -f /home/codespace/.ipfs/repo.lock
+
+Запусти:
+bash
+
+cd /workspaces/Veector/src
+python main.py
+
+//git force update
+git add .
+git commit -m "Updated core, operations, tensors, model_manager and added Colab blocks"
+git push origin main --force
+
+
+pip install --upgrade llama-cpp-python
+
+git clone https://github.com/ggerganov/llama.cpp.git
+cd llama.cpp
+
+------------------------------
+
+Шаг 1: Создай или обнови llama.h
+Создай файл llama.h:
+
+
+mkdir -p /workspaces/Veector/llama.cpp/include
+nano /workspaces/Veector/llama.cpp/include/llama.h
+
+
+#ifndef LLAMA_H
+#define LLAMA_H
+
+#include "ggml.h"
+
+struct VirtualDispatcher;
+
+extern "C" void llama_set_virtual_dispatcher(VirtualDispatcher* dispatcher);
+
+#endif
+
+------------------------------------------
+
+Шаг 2: Обнови llama.cpp
+Замени содержимое /workspaces/Veector/llama.cpp/src/llama.cpp на этот код (он уже исправлен для работы с ggml_get_tensor):
+
+file in backup folder
+
+gdb --args python model_manager.py
+run
+bt
+(gdb) run
+# После сбоя:
+(gdb) bt full
+(gdb) frame 0
+(gdb) p *model
+(gdb) p params
+
+cd /workspaces/Veector/src
+find . -name "__pycache__" -exec rm -rf {} +
+find . -name "*.pyc" -delete
+python model_manager.py
+
+cd /workspaces/Veector/llama.cpp/build
+rm -rf *
+cmake ..
+cmake --build . --config Release
+
+cd /workspaces/Veector/llama.cpp/build
+rm -rf *
+cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake --build . --config Debug
+
+cd /workspaces/Veector/src
+python model_manager.py
+
+cd /workspaces/Veector/src
+gdb --args python model_manager.py
+
+(gdb) run
+# После сбоя:
+(gdb) bt full
+(gdb) frame 0
+(gdb) p *model
+(gdb) p params
+
+cd /workspaces/Veector/src
+find . -name "__pycache__" -exec rm -rf {} +
+find . -name "*.pyc" -delete
+python model_manager.py
+
+cd /workspaces/Veector/llama.cpp/build
+rm bin/libllama.so
+cmake --build . --config Debug
+
+
+
+////////// codespace disk space
+
+df -h (skol'ko vsego)
+du -h /workspaces | sort -rh | head -n 20

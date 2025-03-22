@@ -1,0 +1,288 @@
+{
+    "source_paths": [
+        "/workspaces/Veector/README.md",
+        "/workspaces/Veector/src/main.py",
+        "/workspaces/Veector/src/core.py",
+        "/workspaces/Veector/src/model_manager.py",
+        "/workspaces/Veector/src/veectordb.py",
+        "/workspaces/Veector/src/virtual_space.py",
+        "/workspaces/Veector/src/evolution.py",
+        "/workspaces/Veector/src/file_transfer.py",
+        "/workspaces/Veector/src/interface.py",
+        "/workspaces/Veector/src/memory.py",
+        "/workspaces/Veector/src/operations.py",
+        "/workspaces/Veector/src/sync.py",
+        "/workspaces/Veector/src/tensors.py"
+    ],
+    "output_file": "collected_code.txt",
+    "dir_tree_file": "directory_tree.txt",
+    "extensions": [
+        ".py"
+    ],
+    "include_dir_structure": true,
+    "order_by": null,
+    "exclude_dirs": [
+        ".git",
+        "node_modules",
+        "__pycache__"
+    ],
+    "tree_dirs": [
+        "/workspaces/Veector"
+    ],
+    "combined_output": true,
+    "files_structure_source_files_code": {
+        "source_paths": [
+            "/workspaces/Veector/device",
+            "/workspaces/Veector/device/src/core.py",
+            "/workspaces/Veector/device/src/model_manager.py",
+            "/workspaces/Veector/device/src/tensors.py",
+            "/workspaces/Veector/device/src/veectordb.py",
+            "/workspaces/Veector/device/src/virtual_space.py",
+            "/workspaces/Veector/device/run_veector.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [],
+        "combined_output": false
+    },
+    "device_code": {
+        "source_paths": [
+            "/workspaces/Veector/device",
+            "/workspaces/Veector/device/src/core.py",
+            "/workspaces/Veector/device/src/model_manager.py",
+            "/workspaces/Veector/device/src/tensors.py",
+            "/workspaces/Veector/device/src/veectordb.py",
+            "/workspaces/Veector/device/src/virtual_space.py",
+            "/workspaces/Veector/device/run_veector.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [],
+        "combined_output": false
+    },
+    "source": {
+        "source_paths": [
+            "/workspaces/Veector/src/core.py",
+            "/workspaces/Veector/src/evolution.py",
+            "/workspaces/Veector/src/federated_learning.py",
+            "/workspaces/Veector/src/file_transfer.py",
+            "/workspaces/Veector/src/interface.py",
+            "/workspaces/Veector/src/main.py",
+            "/workspaces/Veector/src/memory.py",
+            "/workspaces/Veector/src/model_manager.py",
+            "/workspaces/Veector/src/operations.py",
+            "/workspaces/Veector/src/sync.py",
+            "/workspaces/Veector/src/tensors.py",
+            "/workspaces/Veector/src/test_imports.py",
+            "/workspaces/Veector/src/tokenization.py",
+            "/workspaces/Veector/src/utils.py",
+            "/workspaces/Veector/src/veectordb.py",
+            "/workspaces/Veector/src/virtual_space.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [],
+        "combined_output": false
+    },
+    "device": {
+        "source_paths": [
+            "/workspaces/Veector/device"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [
+            "/workspaces/Veector/device"
+        ],
+        "combined_output": true
+    },
+    "tree and src": {
+        "source_paths": [
+            "/workspaces/Veector/src/core.py",
+            "/workspaces/Veector/src/evolution.py",
+            "/workspaces/Veector/src/federated_learning.py",
+            "/workspaces/Veector/src/file_transfer.py",
+            "/workspaces/Veector/src/interface.py",
+            "/workspaces/Veector/src/main.py",
+            "/workspaces/Veector/src/main2.py",
+            "/workspaces/Veector/src/memory.py",
+            "/workspaces/Veector/src/model_manager.py",
+            "/workspaces/Veector/src/operations.py",
+            "/workspaces/Veector/src/sync.py",
+            "/workspaces/Veector/src/tensors.py",
+            "/workspaces/Veector/src/test_imports.py",
+            "/workspaces/Veector/src/tokenization.py",
+            "/workspaces/Veector/src/veectordb.py",
+            "/workspaces/Veector/src/virtual_space.py",
+            "/workspaces/Veector/src/utils.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [
+            "/workspaces/Veector"
+        ],
+        "combined_output": true
+    },
+    "tree ans src": {
+        "source_paths": [
+            "/workspaces/Veector/src/core.py",
+            "/workspaces/Veector/src/evolution.py",
+            "/workspaces/Veector/src/federated_learning.py",
+            "/workspaces/Veector/src/file_transfer.py",
+            "/workspaces/Veector/src/interface.py",
+            "/workspaces/Veector/src/main.py",
+            "/workspaces/Veector/src/main2.py",
+            "/workspaces/Veector/src/memory.py",
+            "/workspaces/Veector/src/model_manager.py",
+            "/workspaces/Veector/src/operations.py",
+            "/workspaces/Veector/src/sync.py",
+            "/workspaces/Veector/src/tensors.py",
+            "/workspaces/Veector/src/test_imports.py",
+            "/workspaces/Veector/src/tokenization.py",
+            "/workspaces/Veector/src/veectordb.py",
+            "/workspaces/Veector/src/virtual_space.py",
+            "/workspaces/Veector/src/utils.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [
+            "/workspaces/Veector"
+        ],
+        "combined_output": true
+    },
+    "source coode 1": {
+        "source_paths": [
+            "/workspaces/Veector/src/operations.py",
+            "/workspaces/Veector/src/sync.py",
+            "/workspaces/Veector/src/tensors.py",
+            "/workspaces/Veector/src/test_imports.py",
+            "/workspaces/Veector/src/tokenization.py",
+            "/workspaces/Veector/src/utils.py",
+            "/workspaces/Veector/src/veectordb.py",
+            "/workspaces/Veector/src/virtual_space.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [],
+        "combined_output": false
+    },
+    "source coode 2": {
+        "source_paths": [
+            "/workspaces/Veector/src/operations.py",
+            "/workspaces/Veector/src/sync.py",
+            "/workspaces/Veector/src/tensors.py",
+            "/workspaces/Veector/src/test_imports.py",
+            "/workspaces/Veector/src/tokenization.py",
+            "/workspaces/Veector/src/utils.py",
+            "/workspaces/Veector/src/veectordb.py",
+            "/workspaces/Veector/src/virtual_space.py"
+        ],
+        "output_file": "collected_code.txt",
+        "dir_tree_file": "directory_tree.txt",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css"
+        ],
+        "include_dir_structure": true,
+        "order_by": null,
+        "exclude_dirs": [
+            ".git",
+            "node_modules",
+            "__pycache__"
+        ],
+        "tree_dirs": [],
+        "combined_output": false
+    }
+}
