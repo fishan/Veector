@@ -134,3 +134,15 @@ cmake --build . --config Debug
 
 df -h (skol'ko vsego)
 du -h /workspaces | sort -rh | head -n 20
+
+
+# ochistka istorii git
+cd /workspaces/Veector
+rm -rf .git
+git init
+git add .
+git commit -m "Рестарт репозитория"
+
+//////
+
+rm -rf /tmp/*

@@ -10,7 +10,7 @@ def log_memory():
     return f"Память: {memory.used / (1024 * 1024):.2f} MB / {memory.total / (1024 * 1024):.2f} MB"
 
 print(f"🟢 [LOG] Настройка окружения... {log_memory()}")
-gc.collect()  # Чистим перед стартом
+gc.collect()
 
 model_dir = "../data/models/DeepSeek-R1-Distill-Qwen-1.5B-ONNX"
 split_model_path = os.path.join(model_dir, "model_split.onnx")
@@ -23,11 +23,10 @@ print(f"🟢 [LOG] ✅ ONNX Runtime загружен {log_memory()}")
 tokenizer = AutoTokenizer.from_pretrained(model_dir)
 print(f"🟢 [LOG] Токенизатор загружен {log_memory()}")
 
-# Параметры модели
 num_hidden_layers = 28
 num_key_value_heads = 2
 head_dim = 1536 // 12  # 128
-max_new_tokens = 5  # Уменьшим до 5 для экономии
+max_new_tokens = 3
 
 PROMPT_TEMPLATE = "<｜User｜>{message}<｜Assistant｜>"
 
@@ -42,7 +41,7 @@ def preprocess_text(text):
     for i in range(num_hidden_layers):
         input_feed[f"past_key_values.{i}.key"] = np.zeros((1, num_key_value_heads, 0, head_dim), dtype=np.float16)
         input_feed[f"past_key_values.{i}.value"] = np.zeros((1, num_key_value_heads, 0, head_dim), dtype=np.float16)
-    gc.collect()  # Чистим после подготовки
+    gc.collect()
     return input_feed, inputs["input_ids"], inputs["attention_mask"]
 
 def generate_text(input_feed, input_ids, attention_mask, max_new_tokens):
@@ -50,7 +49,7 @@ def generate_text(input_feed, input_ids, attention_mask, max_new_tokens):
     past_key_values = {k: v for k, v in input_feed.items() if "past_key_values" in k}
 
     outputs = session.run(None, input_feed)
-    logits = outputs[0][:, -1, :]
+    logits = outputs[0][:, -1, :].astype(np.float16)
     next_token = np.argmax(logits, axis=-1)[0]
     generated_ids.append(next_token)
     print(f"🟢 [STREAM] {tokenizer.decode([next_token])}", end='', flush=True)
@@ -69,7 +68,7 @@ def generate_text(input_feed, input_ids, attention_mask, max_new_tokens):
         input_feed.update(past_key_values)
 
         outputs = session.run(None, input_feed)
-        logits = outputs[0][:, -1, :]
+        logits = outputs[0][:, -1, :].astype(np.float16)
         next_token = np.argmax(logits, axis=-1)[0]
         generated_ids.append(next_token)
         print(f"🟢 [STREAM] {tokenizer.decode([next_token])}", end='', flush=True)
@@ -80,7 +79,7 @@ def generate_text(input_feed, input_ids, attention_mask, max_new_tokens):
 
         if next_token == tokenizer.eos_token_id:
             break
-        gc.collect()  # Чистим после каждого шага
+        gc.collect()
 
     print()
     return tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
@@ -95,12 +94,12 @@ def chat():
             break
 
         input_feed, input_ids, attention_mask = preprocess_text(user_input)
-        print(f"🟢 [LOG] Обработка запроса: '{user_input}' {log_memory()}")
+        print(f"🟢 [LOG] Начинаем обработку запроса: '{user_input}' {log_memory()}")
         try:
             response_text = generate_text(input_feed, input_ids, attention_mask, max_new_tokens)
             print(f"🟢 [LOG] Ответ готов {log_memory()}")
             print(f"🤖 ONNX: {response_text}")
         except Exception as e:
-            print(f"🟢 [LOG] Ошибка: {e} {log_memory()}")
+            print(f"🟢 [LOG] Ошибка генерации: {e} {log_memory()}")
 
 chat()
