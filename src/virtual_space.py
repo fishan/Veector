@@ -1,4 +1,3 @@
-# /workspaces/Veector/device/src/virtual_space.py
 import numpy as np
 import torch
 import torch.nn as nn
@@ -7,6 +6,9 @@ from pathlib import Path
 import json
 import os
 import gc
+import logging
+
+logger = logging.getLogger(__name__)
 
 class VirtualMatrix:
     def __init__(self, ipfs_client=None):
@@ -63,14 +65,16 @@ class ModelDispatcher:
         
         total_blocks = len(output_blocks)
         sample_block = list(output_blocks.values())[0]
-        block_width = sample_block["shape"][0]
+        block_width = sample_block["shape"][0]  # Обычно это высота блока, например, 4096
 
         if top_k:
             num_blocks_needed = min((top_k + block_width - 1) // block_width, total_blocks)
         else:
             num_blocks_needed = total_blocks
 
-        needed_blocks = {f"{self.model_name}_output_block{i}" for i in range(num_blocks_needed) if f"{self.model_name}_output_block{i}" in output_blocks}
+        needed_blocks = {f"{self.model_name}_output_block{i}" for i in range(num_blocks_needed) 
+                         if f"{self.model_name}_output_block{i}" in output_blocks}
+        logger.debug(f"Найдено {len(needed_blocks)} выходных блоков из {total_blocks} для top_k={top_k}")
         return needed_blocks
 
     def load_block(self, block_info):
@@ -85,6 +89,53 @@ class ModelDispatcher:
         if not os.path.exists(corrected_path):
             raise FileNotFoundError(f"Файл блока {corrected_path} не найден")
         return torch.load(corrected_path, map_location=self.device, weights_only=True)
+
+    def assemble_tensor(self, block_keys, target_shape):
+        if not block_keys:
+            raise ValueError("Нет блоков для сборки тензора")
+
+        sorted_keys = sorted(block_keys, key=lambda x: int(x.split("_block")[1]))
+        blocks_info = [self.metadata[key] for key in sorted_keys]
+
+        total_height = sum(info["shape"][0] for info in blocks_info)
+        total_width = sum(info["shape"][1] for info in blocks_info)
+        first_height = blocks_info[0]["shape"][0]
+        first_width = blocks_info[0]["shape"][1]
+
+        if total_height == target_shape[0] and all(info["shape"][1] == first_width for info in blocks_info):
+            dim = 0  # Сборка по строкам
+            if target_shape[1] != first_width:
+                raise ValueError(f"Ширина блоков {first_width} не совпадает с целевой шириной {target_shape[1]}")
+        elif total_width == target_shape[1] and all(info["shape"][0] == first_height for info in blocks_info):
+            dim = 1  # Сборка по столбцам
+            if target_shape[0] != first_height:
+                raise ValueError(f"Высота блоков {first_height} не совпадает с целевой высотой {target_shape[0]}")
+        else:
+            raise ValueError(f"Невозможно собрать тензор с целевой формой {target_shape} из блоков: "
+                             f"суммарная высота={total_height}, ширина={total_width}")
+
+        tensor = torch.zeros(target_shape, dtype=torch.float16, device=self.device)
+
+        if dim == 0:
+            current_row = 0
+            for block_key in sorted_keys:
+                block = self.load_block(self.metadata[block_key])
+                block_height = block.shape[0]
+                tensor[current_row:current_row + block_height, :] = block
+                current_row += block_height
+                del block
+                gc.collect()
+        else:
+            current_col = 0
+            for block_key in sorted_keys:
+                block = self.load_block(self.metadata[block_key])
+                block_width = block.shape[1]
+                tensor[:, current_col:current_col + block_width] = block
+                current_col += block_width
+                del block
+                gc.collect()
+
+        return tensor
 
 class MatrixModel(nn.Module):
     def __init__(self, dispatcher):
@@ -104,7 +155,6 @@ class MatrixModel(nn.Module):
         if torch.any(input_ids >= self.vocab_size):
             raise ValueError(f"Входные данные содержат значения, превышающие vocab_size ({self.vocab_size})")
         
-        # Обрабатываем токены по частям
         batch_size, seq_len = input_ids.shape
         hidden_states = torch.zeros(batch_size, seq_len, self.hidden_size, dtype=torch.float16, device=self.device)
         
@@ -116,7 +166,6 @@ class MatrixModel(nn.Module):
             start_idx = int(block_key.split("_block")[1]) * block_height
             end_idx = start_idx + block_height
             
-            # Маска для токенов, попадающих в этот блок
             mask = (input_ids >= start_idx) & (input_ids < end_idx)
             if mask.any():
                 indices = input_ids[mask] - start_idx
@@ -125,13 +174,11 @@ class MatrixModel(nn.Module):
             del block
             gc.collect()
 
-        # Заглушка для слоёв
         for layer_idx in range(self.num_layers):
             layer_blocks = self.dispatcher.get_layer_blocks(layer_idx)
             # Пока пропускаем
             pass
         
-        # Выходной слой
         output_blocks = self.dispatcher.get_output_blocks(top_k=top_k)
         logits = torch.zeros(batch_size, seq_len, self.vocab_size, dtype=torch.float16, device=self.device)
         for block_key in sorted(output_blocks, key=lambda x: int(x.split("_block")[1])):

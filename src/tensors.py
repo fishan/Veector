@@ -1,129 +1,285 @@
+# FILE: tensors.py
+# English comments added for the community
+
 import numpy as np
-from datetime import datetime  # Для метаданных
+from datetime import datetime
+import pickle
+import hashlib
+from typing import Dict, List, Any, Optional, Tuple, Union # Ensure typing is imported
 
-def create_tensor(layer, coords, data, length, op=[1, 0, 0], next_coords=[], metadata=None, version=1):
+# --- Tensor Coordinate System ---
+
+class TensorCoordinate:
     """
-    Создаёт тензор с заданными параметрами и метаданными, поддерживает комплексные числа.
-    :param layer: Слой тензора (список).
-    :param coords: Координаты тензора (список).
-    :param data: Данные тензора (число, список или массив, включая комплексные числа).
-    :param length: Длина данных тензора (число).
-    :param op: Операция, применяемая к тензору (список).
-    :param next_coords: Координаты следующего тензора (список).
-    :param metadata: Дополнительные метаданные (словарь или None).
-    :param version: Версия тензора (число).
-    :return: Список, представляющий тензор.
+    Represents the multi-dimensional address of a tensor within the Veector space.
+    - layer: Abstraction level (e.g., -1 system, 0 core, 1 optimization, 2 expertise)
+    - group: Functional domain (e.g., 0 vision, 1 text, 2 audio, 3 logic)
+    - nest: Depth/Expertise level (e.g., 0 base/lite, 1 intermediate/pro, 2 expert/ultimate)
+    - x, y, z: Spatial or conceptual position within the layer/group/nest grid.
     """
-    if not isinstance(layer, list) or not isinstance(coords, list) or not isinstance(op, list):
-        raise ValueError("Слой, координаты и операция должны быть списками.")
+    def __init__(self, layer: int = 0, group: int = 0, nest: int = 0, x: int = 0, y: int = 0, z: int = 0):
+        self.layer = int(layer)
+        self.group = int(group)
+        self.nest = int(nest)
+        self.x = int(x)
+        self.y = int(y)
+        self.z = int(z)
 
-    if not isinstance(length, (int, float)):
-        raise TypeError("Длина должна быть числом.")
+    def to_tuple(self) -> Tuple[int, int, int, int, int, int]:
+        """Return coordinate components as a tuple."""
+        return (self.layer, self.group, self.nest, self.x, self.y, self.z)
 
-    if not isinstance(next_coords, list):
-        raise TypeError("Координаты следующего тензора должны быть списком.")
+    def to_string(self) -> str:
+        """Return a standardized string representation, suitable for keys or IDs."""
+        return f"L{self.layer}_G{self.group}_N{self.nest}_X{self.x}_Y{self.y}_Z{self.z}"
 
-    # Преобразуем данные в np.array с поддержкой комплексных чисел
-    if isinstance(data, (list, np.ndarray)):
-        data = np.array(data, dtype=np.complex128)
-    elif isinstance(data, (int, float, complex)):
-        data = np.array([data], dtype=np.complex128)
-    else:
-        raise ValueError("Данные должны быть числом, списком или массивом.")
+    @classmethod
+    def from_string(cls, coord_str: str) -> Optional['TensorCoordinate']:
+        """Create a TensorCoordinate object from its string representation."""
+        try:
+            parts = coord_str.replace('L','').replace('G','').replace('N','').replace('X','').replace('Y','').replace('Z','').split('_')
+            coords_int = [int(p) for p in parts]
+            if len(coords_int) == 6:
+                return cls(*coords_int)
+            else:
+                # print(f"Warning: Could not parse coordinate string: {coord_str}") # Less verbose
+                return None
+        except Exception as e:
+            # print(f"Error parsing coordinate string {coord_str}: {e}") # Less verbose
+            return None
 
-    # Проверяем, что длина соответствует данным
-    if data.size != length:
-        raise ValueError(f"Указанная длина {length} не соответствует размеру данных {data.size}")
+    def __str__(self) -> str:
+        return self.to_string()
 
-    return [
-        [list(map(int, layer)), list(map(int, coords)), data, length],
-        [[0], list(map(int, coords)), list(map(int, op)), 1],
-        [1, 0, 0],  # Контекст (по умолчанию)
-        [0, 1, 0],  # Версия (по умолчанию)
-        next_coords,
-        {
-            "version": version,
-            "created_at": str(datetime.now()),
-            "dtype": str(data.dtype),
-            "shape": data.shape,
-            **(metadata or {})
-        }
+    def __repr__(self) -> str:
+        return f"TensorCoordinate(layer={self.layer}, group={self.group}, nest={self.nest}, x={self.x}, y={self.y}, z={self.z})"
+
+    def __hash__(self) -> int:
+        """Allows using as dictionary keys."""
+        return hash(self.to_tuple())
+
+    def __eq__(self, other) -> bool:
+        """Checks for equality between TensorCoordinate objects."""
+        if not isinstance(other, TensorCoordinate):
+            return NotImplemented
+        return self.to_tuple() == other.to_tuple()
+
+# --- Updated Tensor Structure ---
+# [0]: Coordinates (object: TensorCoordinate)
+# [1]: Operation & Channels ([default_op_code_list], [input_channels_list], [output_channels_list])
+# [2]: Filters (list of filter IDs or filter parameters)
+# [3]: Exit Gates (list of gate IDs or predicate functions)
+# [4]: Metadata (dict: evolutionary_version, parents, status, tensor_type, created_at, etc...)
+# [5]: (Temporary, only for knowledge tensors before DB save) - Actual knowledge data (e.g., np.ndarray)
+# ---
+
+def create_tensor(
+    coord: TensorCoordinate,
+    tensor_type: str, # "processor" or "knowledge"
+    metadata: Optional[Dict] = None,
+    # --- Fields primarily for "processor" tensors ---
+    op: Optional[List[int]] = None, # Default operation
+    ops_sequence: Optional[List[List[int]]] = None, # Sequence overrides default op
+    filters: Optional[List] = None,
+    input_channels: Optional[List[Any]] = None, # Use Any for numeric IDs/tags
+    output_channels: Optional[List[Any]] = None, # Use Any for numeric IDs/tags
+    exit_gates: Optional[List] = None,
+    required_knowledge_tags: Optional[List[Any]] = None, # Use Any for numeric IDs/tags
+    param_mapping: Optional[Dict] = None, # { tag_id: param_name_str }
+    # --- Fields primarily for "knowledge" tensors ---
+    knowledge_data: Any = None,
+    compatibility_tags: Optional[List[Any]] = None, # Use Any for numeric IDs/tags
+    performance_metrics: Optional[Dict] = None,
+    training_context: Optional[Dict] = None,
+    # --- Common Metadata ---
+    parents: Optional[List[str]] = None, # List of parent tensor IDs (hashes)
+    evolutionary_version: int = 1,
+    status: str = "active" # "active" or "archived"
+    ) -> List:
+    """
+    Creates the tensor structure based on its type.
+    Large data for "knowledge" tensors is passed via 'knowledge_data'.
+    Processor tensors store their logic definition directly.
+    """
+    if not isinstance(coord, TensorCoordinate):
+        raise TypeError("Coordinates must be a TensorCoordinate object.")
+    if tensor_type not in ["processor", "knowledge"]:
+        raise ValueError("tensor_type must be 'processor' or 'knowledge'")
+
+    # Section [1]: Operation & Channels
+    default_op_code = op if op is not None else [9, 0, 0] # OP_IDENTITY
+    op_channels_section = [
+        list(map(int, default_op_code)),
+        input_channels or [],
+        output_channels or []
+    ] if tensor_type == "processor" else [[9,0,0], [], []] # Defaults for knowledge
+
+    # Section [2]: Filters
+    filters_section = filters or []
+
+    # Section [3]: Exit Gates
+    exit_gates_section = exit_gates or []
+
+    # Section [4]: Metadata
+    base_metadata = {
+        "evolutionary_version": evolutionary_version,
+        "parents": parents or [],
+        "status": status,
+        "tensor_type": tensor_type,
+        "created_at": datetime.now().isoformat(),
+        "coordinate_str": coord.to_string(),
+        **(metadata or {})
+    }
+
+    # Add type-specific metadata
+    if tensor_type == "processor":
+        base_metadata["required_knowledge_tags"] = required_knowledge_tags or []
+        base_metadata["ops_sequence"] = ops_sequence
+        base_metadata["param_mapping"] = param_mapping or {}
+    elif tensor_type == "knowledge":
+        base_metadata["compatibility_tags"] = compatibility_tags or []
+        base_metadata["performance_metrics"] = performance_metrics or {}
+        base_metadata["training_context"] = training_context or {}
+        base_metadata["dtype"] = str(getattr(knowledge_data, 'dtype', type(knowledge_data).__name__))
+        base_metadata["shape"] = getattr(knowledge_data, 'shape', None)
+        if knowledge_data is not None:
+             try: base_metadata["data_hash"] = hashlib.sha256(pickle.dumps(knowledge_data)).hexdigest()
+             except Exception as hash_e: print(f"Warning: Could not hash knowledge data: {hash_e}"); base_metadata["data_hash"] = None
+
+    # Section [0]: Coordinates
+    coord_section = coord
+
+    # Assemble the base structure (5 elements)
+    tensor_structure = [
+        coord_section,         # [0]
+        op_channels_section,   # [1]
+        filters_section,       # [2]
+        exit_gates_section,    # [3]
+        base_metadata          # [4]
     ]
 
-def validate_tensor(tensor):
-    """
-    Проверяет валидность структуры тензора.
-    :param tensor: Тензор для проверки.
-    :return: True, если тензор валиден, иначе False.
-    """
-    if not isinstance(tensor, list):
+    # Add temporary data payload for knowledge tensors (index [5])
+    if tensor_type == "knowledge":
+        tensor_structure.append(knowledge_data)
+
+    return tensor_structure
+
+def validate_tensor(tensor: List) -> bool:
+    """Validates the 5 or 6 element tensor structure."""
+    base_len = 5
+    if not isinstance(tensor, list) or len(tensor) < base_len or len(tensor) > base_len + 1 :
+        # print(f"Validation Error: Tensor must be list of {base_len} or {base_len+1} elements (got {len(tensor)})") # Less verbose
         return False
-    if len(tensor) < 4:
-        return False
-    if not all(isinstance(t, list) for t in tensor[:2]):
-        return False
-    if not isinstance(tensor[0][2], np.ndarray):  # Проверяем, что данные — это np.ndarray
-        return False
-    if not isinstance(tensor[0][3], (int, float)):  # Проверяем длину
-        return False
-    if len(tensor) > 5 and not isinstance(tensor[5], dict):  # Проверяем метаданные
-        return False
+    if not isinstance(tensor[0], TensorCoordinate): return False
+    if not isinstance(tensor[1], list) or len(tensor[1]) != 3: return False
+    if not isinstance(tensor[1][0], list) or not isinstance(tensor[1][1], list) or not isinstance(tensor[1][2], list): return False
+    if not isinstance(tensor[2], list): return False
+    if not isinstance(tensor[3], list): return False
+    if not isinstance(tensor[4], dict): return False
+    required_meta = ["evolutionary_version", "parents", "status", "tensor_type", "created_at", "coordinate_str"]
+    if not all(key in tensor[4] for key in required_meta):
+         # print(f"Validation Error: Metadata missing required keys: {required_meta}") # Less verbose
+         return False
+    tensor_type = tensor[4].get("tensor_type")
+    if tensor_type not in ["processor", "knowledge"]: return False
+    if len(tensor) == base_len + 1 and tensor_type == "processor": print(f"Validation Warning: Processor tensor has unexpected data payload at index [{base_len}].");
+    # Removed warning for missing payload on knowledge structure load, as this is expected now
+    # if len(tensor) == base_len and tensor_type == "knowledge": print(f"Validation Warning: Knowledge tensor structure missing data payload at index [{base_len}].");
     return True
 
-def reshape_tensor(tensor, new_shape):
-    """
-    Изменяет форму данных в тензоре с проверкой объёма.
-    :param tensor: Тензор для изменения формы.
-    :param new_shape: Новая форма данных (кортеж или список).
-    :return: Тензор с изменённой формой данных.
-    """
-    if not validate_tensor(tensor):
-        raise ValueError("Невалидный тензор.")
+# --- Getter Functions ---
 
-    data = tensor[0][2]
-    if data is None:
-        raise ValueError("Данные тензора отсутствуют.")
+def get_tensor_coord(tensor: List) -> Optional[TensorCoordinate]:
+     """Gets the TensorCoordinate object ([0])."""
+     return tensor[0] if validate_tensor(tensor) else None
 
-    try:
-        data = np.array(data, dtype=np.complex128)
-        if np.prod(new_shape) != data.size:
-            raise ValueError(f"Новая форма {new_shape} (объём {np.prod(new_shape)}) не соответствует объёму данных {data.size}")
-        reshaped_data = data.reshape(new_shape)
-        tensor[0][2] = reshaped_data
-        tensor[5]["shape"] = reshaped_data.shape  # Обновляем метаданные
-        return tensor
-    except Exception as e:
-        raise ValueError(f"Не удалось изменить форму тензора: {e}")
+def get_tensor_op_channels(tensor: List) -> Optional[List]:
+     """Gets the Operation & Channels section ([1])."""
+     return tensor[1] if validate_tensor(tensor) else None
 
-def get_tensor_metadata(tensor):
-    """
-    Получает метаданные тензора.
-    :param tensor: Тензор для получения метаданных.
-    :return: Метаданные тензора (словарь).
-    """
-    if not validate_tensor(tensor):
-        raise ValueError("Невалидный тензор.")
+def get_tensor_default_op(tensor: List) -> Optional[List[int]]:
+     """Gets the default operation code list ([1][0])."""
+     op_ch = get_tensor_op_channels(tensor)
+     return op_ch[0] if op_ch else None
 
-    return tensor[5] if len(tensor) > 5 else {}
+# --- ADDED Missing Getters ---
+def get_tensor_input_channels(tensor: List) -> List[Any]:
+     """Gets the list of input channels ([1][1])."""
+     op_ch = get_tensor_op_channels(tensor)
+     return op_ch[1] if op_ch else []
 
-if __name__ == "__main__":
-    # Пример использования
-    # Создание тензора с комплексными числами
-    tensor = create_tensor(
-        layer=[0],
-        coords=[0, 0, 0],
-        data=[1 + 2j, 3 - 4j],
-        length=2,
-        op=[50, 0, 0],  # Квантовая операция Hadamard
-        metadata={"description": "Тестовый тензор"}
-    )
-    print(f"Созданный тензор: {tensor[0][2]}")
-    print(f"Метаданные: {get_tensor_metadata(tensor)}")
+def get_tensor_output_channels(tensor: List) -> List[Any]:
+     """Gets the list of output channels ([1][2])."""
+     op_ch = get_tensor_op_channels(tensor)
+     return op_ch[2] if op_ch else []
+# --- End Added Getters ---
 
-    # Проверка валидации
-    print(f"Валидность тензора: {validate_tensor(tensor)}")
+def get_tensor_filters(tensor: List) -> List:
+     """Gets the list of filters ([2])."""
+     return tensor[2] if validate_tensor(tensor) else []
 
-    # Изменение формы
-    reshaped_tensor = reshape_tensor(tensor, (2, 1))
-    print(f"Тензор после изменения формы: {reshaped_tensor[0][2]}")
-    print(f"Обновлённые метаданные: {get_tensor_metadata(reshaped_tensor)}")
+def get_tensor_exit_gates(tensor: List) -> List:
+     """Gets the list of exit gates ([3])."""
+     return tensor[3] if validate_tensor(tensor) else []
+
+def get_tensor_metadata(tensor: List) -> Dict:
+     """Gets a copy of the metadata dictionary ([4])."""
+     # Returns a copy to prevent accidental modification
+     return tensor[4].copy() if validate_tensor(tensor) else {}
+
+def get_tensor_type(tensor: List) -> Optional[str]:
+     """Gets the tensor type from metadata."""
+     meta = get_tensor_metadata(tensor)
+     return meta.get("tensor_type")
+
+def get_tensor_parents(tensor: List) -> List[str]:
+     """Gets the list of parent IDs from metadata."""
+     meta = get_tensor_metadata(tensor)
+     return meta.get("parents", [])
+
+def get_tensor_status(tensor: List) -> Optional[str]:
+     """Gets the status ('active', 'archived') from metadata."""
+     meta = get_tensor_metadata(tensor)
+     return meta.get("status")
+
+def get_processor_ops_sequence(tensor: List) -> Optional[List[List[int]]]:
+    """Gets the specific ops_sequence from processor metadata."""
+    if get_tensor_type(tensor) == "processor":
+        meta = get_tensor_metadata(tensor)
+        return meta.get("ops_sequence") # Returns None if not present
+    return None
+
+def get_processor_required_knowledge_tags(tensor: List) -> List[Any]:
+    """Gets the required knowledge tags from processor metadata."""
+    if get_tensor_type(tensor) == "processor":
+        meta = get_tensor_metadata(tensor)
+        return meta.get("required_knowledge_tags", [])
+    return []
+
+def get_processor_param_mapping(tensor: List) -> Dict:
+    """Gets the parameter mapping from processor metadata."""
+    if get_tensor_type(tensor) == "processor":
+        meta = get_tensor_metadata(tensor)
+        return meta.get("param_mapping", {})
+    return {}
+
+def get_knowledge_compatibility_tags(tensor: List) -> List[Any]:
+    """Gets the compatibility tags from knowledge metadata."""
+    if get_tensor_type(tensor) == "knowledge":
+        meta = get_tensor_metadata(tensor)
+        return meta.get("compatibility_tags", [])
+    return []
+
+def get_tensor_hash(tensor_structure: List) -> str:
+     """
+     Creates a unique hash for the tensor structure based on its coordinates and evolutionary version.
+     This identifies the conceptual tensor.
+     """
+     if not validate_tensor(tensor_structure):
+          raise ValueError("Invalid tensor structure for hashing.")
+     coord = get_tensor_coord(tensor_structure)
+     meta = get_tensor_metadata(tensor_structure)
+     # Use coordinate string and evolutionary version for a stable ID
+     hash_data = (coord.to_string(), meta.get("evolutionary_version", 1))
+     serialized = pickle.dumps(hash_data)
+     return hashlib.sha256(serialized).hexdigest()

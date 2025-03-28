@@ -88,11 +88,24 @@ def median(x):
         return None
     return np.median(x)
 
-def matrix_multiply(a, b):
-    """Умножение матриц (a @ b.T)."""
-    if a is None or b is None:
+def matrix_multiply(a, b, **kwargs): # Принимаем a и b позиционно
+    """Performs matrix multiplication (a @ b)."""
+    try:
+        # Убедимся, что это NumPy массивы
+        a_np = np.asarray(a)
+        b_np = np.asarray(b)
+        # Стандартное матричное умножение
+        result = np.dot(a_np, b_np)
+        return result
+    except ValueError as e:
+        # Вывести более информативное сообщение об ошибке с размерами
+        a_shape = getattr(a, 'shape', 'N/A')
+        b_shape = getattr(b, 'shape', 'N/A')
+        print(f"Error in matrix_multiply: shapes {a_shape} and {b_shape} not aligned? Original error: {e}")
+        return None # Или поднять исключение
+    except Exception as e:
+        print(f"Unexpected error in matrix_multiply: {e}")
         return None
-    return np.dot(a, b.T) if a.shape[-1] == b.shape[0] else None
 
 def gradient_descent(data, grad, lr=0.01):
     """Градиентный спуск для списка данных."""

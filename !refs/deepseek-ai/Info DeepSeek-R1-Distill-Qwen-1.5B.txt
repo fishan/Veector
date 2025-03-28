@@ -246,146 +246,253 @@ output_weight = dispatcher.assemble_tensor(output_blocks, (vocab_size, hidden_si
 logits = torch.nn.functional.linear(embed_output, output_weight)
 print(f"Логиты: {logits.shape}")
 
-# Архивация и скачивание
-shutil.make_archive("model_blocks", "zip", "blocks")
-print("Блоки сохранены в model_blocks.zip")
 
+new----------------------------------------------------------------------------
+# Установка зависимостей
+!pip install transformers huggingface_hub torch
 
-# /workspaces/Veector/src/sync.py
+# script to google colab to creating blocks of virtual matrix with DeepSeek-R1-Distill-Qwen-1.5B
 
-def parse_block_name(filename):
-    """
-    Разбирает имя файла блока на составляющие.
-    :param filename: Полное имя файла (например, "DeepSeek-R1-Distill-Qwen-1.5B_row1691_col0.pt").
-    :return: Словарь с моделью, row и col.
-    """
-    if not filename.endswith(".pt"):
-        raise ValueError("Имя файла должно заканчиваться на .pt")
-    base_name = filename[:-3]  # Удаляем ".pt"
+import torch
+from transformers import AutoModelForCausalLM
+import os
+import json
+import shutil
+import random
+from google.colab import files, userdata, drive
+from huggingface_hub import login
+import math
 
-    # Извлекаем col
-    col_part = base_name.split("_")[-1]
-    if not col_part.startswith("col"):
-        raise ValueError(f"Некорректный формат col: {col_part}")
-    col = int(col_part[3:])  # Удаляем "col"
-    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_colX"
+# Очистка директории для чистоты эксперимента
+!rm -rf blocks/
+output_dir = "blocks"
+os.makedirs(output_dir, exist_ok=True)
 
-    # Извлекаем row
-    row_part = base_name.split("_")[-1]
-    if not row_part.startswith("row"):
-        raise ValueError(f"Некорректный формат row: {row_part}")
-    row = int(row_part[3:])  # Удаляем "row"
-    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_rowX"
+# Аутентификация с Hugging Face
+hf_token = userdata.get('HF_TOKEN')
+if not hf_token:
+    raise ValueError("Добавь HF_TOKEN в секреты Colab!")
+login(hf_token)
+print("Аутентификация прошла успешно")
 
-    # Оставшаяся часть — название модели
-    model_name = base_name
+# Подключение Google Drive
+drive.mount('/content/drive')
+print("Google Drive подключён")
 
-    return {
-        "model_name": model_name,
-        "row": row,
-        "col": col
-    }
+# Класс для работы с виртуальными матрицами
+class VirtualMatrix:
+    def __init__(self, default_block_width=4096):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.default_block_width = default_block_width
 
-class P2PNode:
-    def sync_model_blocks(self, model_name, blocks_dir):
-        """Синхронизация блоков модели из директории."""
-        if not self.use_ipfs:
-            print("IPFS отключён, синхронизация блоков невозможна")
-            return
-        block_files = list(Path(blocks_dir).glob(f"{model_name}_row*_col*.pt"))
-        if not block_files:
-            print(f"Блоки для модели {model_name} не найдены в {blocks_dir}")
-            return
-        for block_file in block_files:
-            parsed = parse_block_name(block_file.name)  # Используем функцию разбора имени
-            coords = (parsed["row"], parsed["col"])
-            block = torch.load(block_file, map_location="cpu")
-            ipfs_hash = self.store_in_ipfs(block)
-            if ipfs_hash:
-                if model_name not in self.block_map:
-                    self.block_map[model_name] = {}
-                self.block_map[model_name][coords] = ipfs_hash
-                sync_data = {
-                    "tensor_id": f"{model_name}_block_{coords[0]}_{coords[1]}",
-                    "metadata": {
-                        "ipfs_hash": ipfs_hash,
-                        "shape": block.shape,
-                        "dtype": str(block.dtype),
-                        "model_name": model_name,
-                        "coords": coords
-                    }
-                }
-                self.send_data(sync_data)
-                print(f"Блок {block_file.name} синхронизирован: {ipfs_hash}")
-            else:
-                print(f"Не удалось синхронизировать блок {block_file.name}")
-            del block
-            gc.collect()
+    def save_tensor_blocks(self, tensor, prefix, output_dir, metadata, block_type, num_layers):
+        height, width = tensor.shape
+        if block_type == "output":
+            block_width = self.default_block_width
+            num_blocks = math.ceil(height / block_width)
+            blocks = []
+            for i in range(0, height, block_width):
+                end = min(i + block_width, height)
+                block = tensor[i:end, :]
+                blocks.append(block)
+        else:
+            block_height = min(self.default_block_width, height)
+            block_width = min(self.default_block_width, width)
+            row_blocks = []
+            for j in range(0, height, block_height):
+                row_end = min(j + block_height, height)
+                row_block = tensor[j:row_end, :]
+                col_blocks = []
+                for k in range(0, width, block_width):
+                    col_end = min(k + block_width, width)
+                    col_block = row_block[:, k:col_end]
+                    col_blocks.append(col_block)
+                row_blocks.append(col_blocks)
+            blocks = [block for row in row_blocks for block in row]
+            num_blocks = len(blocks)
 
+        print(f"Сохранение {prefix}: {tensor.shape}, {tensor.element_size() * tensor.numel() / 1024 / 1024:.2f} MB")
+        num_blocks_saved = 0
 
-# /workspaces/Veector/src/model_manager.py
+        for idx, block in enumerate(blocks):
+            block_name = f"{prefix}_block{idx}"
+            block_path = f"{output_dir}/{block_name}.pt"
+            actual_size = block.element_size() * block.numel() / 1024 / 1024
+            print(f"Сохранение блока {block_name}: {block.shape}, {actual_size:.2f} MB")
 
-def parse_block_name(filename):
-    """
-    Разбирает имя файла блока на составляющие.
-    :param filename: Полное имя файла (например, "DeepSeek-R1-Distill-Qwen-1.5B_row1691_col0.pt").
-    :return: Словарь с моделью, row и col.
-    """
-    if not filename.endswith(".pt"):
-        raise ValueError("Имя файла должно заканчиваться на .pt")
-    base_name = filename[:-3]  # Удаляем ".pt"
+            torch.save(block.clone(), block_path)
+            num_blocks_saved += 1
 
-    # Извлекаем col
-    col_part = base_name.split("_")[-1]
-    if not col_part.startswith("col"):
-        raise ValueError(f"Некорректный формат col: {col_part}")
-    col = int(col_part[3:])  # Удаляем "col"
-    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_colX"
+            dependencies = []
+            if block_type == "embed":
+                dependencies = ["input_ids"]
+            elif block_type == "layer":
+                layer_idx = int(prefix.split('_layer')[1].split('_')[0])
+                dependencies = [f"layer_{layer_idx - 1}"] if layer_idx > 0 else ["embed"]
+            elif block_type == "output":
+                dependencies = [f"layer_{num_layers - 1}"]
 
-    # Извлекаем row
-    row_part = base_name.split("_")[-1]
-    if not row_part.startswith("row"):
-        raise ValueError(f"Некорректный формат row: {row_part}")
-    row = int(row_part[3:])  # Удаляем "row"
-    base_name = "_".join(base_name.split("_")[:-1])  # Удаляем "_rowX"
+            metadata[block_name] = {
+                "prefix": prefix,
+                "index": idx,
+                "shape": list(block.shape),
+                "dtype": str(block.dtype),
+                "path": block_path,
+                "block_type": block_type,
+                "size_mb": round(actual_size, 2),
+                "dependencies": dependencies,
+                "priority": 1 if block_type == "embed" else (2 if block_type == "layer" else 3)
+            }
 
-    # Оставшаяся часть — название модели
-    model_name = base_name
+        print(f"Сохранено {num_blocks_saved} блоков для {prefix}")
+        return num_blocks_saved
 
-    return {
-        "model_name": model_name,
-        "row": row,
-        "col": col
-    }
+    def allocate_model(self, model_name, model, output_dir="blocks"):
+        metadata = {}
+        total_blocks = 0
+        num_layers = len(model.model.layers)
 
-class ModelManager:
-    def load_pre_split_model(self, model_name, tensor_dir):
-        """
-        Загрузка предварительно разбитой модели.
-        :param model_name: Название модели.
-        :param tensor_dir: Путь к директории с блоками тензоров.
-        """
-        tensor_dir = Path(tensor_dir)
-        
+        # Эмбеддинги
+        embed_weight = model.model.embed_tokens.weight
+        total_blocks += self.save_tensor_blocks(embed_weight, f"{model_name}_embed", output_dir, metadata, "embed", num_layers)
+
+        # Слои с отладочным выводом
+        for layer_idx in range(num_layers):
+            layer = model.model.layers[layer_idx]
+            print(f"\nПараметры слоя {layer_idx}:")
+            for name, param in layer.named_parameters():
+                print(f" - {name}: {param.shape}")
+                if param.dim() == 2:
+                    prefix = f"{model_name}_layer{layer_idx}_{name.replace('.', '_')}"
+                    total_blocks += self.save_tensor_blocks(param, prefix, output_dir, metadata, "layer", num_layers)
+
+        # Выходной слой
+        output_weight = model.lm_head.weight
+        total_blocks += self.save_tensor_blocks(output_weight, f"{model_name}_output", output_dir, metadata, "output", num_layers)
+
+        # Сохранение метаданных
+        metadata_path = f"{output_dir}/{model_name}_metadata.json"
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f, indent=4)
+        print(f"Метаданные сохранены в {metadata_path}")
+        print(f"Модель {model_name} разбита на {total_blocks} блоков")
+
+# Класс для диспетчеризации модели
+class ModelDispatcher:
+    def __init__(self, model_name, metadata_path, vocab_size, hidden_size, num_layers):
+        self.model_name = model_name
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        with open(metadata_path, "r") as f:
+            self.metadata = json.load(f)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.cache = {}
+
+    def get_embedding_blocks(self, input_ids):
+        unique_tokens = torch.unique(input_ids)
+        needed_blocks = set()
+        embed_blocks = [k for k in self.metadata if k.startswith(f"{self.model_name}_embed")]
+        if not embed_blocks:
+            raise ValueError("Нет блоков эмбеддингов в метаданных!")
+        block_height = self.metadata[embed_blocks[0]]["shape"][0]
+
+        for token in unique_tokens:
+            row_block = token.item() // block_height
+            block_key = f"{self.model_name}_embed_block{row_block}"
+            if block_key in self.metadata:
+                needed_blocks.add(block_key)
+
         blocks = {}
-        for block_file in tensor_dir.glob(f"{model_name}_row*_col*.pt"):
-            parsed = parse_block_name(block_file.name)  # Используем функцию разбора имени
-            coords = (parsed["row"], parsed["col"])
-            
-            # Загрузка блока с weights_only=True
-            block = torch.load(block_file, map_location="cpu", weights_only=True)
-            blocks[coords] = {"path": str(block_file), "hash": None}
-        
-        if not blocks:
-            raise ValueError(f"Не найдено блоков для {model_name} в {tensor_dir}")
-        
-        self.virtual_space.load_blocks_model_into_matrix(model_name, blocks)
-        print(f"Модель {model_name} загружена из {tensor_dir} с {len(blocks)} блоками")
+        for block_key in needed_blocks:
+            if block_key not in self.cache:
+                self.cache[block_key] = torch.load(self.metadata[block_key]["path"], map_location=self.device, weights_only=True)
+            blocks[block_key] = self.cache[block_key]
+        return blocks
+
+    def get_output_blocks(self, top_k=None):
+        blocks = {}
+        output_prefix = f"{self.model_name}_output"
+        all_blocks = sorted(
+            [k for k in self.metadata if k.startswith(output_prefix)],
+            key=lambda x: int(x.split("_block")[1])
+        )
+        if top_k:
+            block_width = self.metadata[all_blocks[0]]["shape"][0]
+            num_blocks_needed = min(math.ceil(top_k / block_width), len(all_blocks))
+            needed_blocks = all_blocks[:num_blocks_needed]
+        else:
+            needed_blocks = all_blocks
+
+        for block_key in needed_blocks:
+            if block_key not in self.cache:
+                self.cache[block_key] = torch.load(self.metadata[block_key]["path"], map_location=self.device, weights_only=True)
+            blocks[block_key] = self.cache[block_key]
+        return blocks
+
+    def assemble_tensor(self, blocks, target_shape):
+        tensor = torch.zeros(target_shape, dtype=torch.float16, device=self.device)
+        if len(target_shape) == 2 and target_shape[1] == self.hidden_size:
+            current_row = 0
+            for block_key in sorted(blocks.keys(), key=lambda x: int(x.split("_block")[1])):
+                block = blocks[block_key]
+                block_height = block.shape[0]
+                tensor[current_row:current_row + block_height, :] = block
+                current_row += block_height
+        else:
+            current_row = 0
+            block_height = blocks[list(blocks.keys())[0]].shape[0]
+            block_width = blocks[list(blocks.keys())[0]].shape[1]
+            for j in range(0, target_shape[0], block_height):
+                current_col = 0
+                for k in range(0, target_shape[1], block_width):
+                    idx = (j // block_height) * (target_shape[1] // block_width) + (k // block_width)
+                    block_key = f"{blocks[list(blocks.keys())[0]].metadata['prefix']}_block{idx}"
+                    if block_key in blocks:
+                        block = blocks[block_key]
+                        tensor[j:j + block.shape[0], k:k + block.shape[1]] = block
+                        current_col += block.shape[1]
+                current_row += block_height
+        return tensor
+
+# Загрузка модели
+model_name = "DeepSeek-R1-Distill-Qwen-1.5B"
+model = AutoModelForCausalLM.from_pretrained(f"deepseek-ai/{model_name}", torch_dtype=torch.float16)
+virtual_matrix = VirtualMatrix(default_block_width=4096)
+virtual_matrix.allocate_model(model_name, model)
+
+# Тест диспетчера
+vocab_size = model.config.vocab_size
+hidden_size = model.config.hidden_size
+num_layers = model.config.num_hidden_layers
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Используемое устройство: {device}")
+dispatcher = ModelDispatcher(model_name, f"blocks/{model_name}_metadata.json", vocab_size, hidden_size, num_layers)
+
+# Тестовые входные данные
+input_ids = torch.tensor([0, 1, 2, 1000], dtype=torch.long, device=device)
+
+# Получаем и собираем эмбеддинги
+embed_blocks = dispatcher.get_embedding_blocks(input_ids)
+embed_weight = dispatcher.assemble_tensor(embed_blocks, (vocab_size, hidden_size))
+embed_output = torch.nn.functional.embedding(input_ids, embed_weight)
+print(f"Выходные эмбеддинги: {embed_output.shape}")
+
+# Получаем и собираем выходной слой
+output_blocks = dispatcher.get_output_blocks()
+output_weight = dispatcher.assemble_tensor(output_blocks, (vocab_size, hidden_size))
+logits = torch.nn.functional.linear(embed_output, output_weight)
+print(f"Логиты: {logits.shape}")
+
+# Архивация и отправка на Google Drive
+!zip -r DeepSeek-R1-Distill-Qwen-1.5B-blocks-01.zip blocks/
+
+# Путь на Google Drive
+archive_name = "DeepSeek-R1-Distill-Qwen-1.5B-blocks-01"
+drive_path = f"/content/drive/MyDrive/models/{archive_name}.zip"
+shutil.move(f"{archive_name}.zip", drive_path)
+print(f"Архив перемещён на Google Drive: {drive_path}")
 
 
-        , weights_only=True)
-
-
-p2p_node = P2PNode("localhost", 5000, use_ipfs=True)
-veector = Veector(p2p_node=p2p_node, ipfs_enabled=True)
-manager = ModelManager(veector, ipfs_enabled=True)
+-------------------------------
+attention_layers="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27" 
