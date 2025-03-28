@@ -1,0 +1,1236 @@
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_embed: torch.Size([151936, 1536]), 445.12 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block2: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block3: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block4: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block5: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block6: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block7: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block8: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block9: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block10: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block11: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block12: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block13: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block14: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block15: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block16: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block17: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block18: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block19: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block20: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block21: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block22: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block23: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block24: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block25: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block26: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block27: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block28: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block29: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block30: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block31: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block32: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block33: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block34: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block35: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block36: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_embed_block37: torch.Size([384, 1536]), 1.12 MB
+Сохранено 38 блоков для DeepSeek-R1-Distill-Qwen-1.5B_embed
+
+Параметры слоя 0:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer0_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 1:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer1_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 2:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer2_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 3:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer3_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 4:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer4_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 5:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer5_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 6:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer6_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 7:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer7_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 8:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer8_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 9:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer9_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 10:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer10_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 11:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer11_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 12:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer12_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 13:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer13_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 14:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer14_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 15:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer15_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 16:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer16_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 17:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer17_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 18:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer18_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 19:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer19_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 20:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer20_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 21:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer21_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 22:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer22_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 23:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer23_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 24:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer24_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 25:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer25_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 26:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer26_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+
+Параметры слоя 27:
+ - self_attn.q_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_q_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_q_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_q_proj_weight
+ - self_attn.q_proj.bias: torch.Size([1536])
+ - self_attn.k_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_k_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_k_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_k_proj_weight
+ - self_attn.k_proj.bias: torch.Size([256])
+ - self_attn.v_proj.weight: torch.Size([256, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_v_proj_weight: torch.Size([256, 1536]), 0.75 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_v_proj_weight_block0: torch.Size([256, 1536]), 0.75 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_v_proj_weight
+ - self_attn.v_proj.bias: torch.Size([256])
+ - self_attn.o_proj.weight: torch.Size([1536, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_o_proj_weight: torch.Size([1536, 1536]), 4.50 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_o_proj_weight_block0: torch.Size([1536, 1536]), 4.50 MB
+Сохранено 1 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_self_attn_o_proj_weight
+ - mlp.gate_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_gate_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_gate_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_gate_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_gate_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_gate_proj_weight
+ - mlp.up_proj.weight: torch.Size([8960, 1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_up_proj_weight: torch.Size([8960, 1536]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_up_proj_weight_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_up_proj_weight_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_up_proj_weight_block2: torch.Size([768, 1536]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_up_proj_weight
+ - mlp.down_proj.weight: torch.Size([1536, 8960])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_down_proj_weight: torch.Size([1536, 8960]), 26.25 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_down_proj_weight_block0: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_down_proj_weight_block1: torch.Size([1536, 4096]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_down_proj_weight_block2: torch.Size([1536, 768]), 2.25 MB
+Сохранено 3 блоков для DeepSeek-R1-Distill-Qwen-1.5B_layer27_mlp_down_proj_weight
+ - input_layernorm.weight: torch.Size([1536])
+ - post_attention_layernorm.weight: torch.Size([1536])
+Сохранение DeepSeek-R1-Distill-Qwen-1.5B_output: torch.Size([151936, 1536]), 445.12 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block0: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block1: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block2: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block3: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block4: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block5: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block6: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block7: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block8: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block9: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block10: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block11: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block12: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block13: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block14: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block15: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block16: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block17: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block18: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block19: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block20: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block21: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block22: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block23: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block24: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block25: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block26: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block27: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block28: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block29: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block30: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block31: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block32: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block33: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block34: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block35: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block36: torch.Size([4096, 1536]), 12.00 MB
+Сохранение блока DeepSeek-R1-Distill-Qwen-1.5B_output_block37: torch.Size([384, 1536]), 1.12 MB
+Сохранено 38 блоков для DeepSeek-R1-Distill-Qwen-1.5B_output
+Метаданные сохранены в blocks/DeepSeek-R1-Distill-Qwen-1.5B_metadata.json
+Модель DeepSeek-R1-Distill-Qwen-1.5B разбита на 440 блоков
+Используемое устройство: cpu
+Выходные эмбеддинги: torch.Size([4, 1536])
+Логиты: torch.Size([4, 151936])
+
+
+DeepSeek-R1-Distill-Qwen-1.5B

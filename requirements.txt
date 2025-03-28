@@ -2,3 +2,4 @@ numpy
 qiskit
 qiskit_aer
 ipfshttpclient
+transformers
