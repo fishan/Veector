@@ -1,0 +1,1271 @@
+
+# === Cell 0: Install Dependencies ===
+!pip install numpy psutil torch transformers accelerate bitsandbytes ipfshttpclient qiskit qiskit-aer requests huggingface_hub -q
+print("Dependencies installed/checked.")
+     
+  Preparing metadata (setup.py) ... done
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 363.4/363.4 MB 3.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 13.8/13.8 MB 96.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 24.6/24.6 MB 73.7 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 883.7/883.7 kB 48.9 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 664.8/664.8 MB 2.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 211.5/211.5 MB 6.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 56.3/56.3 MB 12.5 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 127.9/127.9 MB 7.3 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 207.5/207.5 MB 6.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 21.1/21.1 MB 76.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 76.0/76.0 MB 9.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 82.7/82.7 kB 7.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.8/6.8 MB 83.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.4/12.4 MB 95.9 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 119.4/119.4 kB 10.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 69.4 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.5/49.5 kB 3.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.7/49.7 MB 16.6 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 109.0/109.0 kB 9.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.3/2.3 MB 68.4 MB/s eta 0:00:00
+  Building wheel for varint (setup.py) ... done
+Dependencies installed/checked.
+
+# === Cell 1: Imports (Corrected and Simplified - FINAL) ===
+
+# --- Standard Imports ---
+import numpy as np
+import queue
+import threading
+import time
+import random
+import psutil
+import os
+import gc
+import pickle
+import hashlib
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Tuple, Union
+from google.colab import drive, files, userdata # Keep Colab imports
+from huggingface_hub import login             # Keep HF import
+from transformers import AutoModelForCausalLM, AutoTokenizer # Keep Transformers imports
+
+print("Standard/External imports loaded.")
+
+# --- Optional Imports ---
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("Warning: PyTorch not found. GPU features may be limited.")
+
+try:
+    import ipfshttpclient
+    IPFS_AVAILABLE = True
+except ImportError:
+    IPFS_AVAILABLE = False
+    # print("Warning: ipfshttpclient not found. IPFS features disabled.")
+
+try:
+    from qiskit import QuantumCircuit
+    from qiskit.providers.aer import Aer
+    from qiskit import execute
+    QISKIT_AVAILABLE = True
+except ImportError:
+    QISKIT_AVAILABLE = False
+    # print("Warning: Qiskit not found. Quantum operations disabled.")
+
+print("Optional imports checked.")
+
+# --- Veector Project Imports (Single Correct Block) ---
+# Ensure core.py, tensors.py (v0.5.1+), veectordb.py (v0.7.1+),
+# operations.py, memory.py are uploaded and accessible.
+PROJECT_IMPORTS_OK = False
+try:
+    # Import core classes/functions needed by THIS script (converter/inference)
+    from core import Veector
+    from veectordb import VeectorDB # Needed if we re-initialize DB here? Usually not.
+    from tensors import (
+        TensorCoordinate, create_tensor, # Needed for creating tensors
+        # Import ALL necessary TAG and GROUP constants for use in this script
+        TAG_CAT_TYPE, TAG_CAT_COMPONENT, TAG_CAT_PRECISION, TAG_CAT_MODEL_FAMILY,
+        TAG_CAT_LAYER_IDX, TAG_CAT_FUNCTION, TAG_CAT_DATA_SEMANTIC, TAG_CAT_USER,
+        TAG_TYPE_PROCESSOR, TAG_TYPE_KNOWLEDGE, TAG_TYPE_CONVERTER, TAG_TYPE_STATE,
+        TAG_COMP_WEIGHTS, TAG_COMP_BIAS, TAG_COMP_EMBEDDING, TAG_COMP_ATTN_Q,
+        TAG_COMP_ATTN_K, TAG_COMP_ATTN_V, TAG_COMP_ATTN_O, TAG_COMP_ATTN_QKV,
+        TAG_COMP_FFN_GATE, TAG_COMP_FFN_UP, TAG_COMP_FFN_DOWN, TAG_COMP_LAYERNORM,
+        TAG_COMP_LM_HEAD, TAG_PREC_FLOAT32, TAG_PREC_FLOAT16, TAG_PREC_BFLOAT16,
+        TAG_PREC_INT8, TAG_PREC_INT4, TAG_MODEL_QWEN2, TAG_MODEL_LLAMA3,
+        TAG_MODEL_DEEPSEEK, TAG_FUNC_LINEAR, TAG_FUNC_ATTENTION, TAG_FUNC_FFN,
+        TAG_FUNC_EMBED_LOOKUP, TAG_FUNC_CAST_DTYPE, TAG_FUNC_RESHAPE,
+        TAG_SEMANTIC_HIDDEN_STATE, TAG_SEMANTIC_LOGITS, TAG_SEMANTIC_TOKEN_IDS,
+        TAG_SEMANTIC_KV_CACHE, tag_layer,
+        GROUP_IDX_QWEN_KNOWLEDGE, GROUP_IDX_QWEN_PROCESSOR
+    )
+    # Only import from operations/memory if DIRECTLY used in THIS script, otherwise core.py handles it
+    # from operations import * # Generally not needed here
+    # from memory import Memory # Generally not needed here
+
+    print("Veector project components imported successfully for this script.")
+    PROJECT_IMPORTS_OK = True
+
+except ImportError as e:
+    print(f"---!!! FATAL ERROR (ImportError) !!! ---")
+    print(f"Specific error: {e}")
+    print(f"Could not import required name from core.py or tensors.py.")
+    print(f"Ensure files are UP-TO-DATE (tensors v0.5.1+, core v0.5.2+), CORRECT, and ACCESSIBLE.")
+    print(f"-----------------------------------------")
+    # Optionally define dummies if needed for notebook structure
+except Exception as other_e:
+    print(f"---!!! FATAL ERROR (Other Exception during Import) !!! ---")
+    print(f"Specific error: {other_e}")
+    import traceback
+    traceback.print_exc()
+    print(f"Check imported files for syntax errors.")
+    print(f"----------------------------------------------------------")
+
+# Removed the redundant import check block ('Checking imports...')
+     
+Standard/External imports loaded.
+Optional imports checked.
+  Imported VeectorDB (v0.8.2)
+  Imported tensors (v0.5.1)
+  Imported operations (v0.7.0)
+  Imported Memory (v0.1.0)
+Core components imported successfully.
+Veector project components imported successfully for this script.
+
+# Очистка директории для чистоты эксперимента
+!rm -rf data/
+output_dir = "data"
+os.makedirs(output_dir, exist_ok=True)
+
+     
+
+# --- Configuration ---
+
+# Аутентификация с Hugging Face
+hf_token = userdata.get('HF_TOKEN')
+if not hf_token:
+    raise ValueError("Добавь HF_TOKEN в секреты Colab!")
+login(hf_token)
+print("Аутентификация прошла успешно")
+
+# Подключение Google Drive
+drive.mount('/content/drive')
+print("Google Drive подключён")
+
+HF_MODEL_NAME = "DeepSeek-R1-Distill-Qwen-1.5B"
+# Определяем ОДИН основной путь к БД (например, в data/db/)
+DB_PATH = Path("./data/db/")
+DB_PATH.mkdir(parents=True, exist_ok=True) # Создаем data/db, если ее нет
+print(f"Using Main Veector DB Path: {DB_PATH.resolve()}")
+
+# Set data type (bfloat16 might not be fully supported everywhere, float16 is safer)
+TORCH_DTYPE = torch.float16 # Use float16 for wider compatibility
+
+print(f"Model to convert: {HF_MODEL_NAME}")
+print(f"Target Veector DB: {DB_PATH}")
+print(f"Target dtype: {TORCH_DTYPE}")
+     
+Аутентификация прошла успешно
+Mounted at /content/drive
+Google Drive подключён
+Using Main Veector DB Path: /content/data/db
+Model to convert: DeepSeek-R1-Distill-Qwen-1.5B
+Target Veector DB: data/db
+Target dtype: torch.float16
+
+# === Cell 2: Tag Ontology Definition (Corrected) ===
+
+# Using tuples for potential hierarchy: (Category, SubCategory, Detail)
+
+# Categories
+TAG_CAT_TYPE = 0
+TAG_CAT_COMPONENT = 1
+TAG_CAT_PRECISION = 2
+TAG_CAT_MODEL_FAMILY = 3
+TAG_CAT_LAYER_IDX = 4 # Use actual layer index directly here
+TAG_CAT_FUNCTION = 5 # For processors
+TAG_CAT_DATA_SEMANTIC = 6 # Semantic meaning of data
+TAG_CAT_USER = 1000 # Range for user-defined tags
+
+# Type Tags (Category 0)
+TAG_TYPE_PROCESSOR = (TAG_CAT_TYPE, 1)
+TAG_TYPE_KNOWLEDGE = (TAG_CAT_TYPE, 2)
+TAG_TYPE_CONVERTER = (TAG_CAT_TYPE, 3)
+TAG_TYPE_STATE = (TAG_CAT_TYPE, 4)
+
+# Component Tags (Category 1) - Example for Qwen2 style models
+TAG_COMP_WEIGHTS = (TAG_CAT_COMPONENT, 1)
+TAG_COMP_BIAS = (TAG_CAT_COMPONENT, 2)
+TAG_COMP_EMBEDDING = (TAG_CAT_COMPONENT, 10)
+# --- Added Q, K, V constants ---
+TAG_COMP_ATTN_Q = (TAG_CAT_COMPONENT, 21) # Separate Q
+TAG_COMP_ATTN_K = (TAG_CAT_COMPONENT, 22) # Separate K
+TAG_COMP_ATTN_V = (TAG_CAT_COMPONENT, 23) # Separate V
+# --- End Added ---
+TAG_COMP_ATTN_O = (TAG_CAT_COMPONENT, 24) # Output projection
+TAG_COMP_ATTN_QKV = (TAG_CAT_COMPONENT, 25) # Keep for models that DO use fused QKV
+TAG_COMP_FFN_GATE = (TAG_CAT_COMPONENT, 30) # gate_proj
+TAG_COMP_FFN_UP = (TAG_CAT_COMPONENT, 31)   # up_proj
+TAG_COMP_FFN_DOWN = (TAG_CAT_COMPONENT, 32) # down_proj
+TAG_COMP_LAYERNORM = (TAG_CAT_COMPONENT, 40)
+TAG_COMP_LM_HEAD = (TAG_CAT_COMPONENT, 50)
+
+# Precision Tags (Category 2)
+TAG_PREC_FLOAT32 = (TAG_CAT_PRECISION, 32)
+TAG_PREC_FLOAT16 = (TAG_CAT_PRECISION, 16)
+TAG_PREC_BFLOAT16 = (TAG_CAT_PRECISION, 17)
+TAG_PREC_INT8 = (TAG_CAT_PRECISION, 8)
+TAG_PREC_INT4 = (TAG_CAT_PRECISION, 4)
+
+# Model Family Tags (Category 3)
+TAG_MODEL_QWEN2 = (TAG_CAT_MODEL_FAMILY, 1)
+TAG_MODEL_DEEPSEEK = (TAG_CAT_MODEL_FAMILY, 3)
+
+# Layer Index Tags (Category 4) - Use function to generate
+def tag_layer(idx: int):
+    # Make sure layer index tag is distinct enough
+    return (TAG_CAT_LAYER_IDX, idx)
+
+# Function Tags (Category 5) - For Processors
+TAG_FUNC_LINEAR = (TAG_CAT_FUNCTION, 1)
+TAG_FUNC_ATTENTION = (TAG_CAT_FUNCTION, 2)
+TAG_FUNC_FFN = (TAG_CAT_FUNCTION, 3)
+TAG_FUNC_EMBED_LOOKUP = (TAG_CAT_FUNCTION, 4)
+TAG_FUNC_CAST_DTYPE = (TAG_CAT_FUNCTION, 90)
+TAG_FUNC_RESHAPE = (TAG_CAT_FUNCTION, 91)
+
+# Data Semantic Type Tags (Category 6)
+TAG_SEMANTIC_HIDDEN_STATE = (TAG_CAT_DATA_SEMANTIC, 1)
+TAG_SEMANTIC_LOGITS = (TAG_CAT_DATA_SEMANTIC, 2)
+TAG_SEMANTIC_TOKEN_IDS = (TAG_CAT_DATA_SEMANTIC, 3)
+TAG_SEMANTIC_KV_CACHE = (TAG_CAT_DATA_SEMANTIC, 4)
+
+GROUP_IDX_QWEN_KNOWLEDGE = 100 # Group ID for Qwen 1.5B Knowledge tensors
+GROUP_IDX_QWEN_PROCESSOR = 500 # Group ID for Qwen architecture processors
+
+print("Tag ontology defined (with Q, K, V tags).")
+     
+Tag ontology defined (with Q, K, V tags).
+
+# === Cell 3: Initialize Veector (SINGLE Instance) ===
+from core import Veector # Импортируем класс Veector из core.py
+try:
+    # Используем этот путь при инициализации
+    vec = Veector(db_dir=DB_PATH, ipfs_enabled=False)
+    print(f"Veector core initialized using DB at: {DB_PATH.resolve()}")
+except Exception as e:
+    print(f"FATAL: Veector initialization failed: {e}")
+    raise RuntimeError("Veector Core failed to initialize") from e
+     
+--- Initializing Veector Core v0.5.12 ---
+--- Initializing VeectorDB v0.8.2 ---
+VeectorDB v0.8.2 initialized. Root directory: /content/data/db
+Loaded index from /content/data/db/tensor_index.pkl with 0 entries.
+VeectorDB initialized.
+Cache initialized: Size=1000, Strategy=LRU
+Initialized 67 core operations.
+DEBUG INIT: Is (40, 1, 0) in core_ops keys? True
+DEBUG INIT: Function for (40, 1, 0): <function Veector.__init__.<locals>.<lambda> at 0x7b07f99f9440>
+Mem(Veector Initialized): RAM 758.9MB
+Veector core initialized using DB at: /content/data/db
+
+# === Cell 4: Load Hugging Face Model ===
+
+model = None
+tokenizer = None
+try:
+    model = AutoModelForCausalLM.from_pretrained(f"deepseek-ai/{HF_MODEL_NAME}", torch_dtype=TORCH_DTYPE, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(f"deepseek-ai/{HF_MODEL_NAME}", trust_remote_code=True)
+    model.eval() # Set to evaluation mode
+    print(f"Successfully loaded HF model: {HF_MODEL_NAME}")
+    print(f"Model config: {model.config}")
+except Exception as e:
+    print(f"FATAL: Failed to load HF model '{HF_MODEL_NAME}': {e}")
+    # Stop execution
+    raise RuntimeError(f"Hugging Face model loading failed") from e
+
+# Clean up GPU memory if possible after loading
+if TORCH_AVAILABLE and torch.cuda.is_available():
+    torch.cuda.empty_cache()
+gc.collect()
+print("Model loaded and memory potentially cleaned.")
+     
+config.json:   0%|          | 0.00/679 [00:00<?, ?B/s]
+model.safetensors:   0%|          | 0.00/3.55G [00:00<?, ?B/s]
+Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+generation_config.json:   0%|          | 0.00/181 [00:00<?, ?B/s]
+tokenizer_config.json:   0%|          | 0.00/3.07k [00:00<?, ?B/s]
+tokenizer.json:   0%|          | 0.00/7.03M [00:00<?, ?B/s]
+Successfully loaded HF model: DeepSeek-R1-Distill-Qwen-1.5B
+Model config: Qwen2Config {
+  "_attn_implementation_autoset": true,
+  "architectures": [
+    "Qwen2ForCausalLM"
+  ],
+  "attention_dropout": 0.0,
+  "bos_token_id": 151643,
+  "eos_token_id": 151643,
+  "hidden_act": "silu",
+  "hidden_size": 1536,
+  "initializer_range": 0.02,
+  "intermediate_size": 8960,
+  "max_position_embeddings": 131072,
+  "max_window_layers": 21,
+  "model_type": "qwen2",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 28,
+  "num_key_value_heads": 2,
+  "rms_norm_eps": 1e-06,
+  "rope_scaling": null,
+  "rope_theta": 10000,
+  "sliding_window": 4096,
+  "tie_word_embeddings": false,
+  "torch_dtype": "float16",
+  "transformers_version": "4.50.0",
+  "use_cache": true,
+  "use_mrope": false,
+  "use_sliding_window": false,
+  "vocab_size": 151936
+}
+
+Model loaded and memory potentially cleaned.
+
+# === Cell 5: Convert Parameters to Knowledge Tensors (Fixed Tag Logic v3 + Unique Coords + Logging) ===
+
+import gc
+import pickle
+from pathlib import Path
+import numpy as np
+import torch # Убедимся, что torch импортирован для TORCH_DTYPE
+
+# --- Version ---
+# Обновляем версию, отражая исправление координат
+CONVERTER_CELL5_VERSION = "Fixed Tag Logic v3 + Unique Coords + Logging"
+# --- End Version ---
+
+print(f"--- Running Converter Cell 5 v{CONVERTER_CELL5_VERSION} ---")
+
+# --- Проверка наличия объекта vec из Ячейки 3 ---
+if 'vec' not in locals() or vec is None:
+    print("FATAL ERROR: 'vec' object (Veector instance) not found.")
+    print("Please ensure Cell 3 (Initialize Veector) was executed successfully before this cell.")
+    raise NameError("Veector object 'vec' is not defined.")
+elif not hasattr(vec, 'db') or vec.db is None:
+     print("FATAL ERROR: 'vec' object exists, but 'vec.db' (VeectorDB instance) is not initialized.")
+     raise AttributeError("Veector object 'vec' does not have an initialized 'db' attribute.")
+else:
+    print("'vec' object found and seems initialized.")
+# --- Конец проверки ---
+
+param_count = 0
+knowledge_map = {} # Словарь для маппинга: имя параметра -> ID тензора знаний
+conversion_errors = 0
+
+# Определяем тег точности на основе TORCH_DTYPE (определенного в предыдущих ячейках)
+default_precision_tag = TAG_PREC_FLOAT16 # Значение по умолчанию
+if 'TORCH_DTYPE' in locals():
+    if TORCH_DTYPE == torch.bfloat16:
+        default_precision_tag = TAG_PREC_BFLOAT16
+    elif TORCH_DTYPE == torch.float32:
+        default_precision_tag = TAG_PREC_FLOAT32
+else:
+    print("Warning: TORCH_DTYPE not defined, defaulting precision tag to float16.")
+
+# Используем константу для группы знаний
+print(f"\n--- Creating Knowledge Tensors (Group: {GROUP_IDX_QWEN_KNOWLEDGE}) ---")
+print(f"    Default Precision: {default_precision_tag}")
+print(f"    Saving Embeddings and LM Head as NPY (Memory Mapping enabled)")
+
+# Проверяем наличие модели
+if 'model' in locals() and model is not None:
+    # --- Начало цикла по параметрам модели ---
+    for name, param in model.named_parameters():
+        print(f"Processing: {name} | Shape: {param.shape} | Dtype: {param.dtype}")
+        try:
+            # Получаем данные параметра как NumPy массив на CPU
+            param_data = param.data.cpu().numpy()
+        except Exception as e:
+            print(f"  ERROR getting data for {name}: {e}")
+            conversion_errors += 1
+            continue # Пропускаем этот параметр
+
+        # --- Определяем теги и координаты ---
+        # Начальные теги: тип, точность, модель (используем QWEN2)
+        tags = [TAG_TYPE_KNOWLEDGE, default_precision_tag, TAG_MODEL_QWEN2]
+        layer_idx = -1 # Слой по умолчанию (для embed/head)
+        group_idx = GROUP_IDX_QWEN_KNOWLEDGE # Группа знаний
+        component_tag = None # Сбрасываем тег компонента
+        coord_x = 0 # Сбрасываем координату X
+        current_nest = 1 # Уровень точности/вложенности (1 для fp16)
+        is_weight = name.endswith(".weight")
+        is_bias = name.endswith(".bias")
+
+        # Добавляем тег веса или смещения
+        if is_weight:
+            tags.append(TAG_COMP_WEIGHTS)
+        elif is_bias:
+            tags.append(TAG_COMP_BIAS)
+
+        # Флаг для указания формата сохранения (NPY или Pickle)
+        is_npy_target = False
+
+        # --- Определяем компонент и его уникальные атрибуты ---
+        if "model.embed_tokens.weight" in name:
+            component_tag = TAG_COMP_EMBEDDING
+            tags.append(component_tag) # Добавляем тег эмбеддинга
+            coord_x = 0 # !!! X = 0 для Embedding !!!
+            is_npy_target = True
+            # print("    Marking Embedding for NPY format (mmap)")
+        elif "lm_head.weight" in name:
+            component_tag = TAG_COMP_LM_HEAD
+            tags.append(component_tag) # Добавляем тег головы
+            coord_x = 1 # !!! X = 1 для LM Head (чтобы избежать коллизии) !!!
+            is_npy_target = True
+            # print("    Marking LM Head for NPY format (mmap)")
+        elif "model.norm.weight" in name:
+             layer_idx = model.config.num_hidden_layers # Финальная нормализация
+             component_tag = TAG_COMP_LAYERNORM
+             tags.append(component_tag) # Добавляем тег LN
+             coord_x = 0 # X=0 для финальной нормализации (слой другой)
+        # Добавить обработку model.norm.bias здесь, если он есть
+
+        elif ".layers." in name:
+            try:
+                # Извлекаем номер слоя
+                layer_part = name.split('.layers.')[1]
+                layer_idx = int(layer_part.split('.')[0])
+                tags.append(tag_layer(layer_idx)) # Добавляем тег слоя
+
+                # Определяем компонент внутри слоя
+                component_tag_layer = None # Локальная переменная для тега компонента слоя
+                if "self_attn" in name:
+                    if "q_proj" in name: component_tag_layer = TAG_COMP_ATTN_Q; coord_x = 1 if is_weight else 11
+                    elif "k_proj" in name: component_tag_layer = TAG_COMP_ATTN_K; coord_x = 2 if is_weight else 12
+                    elif "v_proj" in name: component_tag_layer = TAG_COMP_ATTN_V; coord_x = 3 if is_weight else 13
+                    elif "o_proj" in name: component_tag_layer = TAG_COMP_ATTN_O; coord_x = 4 if is_weight else 14
+                elif "mlp" in name:
+                    if "gate_proj" in name: component_tag_layer = TAG_COMP_FFN_GATE; coord_x = 5
+                    elif "up_proj" in name: component_tag_layer = TAG_COMP_FFN_UP; coord_x = 6
+                    elif "down_proj" in name: component_tag_layer = TAG_COMP_FFN_DOWN; coord_x = 7
+                elif "input_layernorm" in name:
+                    component_tag_layer = TAG_COMP_LAYERNORM; coord_x = 10 # X для input LN
+                elif "post_attention_layernorm" in name:
+                     component_tag_layer = TAG_COMP_LAYERNORM; coord_x = 12 # X для post-attn LN
+
+                # Добавляем определенный тег компонента слоя
+                if component_tag_layer:
+                     tags.append(component_tag_layer)
+
+            except Exception as parse_e:
+                 print(f"  Error parsing layer part for {name}: {parse_e}")
+                 conversion_errors += 1
+                 continue # Переходим к следующему параметру
+        else:
+             # Параметр не опознан (не эмбеддинг, не голова, не слой)
+             # print(f"  Warn: Unrecognized parameter name pattern: {name}") # Можно убрать для чистоты
+             pass # Ничего не делаем, тег компонента не добавляется
+
+        # --- Завершение определения тегов и координат ---
+
+        # Убираем возможные дубликаты тегов
+        final_tags = list(set(tuple(t) if isinstance(t, list) else t for t in tags))
+        # Создаем объект координат
+        knowledge_coord = TensorCoordinate(layer=layer_idx, group=group_idx, nest=current_nest, x=coord_x)
+
+        # Готовим метаданные для сохранения
+        final_metadata = {
+            "original_name": name,
+            "model_source": HF_MODEL_NAME,
+             # Добавляем подсказку для формата сохранения, если это NPY
+            **({"blob_format_hint": "npy"} if is_npy_target else {})
+            }
+
+        # --- Создаем и сохраняем тензор знаний ---
+        try:
+            knowledge_tensor = vec.create_tensor(
+                coord=knowledge_coord,
+                tensor_type="knowledge",
+                knowledge_data=param_data, # Передаем NumPy данные
+                tags=final_tags,          # Передаем финальный список тегов
+                metadata=final_metadata
+            )
+            knowledge_id = vec.save_tensor(knowledge_tensor) # Сохранение через Veector -> VeectorDB
+
+            if knowledge_id:
+                # Успех
+                # print(f"  Saved Knowledge: {name} -> {knowledge_id} (Coord: {knowledge_coord})") # Уменьшим вербозность
+                knowledge_map[name] = knowledge_id # Добавляем в карту
+                param_count += 1
+            else:
+                # Ошибка сохранения (сообщение выведет save_tensor)
+                conversion_errors += 1
+        except Exception as save_e:
+             print(f"  ERROR during create/save_tensor call for {name}: {save_e}")
+             conversion_errors += 1
+
+        # Освобождаем память
+        del param_data
+        # gc.collect() # Можно включить при необходимости
+
+    # --- Конец цикла по параметрам ---
+
+    print(f"\n--- Finished saving {param_count} knowledge tensors to {vec.db.db_root_path} ---")
+    if conversion_errors > 0:
+        print(f"!!! WARNING: {conversion_errors} errors occurred during saving knowledge tensors !!!")
+
+    # Сохраняем карту имен в ID
+    map_file = DB_PATH / f"{HF_MODEL_NAME}_param_map.pkl"
+    try:
+        with open(map_file, 'wb') as f:
+            pickle.dump(knowledge_map, f)
+        print(f"Parameter name to Knowledge ID map saved to {map_file}")
+    except Exception as e:
+        print(f"Error saving parameter map: {e}")
+else:
+    # Если объект 'model' не был загружен
+    print("Model was not loaded successfully. Skipping parameter conversion.")
+
+# Финальная очистка
+if 'model' in locals() and model is not None:
+    del model
+if 'TORCH_AVAILABLE' in locals() and TORCH_AVAILABLE and torch.cuda.is_available():
+    torch.cuda.empty_cache()
+gc.collect()
+print("Cleaned up HF model memory.")
+     
+--- Running Converter Cell 5 vFixed Tag Logic v3 + Unique Coords + Logging ---
+'vec' object found and seems initialized.
+
+--- Creating Knowledge Tensors (Group: 100) ---
+    Default Precision: (2, 16)
+    Saving Embeddings and LM Head as NPY (Memory Mapping enabled)
+Processing: model.embed_tokens.weight | Shape: torch.Size([151936, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.0.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.0.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.0.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.0.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.1.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.1.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.1.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.1.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.1.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.1.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.2.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.2.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.2.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.2.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.2.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.2.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.3.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.3.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.3.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.3.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.3.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.3.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.4.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.4.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.4.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.4.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.4.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.4.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.5.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.5.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.5.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.5.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.5.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.5.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.6.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.6.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.6.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.6.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.6.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.6.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.7.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.7.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.7.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.7.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.7.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.7.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.8.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.8.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.8.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.8.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.8.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.8.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.9.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.9.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.9.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.9.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.9.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.9.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.10.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.10.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.10.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.10.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.10.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.10.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.11.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.11.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.11.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.11.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.11.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.11.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.12.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.12.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.12.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.12.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.12.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.12.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.13.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.13.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.13.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.13.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.13.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.13.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.14.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.14.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.14.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.14.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.14.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.14.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.15.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.15.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.15.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.15.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.15.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.15.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.16.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.16.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.16.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.16.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.16.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.16.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.17.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.17.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.17.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.17.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.17.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.17.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.18.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.18.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.18.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.18.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.18.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.18.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.19.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.19.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.19.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.19.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.19.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.19.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.20.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.20.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.20.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.20.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.20.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.20.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.21.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.21.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.21.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.21.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.21.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.21.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.22.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.22.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.22.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.22.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.22.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.22.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.23.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.23.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.23.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.23.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.23.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.23.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.24.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.24.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.24.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.24.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.24.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.24.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.25.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.25.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.25.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.25.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.25.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.25.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.26.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.26.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.26.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.26.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.26.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.26.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.q_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.q_proj.bias | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.k_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.k_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.v_proj.weight | Shape: torch.Size([256, 1536]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.v_proj.bias | Shape: torch.Size([256]) | Dtype: torch.float16
+Processing: model.layers.27.self_attn.o_proj.weight | Shape: torch.Size([1536, 1536]) | Dtype: torch.float16
+Processing: model.layers.27.mlp.gate_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.27.mlp.up_proj.weight | Shape: torch.Size([8960, 1536]) | Dtype: torch.float16
+Processing: model.layers.27.mlp.down_proj.weight | Shape: torch.Size([1536, 8960]) | Dtype: torch.float16
+Processing: model.layers.27.input_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.layers.27.post_attention_layernorm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: model.norm.weight | Shape: torch.Size([1536]) | Dtype: torch.float16
+Processing: lm_head.weight | Shape: torch.Size([151936, 1536]) | Dtype: torch.float16
+
+--- Finished saving 339 knowledge tensors to /content/data/db ---
+Parameter name to Knowledge ID map saved to data/db/DeepSeek-R1-Distill-Qwen-1.5B_param_map.pkl
+Cleaned up HF model memory.
+
+# === Cell 6: Define Processor Tensors (Original Mixed Format + Unique Coords + Logging) ===
+
+import pickle
+from tensors import TensorCoordinate, TAG_MODEL_QWEN2 # ... и другие константы ...
+
+# --- Version ---
+CONVERTER_CELL6_VERSION = "Original Mixed Format + Unique Coords + Logging"
+# --- End Version ---
+
+print(f"\n--- Running Converter Cell 6 v{CONVERTER_CELL6_VERSION} ---")
+print("--- Defining Processor Tensors (Original Mixed Format + QWEN2 Tag) ---")
+
+# --- Проверка 'vec' ---
+if 'vec' not in locals() or vec is None: raise NameError("Veector object 'vec' is not defined.")
+elif not hasattr(vec, 'db') or vec.db is None or not hasattr(vec.db, 'index'): raise AttributeError("Veector object 'vec' does not have an initialized 'db' attribute.")
+else: print("'vec' object found and DB seems open. Reusing.")
+
+processor_errors = 0
+processor_map = {}
+
+# --- Загрузка карты имен параметров ---
+param_map_file = DB_PATH / f"{HF_MODEL_NAME}_param_map.pkl"
+knowledge_map_by_name = {}
+if param_map_file.exists():
+    try:
+        with open(param_map_file, 'rb') as f: knowledge_map_by_name = pickle.load(f)
+        print(f"Loaded parameter map ({len(knowledge_map_by_name)} entries) from {param_map_file}")
+    except Exception as e: print(f"Warning: Failed to load parameter map: {e}.")
+else: print(f"Parameter map file not found at {param_map_file}.")
+
+# --- Helper function ---
+def find_knowledge_id(pattern: str) -> Optional[str]:
+    for name, kid in knowledge_map_by_name.items():
+        if pattern in name: return kid
+    return None
+
+# --- Define Groups & OP Codes & Tags ---
+# ... (КОНСТАНТЫ OP_*, TAG_*, GROUP_*, tag_layer() КАК В ПРЕДЫДУЩЕЙ ВЕРСИИ ЯЧЕЙКИ 6) ...
+GROUP_IDX_QWEN_KNOWLEDGE = 100; GROUP_IDX_QWEN_PROCESSOR = 500
+OP_LAYER_NORM=[40,1,0]; OP_MATRIX_MULTIPLY=[30,0,0]; OP_ADD=[0,0,2]; OP_SILU=[18,4,0];
+OP_MULTIPLY=[0,1,0]; OP_EMBEDDING_LOOKUP=[40,6,0]; OP_APPLY_ROPE=[40,7,0];
+OP_RESIDUAL_ADD=OP_ADD; OP_LINEAR=OP_MATRIX_MULTIPLY; OP_ATTENTION_MULTIHEAD=[40,2,0];
+OP_FINAL_NORM=OP_LAYER_NORM; OP_LINEAR_HEAD=OP_LINEAR; OP_PRINT=[8,0,0];
+META_OP_CATEGORY = 99; OP_STORE = [99,0,0]; OP_LOAD = [99,0,1]; OP_LOAD_INITIAL_INPUT = [99,0,3]; OP_DEBUG_CONTEXT = [99,1,0];
+OP_SCALED_DOT_PROD_ATTN = [40, 9, 2];
+TAG_CAT_TYPE=0; TAG_TYPE_PROCESSOR=(0,1); TAG_TYPE_KNOWLEDGE=(0,2); TAG_CAT_COMPONENT=1; TAG_COMP_WEIGHTS=(1,1); TAG_COMP_BIAS=(1,2); TAG_COMP_EMBEDDING=(1,10); TAG_COMP_ATTN_Q=(1,21); TAG_COMP_ATTN_K=(1,22); TAG_COMP_ATTN_V=(1,23); TAG_COMP_ATTN_O=(1,24); TAG_COMP_FFN_GATE=(1,30); TAG_COMP_FFN_UP=(1,31); TAG_COMP_FFN_DOWN=(1,32); TAG_COMP_LAYERNORM=(1,40); TAG_COMP_LM_HEAD=(1,50); TAG_CAT_PRECISION=2; TAG_PREC_FLOAT16=(2,16); TAG_PREC_INT8=(2,8); TAG_CAT_MODEL_FAMILY=3; TAG_MODEL_QWEN2=(3,1); TAG_MODEL_DEEPSEEK=(3,3); TAG_CAT_LAYER_IDX=4; TAG_CAT_FUNCTION=5; TAG_FUNC_LINEAR=(5,1); TAG_FUNC_ATTENTION=(5,2); TAG_FUNC_FFN=(5,3); TAG_FUNC_EMBED_LOOKUP=(5,4); TAG_CAT_DATA_SEMANTIC=6; TAG_SEMANTIC_HIDDEN_STATE=(6,1); TAG_SEMANTIC_LOGITS=(6,2); TAG_SEMANTIC_TOKEN_IDS=(6,3);
+def tag_layer(idx: int): return (TAG_CAT_LAYER_IDX, idx)
+
+# --- 1. Embedding Processor ---
+print("\nDefining Embedding Processor...")
+try:
+    embed_proc_coord = TensorCoordinate(layer=-1, group=GROUP_IDX_QWEN_PROCESSOR, nest=0, x=0) # X=0
+    embed_param_name = "embedding_matrix"; embed_knowledge_base_tags = [TAG_COMP_EMBEDDING, TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]
+    embed_interface = {"inputs": [{"name":"token_ids","dtype":"int64"}], "outputs": [{"name":"hidden_states","dtype":"float16"}], "knowledge_needed": [ {"param_name": embed_param_name, "tags": embed_knowledge_base_tags}]}
+    embed_ops_sequences = { 'default': [ [OP_EMBEDDING_LOOKUP] ] } # [[OP]]
+    embed_proc = vec.create_tensor(coord=embed_proc_coord, tensor_type="processor", tags=[TAG_TYPE_PROCESSOR, TAG_FUNC_EMBED_LOOKUP, TAG_MODEL_QWEN2], ops_sequences=embed_ops_sequences, interface=embed_interface, metadata={"description": "Qwen2 Embedding Processor"})
+    proc_id = vec.save_tensor(embed_proc)
+    if proc_id: processor_map["embedding"] = proc_id; print(f"Saved Embedding Processor: {proc_id}")
+    else: processor_errors += 1; print(f"ERROR saving Embedding Processor")
+except Exception as e: print(f"ERROR during Embedding Processor def: {e}"); processor_errors += 1
+
+# --- 2. Attention Processor (Layer 0 - Original Mixed Format + Unique Coord) ---
+print("\nDefining Attention Processor (Layer 0)...")
+try:
+    layer_idx = 0
+    attn_proc_coord = TensorCoordinate(layer=layer_idx, group=GROUP_IDX_QWEN_PROCESSOR, nest=0, x=0) # <<< X = 0
+    # ... (определение тегов tag_..._base с TAG_MODEL_QWEN2 как в исходной ячейке) ...
+    tag_norm1_w_base = [TAG_COMP_LAYERNORM, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_q_w_base = [TAG_COMP_ATTN_Q, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_q_b_base = [TAG_COMP_ATTN_Q, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_BIAS]; tag_k_w_base = [TAG_COMP_ATTN_K, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_k_b_base = [TAG_COMP_ATTN_K, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_BIAS]; tag_v_w_base = [TAG_COMP_ATTN_V, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_v_b_base = [TAG_COMP_ATTN_V, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_BIAS]; tag_o_w_base = [TAG_COMP_ATTN_O, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]
+    # ... (проверка и формирование attn_knowledge_needs_final как в исходной ячейке) ...
+    knowledge_defs = [ {"param_name": "norm_weight", "tags": tag_norm1_w_base, "pattern": f"layers.{layer_idx}.input_layernorm.weight"}, {"param_name": "q_weights", "tags": tag_q_w_base, "pattern": f"layers.{layer_idx}.self_attn.q_proj.weight"}, {"param_name": "q_bias", "tags": tag_q_b_base, "pattern": f"layers.{layer_idx}.self_attn.q_proj.bias"}, {"param_name": "k_weights", "tags": tag_k_w_base, "pattern": f"layers.{layer_idx}.self_attn.k_proj.weight"}, {"param_name": "k_bias", "tags": tag_k_b_base, "pattern": f"layers.{layer_idx}.self_attn.k_proj.bias"}, {"param_name": "v_weights", "tags": tag_v_w_base, "pattern": f"layers.{layer_idx}.self_attn.v_proj.weight"}, {"param_name": "v_bias", "tags": tag_v_b_base, "pattern": f"layers.{layer_idx}.self_attn.v_proj.bias"}, {"param_name": "o_weights", "tags": tag_o_w_base, "pattern": f"layers.{layer_idx}.self_attn.o_proj.weight"},]
+    attn_knowledge_needs_final = []; essential_attn_missing = False
+    for kdef in knowledge_defs:
+        if find_knowledge_id(kdef["pattern"]) is not None: attn_knowledge_needs_final.append({"param_name": kdef["param_name"], "tags": kdef["tags"], "optional": False})
+        else:
+            is_essential = "bias" not in kdef["param_name"];
+            if is_essential: print(f"ERROR: Essential Attention knowledge '{kdef['param_name']}' not found matching '{kdef['pattern']}'."); essential_attn_missing = True; processor_errors += 1
+    # ---
+    if not essential_attn_missing:
+        attn_interface = {"inputs": [{"name":"hidden_state_in"}, {"name":"residual_input"}, {"name":"position_ids"}, {"name":"attention_mask", "optional":True}], "outputs": [{"name":"attn_output"}], "knowledge_needed": attn_knowledge_needs_final}
+        # ИСХОДНАЯ Ops sequence с РАЗНЫМИ форматами мета-операций
+        attn_ops_sequences = {'default': [
+                [OP_STORE, 'attn_residual_input'], [OP_LAYER_NORM], [[OP_STORE], 'norm_output'],
+                [[OP_LOAD], 'norm_output'], [OP_LINEAR], [[OP_STORE], 'q_proj'],
+                [[OP_LOAD], 'norm_output'], [OP_LINEAR], [[OP_STORE], 'k_proj'],
+                [[OP_LOAD], 'norm_output'], [OP_LINEAR], [[OP_STORE], 'v_proj'],
+                [OP_APPLY_ROPE], [[OP_STORE], 'q_k_rot'],
+                [[OP_LOAD], 'q_k_rot'], [[OP_STORE], 'rope_out'],
+                [[OP_LOAD], 'v_proj'], [[OP_STORE], 'value_in'],
+                [OP_SCALED_DOT_PROD_ATTN], [[OP_STORE], 'attn_context'],
+                [[OP_LOAD], 'attn_context'], [OP_LINEAR], [[OP_STORE], 'attn_output_proj'],
+                [[OP_LOAD], 'attn_residual_input'], [[OP_STORE], 'input_a'],
+                [[OP_LOAD], 'attn_output_proj'], [[OP_STORE], 'input_b'],
+                [OP_ADD] ]}
+        attn_proc = vec.create_tensor( coord=attn_proc_coord, tensor_type="processor", tags=[TAG_TYPE_PROCESSOR, TAG_FUNC_ATTENTION, tag_layer(layer_idx), TAG_MODEL_QWEN2], ops_sequences=attn_ops_sequences, interface=attn_interface, metadata={"description": f"{HF_MODEL_NAME} Attention Layer {layer_idx} (Original Mixed Ops)"} )
+        proc_id = vec.save_tensor(attn_proc)
+        if proc_id: processor_map[f"attn_{layer_idx}"] = proc_id; print(f"Saved Attention Processor L{layer_idx}: {proc_id}")
+        else: processor_errors += 1; print(f"ERROR saving Attention Processor L{layer_idx}")
+    else: print(f"Skipping Attention Processor L{layer_idx} due to missing essential knowledge.")
+except Exception as e: print(f"ERROR during Attention Processor definition: {e}"); import traceback; traceback.print_exc(); processor_errors += 1
+
+# --- 3. FFN Processor (Layer 0 - Original Mixed Format + Unique Coord) ---
+print("\nDefining FFN Processor (Layer 0)...")
+try:
+    layer_idx = 0
+    ffn_proc_coord = TensorCoordinate(layer=layer_idx, group=GROUP_IDX_QWEN_PROCESSOR, nest=0, x=1) # <<< X = 1
+    # ... (определение тегов tag_..._base с TAG_MODEL_QWEN2 как в исходной ячейке) ...
+    tag_norm2_w_base = [TAG_COMP_LAYERNORM, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_gate_w_base = [TAG_COMP_FFN_GATE, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_up_w_base = [TAG_COMP_FFN_UP, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]; tag_down_w_base = [TAG_COMP_FFN_DOWN, tag_layer(layer_idx), TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]
+    # ... (проверка и формирование ffn_knowledge_needs_final как в исходной ячейке) ...
+    knowledge_defs_ffn = [ {"param_name": "norm_weight", "tags": tag_norm2_w_base, "pattern": f"layers.{layer_idx}.post_attention_layernorm.weight"}, {"param_name": "gate_weights", "tags": tag_gate_w_base, "pattern": f"layers.{layer_idx}.mlp.gate_proj.weight"}, {"param_name": "up_weights", "tags": tag_up_w_base, "pattern": f"layers.{layer_idx}.mlp.up_proj.weight"}, {"param_name": "down_weights", "tags": tag_down_w_base, "pattern": f"layers.{layer_idx}.mlp.down_proj.weight"},]
+    ffn_knowledge_needs_final = []; essential_ffn_missing = False
+    for kdef in knowledge_defs_ffn:
+        if find_knowledge_id(kdef["pattern"]) is not None: ffn_knowledge_needs_final.append({"param_name": kdef["param_name"], "tags": kdef["tags"], "optional": False})
+        else: print(f"ERROR: Essential FFN knowledge '{kdef['param_name']}' not found matching '{kdef['pattern']}'."); essential_ffn_missing = True; processor_errors += 1
+    # ---
+    if not essential_ffn_missing:
+        ffn_interface = {"inputs": [{"name":"attn_output"}, {"name":"residual_input"}], "outputs": [{"name":"ffn_output"}], "knowledge_needed": ffn_knowledge_needs_final}
+        # ИСХОДНАЯ Ops sequence с РАЗНЫМИ форматами мета-операций
+        ffn_ops_sequences = {'default': [
+                  [OP_STORE, 'ffn_residual_input'], [OP_LAYER_NORM], [[OP_STORE], 'norm_out'],
+                  [[OP_LOAD], 'norm_out'], [OP_LINEAR], [[OP_STORE], 'gate_proj'],
+                  [[OP_LOAD], 'norm_out'], [OP_LINEAR], [[OP_STORE], 'up_proj'],
+                  [[OP_LOAD], 'gate_proj'], [OP_SILU], [[OP_STORE], 'silu_gate'],
+                  [[OP_LOAD], 'silu_gate'], [[OP_STORE], 'factor1'],
+                  [[OP_LOAD], 'up_proj'],   [[OP_STORE], 'factor2'],
+                  [OP_MULTIPLY], [[OP_STORE], 'activated'],
+                  [[OP_LOAD], 'activated'], [OP_LINEAR], [[OP_STORE], 'ffn_out'],
+                  [[OP_LOAD], 'ffn_residual_input'], [[OP_STORE], 'input_a'],
+                  [[OP_LOAD], 'ffn_out'], [[OP_STORE], 'input_b'],
+                  [OP_ADD] ]}
+        ffn_proc = vec.create_tensor( coord=ffn_proc_coord, tensor_type="processor", tags=[TAG_TYPE_PROCESSOR, TAG_FUNC_FFN, tag_layer(layer_idx), TAG_MODEL_QWEN2], ops_sequences=ffn_ops_sequences, interface=ffn_interface, metadata={"description": f"{HF_MODEL_NAME} FFN L{layer_idx} (Original Mixed Ops)"}) # Updated description
+        proc_id = vec.save_tensor(ffn_proc)
+        if proc_id: processor_map[f"ffn_{layer_idx}"] = proc_id; print(f"Saved FFN Processor L{layer_idx}: {proc_id}")
+        else: processor_errors += 1; print(f"ERROR saving FFN Processor L{layer_idx}")
+    else: print(f"Skipping FFN Processor L{layer_idx} due to missing essential knowledge.")
+except Exception as e: print(f"ERROR during FFN Processor definition: {e}"); import traceback; traceback.print_exc(); processor_errors += 1
+
+# --- 4. Final Norm Processor (Original format) ---
+print("\nDefining Final Norm Processor...")
+try:
+    final_norm_proc_coord = TensorCoordinate(layer=-1, group=GROUP_IDX_QWEN_PROCESSOR, nest=0, x=1) # X=1
+    # ... (остальной код как в исходной ячейке 6) ...
+    tag_final_norm_w_base = [TAG_COMP_LAYERNORM, TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]
+    final_norm_knowledge_needs = []
+    if find_knowledge_id("model.norm.weight") is not None: final_norm_knowledge_needs.append({"param_name": "norm_weight", "tags": tag_final_norm_w_base, "optional": False})
+    else: print(f"ERROR: Essential knowledge 'norm_weight' not found for Final Norm."); processor_errors += 1
+    if find_knowledge_id("model.norm.weight"):
+        final_norm_interface = {"inputs": [{"name":"final_hidden_state"}], "outputs": [{"name":"final_normed_state"}], "knowledge_needed": final_norm_knowledge_needs}
+        final_norm_ops_sequences = { 'default': [ [OP_FINAL_NORM] ] } # [[OP]]
+        final_norm_proc = vec.create_tensor( coord=final_norm_proc_coord, tensor_type="processor", tags=[TAG_TYPE_PROCESSOR, TAG_COMP_LAYERNORM, TAG_MODEL_QWEN2], ops_sequences=final_norm_ops_sequences, interface=final_norm_interface, metadata={"description": f"{HF_MODEL_NAME} Final LayerNorm Processor (QWEN2 Arch)"})
+        proc_id = vec.save_tensor(final_norm_proc)
+        if proc_id: processor_map["final_norm"] = proc_id; print(f"Saved Final Norm Processor: {proc_id}")
+        else: processor_errors += 1; print(f"ERROR saving Final Norm Processor")
+except Exception as e: print(f"ERROR during Final Norm Processor def: {e}"); processor_errors += 1
+
+# --- 5. LM Head Processor (Original format) ---
+print("\nDefining LM Head Processor...")
+try:
+    lm_head_proc_coord = TensorCoordinate(layer=-1, group=GROUP_IDX_QWEN_PROCESSOR, nest=0, x=2) # X=2
+    # ... (остальной код как в исходной ячейке 6) ...
+    tag_lm_head_w_base = [TAG_COMP_LM_HEAD, TAG_MODEL_QWEN2, TAG_COMP_WEIGHTS]
+    lm_head_knowledge_needs = []
+    if find_knowledge_id("lm_head.weight") is not None: lm_head_knowledge_needs.append({"param_name": "lm_head_weights", "tags": tag_lm_head_w_base, "optional": False})
+    else: print(f"ERROR: Missing critical knowledge ID for LM Head."); processor_errors += 1
+    if find_knowledge_id("lm_head.weight"):
+        lm_head_interface = {"inputs": [{"name":"final_normed_state"}], "outputs": [{"name":"logits"}], "knowledge_needed": lm_head_knowledge_needs}
+        lm_head_ops_sequences = { 'default': [ [OP_LINEAR_HEAD] ] } # [[OP]]
+        lm_head_proc = vec.create_tensor( coord=lm_head_proc_coord, tensor_type="processor", tags=[TAG_TYPE_PROCESSOR, TAG_FUNC_LINEAR, TAG_MODEL_QWEN2], ops_sequences=lm_head_ops_sequences, interface=lm_head_interface, metadata={"description": f"{HF_MODEL_NAME} LM Head Processor (QWEN2 Arch)"})
+        proc_id = vec.save_tensor(lm_head_proc)
+        if proc_id: processor_map["lm_head"] = proc_id; print(f"Saved LM Head Processor: {proc_id}")
+        else: processor_errors += 1; print(f"ERROR saving LM Head Processor")
+except Exception as e: print(f"ERROR during LM Head Processor def: {e}"); processor_errors += 1
+
+
+print(f"\n--- Processor Definition Phase Completed ({processor_errors} errors) ---")
+# ... (Сохранение карты и индекса как было) ...
+proc_map_file = DB_PATH / f"{HF_MODEL_NAME}_proc_map.pkl"
+try:
+    if processor_errors == 0:
+        with open(proc_map_file, 'wb') as f: pickle.dump(processor_map, f)
+        print(f"\nProcessor map saved to {proc_map_file}")
+    else: print(f"\nProcessor map NOT saved due to {processor_errors} errors.")
+except Exception as e: print(f"Error saving processor map: {e}")
+if 'vec' in locals() and vec and hasattr(vec, 'db') and vec.db:
+    print("\nExplicitly saving index and closing DB at end of Cell 6...")
+    vec.db._save_index(); vec.db.close()
+    print("Index saved and DB connection closed for Cell 6.")
+else: print("Warning: Could not explicitly save/close DB index at end of Cell 6 ('vec' object missing?).")
+     
+--- Running Converter Cell 6 vOriginal Mixed Format + Unique Coords + Logging ---
+--- Defining Processor Tensors (Original Mixed Format + QWEN2 Tag) ---
+'vec' object found and DB seems open. Reusing.
+Loaded parameter map (339 entries) from data/db/DeepSeek-R1-Distill-Qwen-1.5B_param_map.pkl
+
+Defining Embedding Processor...
+Saved Embedding Processor: fb769b8034ba0aae87a82183e23c06bab7160aaea5b151b94080a49f5fa7abc9
+
+Defining Attention Processor (Layer 0)...
+Saved Attention Processor L0: 637fa4ff0945661a2373135c652dc8406ecef73c01fbf3884fb0d10196529c32
+
+Defining FFN Processor (Layer 0)...
+Saved FFN Processor L0: 550644eeb529f7b42d61eb4f3776d6403548a1c5935db231a8637b9e391bf982
+
+Defining Final Norm Processor...
+Saved Final Norm Processor: 6577c7a755eccbecc951e4e2d491bb1a44683b70d45c8f6fc02828f37084e3b7
+
+Defining LM Head Processor...
+Saved LM Head Processor: ab2f6f273bbbdb6ad3e897cd85f5107bf787cc85fe28b1ddcca5706b21a8535a
+
+--- Processor Definition Phase Completed (0 errors) ---
+
+Processor map saved to data/db/DeepSeek-R1-Distill-Qwen-1.5B_proc_map.pkl
+
+Explicitly saving index and closing DB at end of Cell 6...
+DEBUG INDEX SAVE (v0.8.2): Attempting save index (Size: 316) to /content/data/db/tensor_index.pkl...
+DEBUG INDEX SAVE (v0.8.2): Index saved to /content/data/db/tensor_index.pkl.
+Closing VeectorDB v0.8.2 connection...
+Index saved and DB connection closed for Cell 6.
+
+# === Cell 7: Analyze Veector DB Structure (Corrected for Pickle Index) ===
+
+import os
+import shelve # Убираем shelve, используем pickle
+import pickle
+from pathlib import Path
+import numpy as np
+# Импортируем ТОЛЬКО то, что нужно для анализа
+try:
+    # Нужны только константы и геттеры метаданных
+    from tensors import TensorCoordinate, get_tensor_coord, get_tensor_metadata, get_tensor_type, has_blob_data
+    # Имя индексного файла из VeectorDB
+    # Вместо импорта VeectorDB, просто используем имя файла напрямую
+    INDEX_FILENAME = "tensor_index.pkl"
+    ANALYSIS_IMPORTS_OK = True
+except ImportError as e:
+    print(f"WARN: Cannot import from tensors.py for full analysis: {e}")
+    ANALYSIS_IMPORTS_OK = False
+    INDEX_FILENAME = "tensor_index.pkl" # Fallback name
+except Exception as e:
+    print(f"WARN: Error during imports for analysis: {e}")
+    ANALYSIS_IMPORTS_OK = False
+    INDEX_FILENAME = "tensor_index.pkl"
+
+print("\n--- Analyzing Veector DB (Pickle Index Structure) ---")
+
+# --- Configuration (Должен совпадать с Ячейкой 3) ---
+DB_PATH = Path("./data/db/") # Используем корневой путь БД
+if not DB_PATH.is_dir():
+    print(f"ERROR: Database directory not found at {DB_PATH}")
+else:
+    print(f"Analyzing DB at: {DB_PATH.resolve()}")
+
+    total_meta_files = 0
+    total_meta_size = 0
+    total_blob_files = 0
+    total_blob_size = 0
+    processor_count = 0
+    knowledge_count = 0
+    state_count = 0
+    converter_count = 0
+    other_count = 0
+
+    # --- 1. Analyze Index (Pickle File) ---
+    index_path = DB_PATH / INDEX_FILENAME
+    index_entry_count = 0
+    index_total_size = 0
+    index_data = {}
+
+    if not index_path.is_file():
+        print(f"\nIndex file '{index_path.name}' not found.")
+    else:
+        try:
+            index_total_size = index_path.stat().st_size
+            print(f"\nFound index file: {index_path.name}")
+            # Загружаем весь индекс pickle
+            with open(index_path, 'rb') as f:
+                index_data = pickle.load(f)
+            if isinstance(index_data, dict):
+                 index_entry_count = len(index_data)
+                 print(f"Index contains {index_entry_count} entries.")
+                 # Optionally print a few entries
+                 count = 0
+                 print("  Sample Index Entries:")
+                 for key, value in index_data.items():
+                     # Печатаем только первые 5 для примера
+                     print(f"    ID: {key} -> Value: {value}")
+                     count += 1
+                     if count >= 5: break
+            else:
+                 print("  Error: Index file content is not a dictionary.")
+        except Exception as e:
+            print(f"  Error opening or reading index file '{index_path}': {e}")
+
+        print(f"Total Index File Size: {index_total_size / 1024:.2f} KB")
+
+
+    # --- 2. Analyze Meta and Blob Files (Co-located) ---
+    # Ищем `.meta` файлы напрямую в DB_PATH и подпапках gX/lY/nZ
+    print(f"\nScanning for meta/blob files under: {DB_PATH}...")
+    all_meta_files = list(DB_PATH.rglob('*.meta'))
+    total_meta_files = len(all_meta_files)
+
+    if total_meta_files == 0:
+        print("No .meta files found.")
+    else:
+        for meta_file in all_meta_files:
+            try:
+                total_meta_size += meta_file.stat().st_size
+                # Загружаем структуру для анализа
+                structure = None
+                try:
+                     with open(meta_file, 'rb') as f: structure = pickle.load(f)
+                except Exception: pass
+
+                if structure and isinstance(structure, list) and len(structure) >= 5 and ANALYSIS_IMPORTS_OK:
+                    meta_dict = get_tensor_metadata(structure) # Используем геттер
+                    t_type = get_tensor_type(structure)
+                    if t_type == "processor": processor_count += 1
+                    elif t_type == "knowledge": knowledge_count += 1
+                    elif t_type == "state": state_count += 1
+                    elif t_type == "converter": converter_count += 1
+                    else: other_count +=1
+
+                    # Check for blob
+                    if has_blob_data(structure): # Используем геттер
+                        blob_file = meta_file.with_suffix('.blob')
+                        if blob_file.is_file():
+                            total_blob_files += 1
+                            try: total_blob_size += blob_file.stat().st_size
+                            except Exception: pass
+                elif structure:
+                     other_count += 1 # Count as other if structure is weird or imports failed
+
+            except Exception as e:
+                print(f"  Error processing file {meta_file}: {e}")
+
+        print(f"\n--- Summary ---")
+        print(f"Total Tensor Metadata Files (.meta): {total_meta_files}")
+        print(f"Total Metadata Size: {total_meta_size / 1024:.2f} KB")
+        print(f"Total Blob Files (.blob): {total_blob_files}")
+        print(f"Total Blob Size: {total_blob_size / (1024*1024):.2f} MB")
+        if total_blob_files > 0:
+             print(f"Average Blob Size: {(total_blob_size / total_blob_files) / 1024:.2f} KB")
+        print(f"Tensor Counts (by type in meta):")
+        print(f"  Knowledge: {knowledge_count}")
+        print(f"  Processor: {processor_count}")
+        print(f"  State: {state_count}")
+        print(f"  Converter: {converter_count}")
+        print(f"  Other/Unknown: {other_count}")
+        print(f"Total Index Entries (from pickle): {index_entry_count}")
+        # Сравниваем количество мета-файлов и записей в индексе
+        if total_meta_files != index_entry_count:
+             print(f"  WARNING: Mismatch between meta files found ({total_meta_files}) and index entries ({index_entry_count})!")
+        else:
+             print(f"  Meta file count matches index entry count.")
+
+     
+--- Analyzing Veector DB (Pickle Index Structure) ---
+Analyzing DB at: /content/data/db
+
+Found index file: tensor_index.pkl
+Index contains 316 entries.
+  Sample Index Entries:
+    ID: fb4ef375e208da470d6841a89c441ca29e016873a80c8519660c22cfa227be8d -> Value: {'path': 'g100/l-1/n1/fb4ef375e208da470d6841a89c441ca29e016873a80c8519660c22cfa227be8d.meta', 'type': 'knowledge', 'stat': 'active', 'g': 100, 'l': -1, 'n': 1}
+    ID: c553c0b4339a04b5502cdfe4e350523abc6e1b4e5baa9cde57207020587f1c85 -> Value: {'path': 'g100/l0/n1/c553c0b4339a04b5502cdfe4e350523abc6e1b4e5baa9cde57207020587f1c85.meta', 'type': 'knowledge', 'stat': 'active', 'g': 100, 'l': 0, 'n': 1}
+    ID: 7e35759fe8c401a67215f0914efcf0130a3523aec2106b85ccc604a9204ba17d -> Value: {'path': 'g100/l0/n1/7e35759fe8c401a67215f0914efcf0130a3523aec2106b85ccc604a9204ba17d.meta', 'type': 'knowledge', 'stat': 'active', 'g': 100, 'l': 0, 'n': 1}
+    ID: cd230a37dfd83f0c96cea293f6cd319a8cfe3c96cea595a6d319cd6764f5c106 -> Value: {'path': 'g100/l0/n1/cd230a37dfd83f0c96cea293f6cd319a8cfe3c96cea595a6d319cd6764f5c106.meta', 'type': 'knowledge', 'stat': 'active', 'g': 100, 'l': 0, 'n': 1}
+    ID: 9e6aece757fdccb6cbea58369bc69c136ff4b48c60a0a60f02749d288c206586 -> Value: {'path': 'g100/l0/n1/9e6aece757fdccb6cbea58369bc69c136ff4b48c60a0a60f02749d288c206586.meta', 'type': 'knowledge', 'stat': 'active', 'g': 100, 'l': 0, 'n': 1}
+Total Index File Size: 59.81 KB
+
+Scanning for meta/blob files under: data/db...
+
+--- Summary ---
+Total Tensor Metadata Files (.meta): 316
+Total Metadata Size: 187.82 KB
+Total Blob Files (.blob): 309
+Total Blob Size: 1929.53 MB
+Average Blob Size: 6394.29 KB
+Tensor Counts (by type in meta):
+  Knowledge: 311
+  Processor: 5
+  State: 0
+  Converter: 0
+  Other/Unknown: 0
+Total Index Entries (from pickle): 316
+  Meta file count matches index entry count.
