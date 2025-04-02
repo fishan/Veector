@@ -1,4 +1,10 @@
 numpy
+psutil
+torch
+bitsandbytes
+accelerate
+requests
+huggingface_hub
 qiskit
 qiskit_aer
 ipfshttpclient

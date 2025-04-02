@@ -27,5 +27,9 @@ python main.py
 
 //git force update
 git add .
-git commit -m "Updated core, operations, tensors, model_manager and added Colab blocks"
-git push origin main --force
+git commit -m "Updated core, operations, tensors"
+git push origin base --force
+
+gdown "https://drive.google.com/uc?id=1-44oz7VeKEPCCyesgqXq0A-Zs9ZzkddD" -O deepseek.zip
+
+https://drive.google.com/file/d/1-44oz7VeKEPCCyesgqXq0A-Zs9ZzkddD/view?usp=sharing

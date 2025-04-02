@@ -1,0 +1,1031 @@
+--- Starting Inference ---
+DB: /workspaces/Veector/data/db
+Input: 'The best way to predict the future is to'
+Nest: 1
+Core: 0.6.12
+Tensors: 0.7.6
+DB: 0.9.7
+
+--- Running Inference Script v0.2.14 ---
+Original Input Text: 'The best way to predict the future is to'
+Formatted Input Text: '<｜User｜>The best way to predict the future is to<｜Assistant｜>'
+DB Path: /workspaces/Veector/data/db
+HF Model Name: DeepSeek-R1-Distill-Qwen-1.5B
+Target Nest Level: 1
+Number of Layers: 28
+Sampling Params (info only): Temp=0.6, TopK=20, TopP=0.9, MinP=0.1
+Loading tokenizer 'DeepSeek-R1-Distill-Qwen-1.5B'...
+Tokenizer loaded from deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B.
+Loaded processor map (59 entries) from /workspaces/Veector/data/db/DeepSeek-R1-Distill-Qwen-1.5B_proc_map.pkl
+--- Initializing Veector Core v0.6.12 ---
+    Requires: tensors v0.7.6+, veectordb v0.9.7+, operations v0.7.3+
+    IPFS: False, Address: /ip4/127.0.0.1/tcp/5001
+--- Initializing VeectorDB v0.9.7 (requires tensors v0.7.6+) ---
+VeectorDB v0.9.7 initialized at /workspaces/Veector/data/db. Index entries: 398.
+VeectorDB initialized.
+Cache initialized: Size=1000, Strategy=LRU
+Initialized 69 core operations.
+Mem(Veector Initialized): RAM 514.3MB
+Veector core v0.6.12 initialized using DB at: /workspaces/Veector/data/db
+All required processor IDs found in map.
+
+--- Prepared Input ---
+Input IDs shape: (1, 12)
+Position IDs shape: (1, 12)
+Attention Mask shape: (1, 12)
+Input IDs: [151646, 151644, 785, 1850, 1616, 311, 7023, 279, 3853, 374, 311, 151645]
+Decoded Tokens: ['<｜begin▁of▁sentence｜>', '<｜User｜>', 'The', 'Ġbest', 'Ġway', 'Ġto', 'Ġpredict', 'Ġthe', 'Ġfuture', 'Ġis', 'Ġto', '<｜Assistant｜>']
+
+--- Starting Inference (using knowledge group 100) ---
+Running Embedding Processor (fb769b8034ba0aae87a82183e23c06bab7160aaea5b151b94080a49f5fa7abc9)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+INFO: Executing embedding_lookup (IDs shape: (1, 12), Matrix shape: (151936, 1536))
+  Embed Output Shape: (1, 12, 1536), Dtype: float32
+
+--- Running Transformer Layers ---
+
+--- Processing Layer 0/27 ---
+  Running Attn Layer 0 (637fa4ff0945661a2373135c652dc8406ecef73c01fbf3884fb0d10196529c32)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L0 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 0 (550644eeb529f7b42d61eb4f3776d6403548a1c5935db231a8637b9e391bf982)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L0 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 0 in 1.018 seconds ---
+
+--- Processing Layer 1/27 ---
+  Running Attn Layer 1 (0861d409409e03f0d6368f3850356593610a0a210380e05bc824a26886f9cd3d)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L1 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 1 (d9e18793c9c1c87a6645af46e385cf03e4a7edb6c51fe5d85140355434a02ff1)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L1 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 1 in 1.043 seconds ---
+
+--- Processing Layer 2/27 ---
+  Running Attn Layer 2 (3cd51f182f4a9a1b96cbedb99b704f540ed0b3037562a67cdc1ad516e5361394)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L2 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 2 (4864857723698fa8181e9eddff8f4a87068469b2a537ad1fff9b87698b0a5f61)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L2 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 2 in 1.192 seconds ---
+
+--- Processing Layer 3/27 ---
+  Running Attn Layer 3 (2d649133d071e9b74a348c0a404d17ba563d915248797c7b83b63297ef3b8565)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L3 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 3 (9d55d5ff00cda6ee096e60ebf3468983698c8a36b1e95addcba2745ce3f0a899)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L3 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 3 in 1.185 seconds ---
+
+--- Processing Layer 4/27 ---
+  Running Attn Layer 4 (de2539c4583cfbe14a397b58f09ec6e690ef4c040ffe8a45ce70a250a4ba738f)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L4 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 4 (8c743aeea195bd3b4c9cf1d0699cdd0ec7f636a3852c4a610d96f2c3f3295fa2)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L4 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 4 in 1.230 seconds ---
+
+--- Processing Layer 5/27 ---
+  Running Attn Layer 5 (7f0c3eea60bc11cb5c2a72d129a032a84b2c693c757683c5e1e18aeee4bcc720)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L5 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 5 (03f29ab21bc568b16352618a45a6a36d049209ad3f42075c8f6b5c45e2020273)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L5 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 5 in 1.265 seconds ---
+
+--- Processing Layer 6/27 ---
+  Running Attn Layer 6 (faadc6861ec7ecbcc78444da7028ed6defdc073365c5379ed8e14114016d6a18)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L6 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 6 (89f25095721848a72defb224c12261f1d52125dfba80947e593a9fd5b132d232)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L6 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 6 in 1.149 seconds ---
+
+--- Processing Layer 7/27 ---
+  Running Attn Layer 7 (97bb0486dd31c380e99c1536db7691a05ba55a758fc8387eea0c03c281af4b35)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L7 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 7 (901262d53a2fd6726e3b481497fbb9f623aa449b174d07b7860857dd24a46bd4)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L7 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 7 in 1.197 seconds ---
+
+--- Processing Layer 8/27 ---
+  Running Attn Layer 8 (40df7dccdc06a7a480232ce7290eed65bfc24277931dc1b0f32e7a19cdc8703d)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L8 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 8 (d2a4ba55b42ff87eab85f2248cfa6c3ad481767e3e10997d2426f960b5990e60)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L8 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 8 in 1.233 seconds ---
+
+--- Processing Layer 9/27 ---
+  Running Attn Layer 9 (64deb9968d0a9575aefd6137f7a032a57cfe43da4435f56fd5f34c2e29050f29)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L9 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 9 (ab3b8ee16707460c8084c1bcd225e908604fd6f7c1720ed53a39ac4b88671c03)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L9 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 9 in 1.272 seconds ---
+
+--- Processing Layer 10/27 ---
+  Running Attn Layer 10 (56b250e7146f8530a777d8175b7dc9d1c2231d7ff2885791abef665fbb59dee5)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L10 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 10 (c92c838d4ee07558d5684d74c6539287847ac085fbbc8175111184d5cc7558d1)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L10 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 10 in 1.301 seconds ---
+
+--- Processing Layer 11/27 ---
+  Running Attn Layer 11 (9778ccef5502ed004e5d8a1f3ba9ef600c4be2967f14a51fea09484b25ae3b99)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L11 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 11 (9c635b13896dc129de7bc223c75dc57ecce7f3c329514834f7de9f282857d97e)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L11 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 11 in 1.186 seconds ---
+
+--- Processing Layer 12/27 ---
+  Running Attn Layer 12 (574e7e6464873af27e0e8190e0967cdabf82ef1b7021670096aaed57e3111748)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L12 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 12 (fad55724dcec62a204cf5a80830b31b0df82399a56ad75dfd7c155d56f7bcc88)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L12 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 12 in 1.164 seconds ---
+
+--- Processing Layer 13/27 ---
+  Running Attn Layer 13 (c8b90262b8b7ce06662944acb023f4186563d131d0c1a1fd7aabd1bcfbceb53f)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L13 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 13 (c6a4941e5913f468ff6d54643e2d42a2d75d20de0c0c6f245ee3da40905bd6d2)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L13 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 13 in 1.204 seconds ---
+
+--- Processing Layer 14/27 ---
+  Running Attn Layer 14 (143a1e0c65b53483d3725d6e38bc51ed2f19cef26c36b9d1821813bbe2811a0a)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L14 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 14 (0151e0b5cbdbecef71f47dd9678c62a7b19efbd970e80a41c80ff33c2f788558)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L14 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 14 in 1.230 seconds ---
+
+--- Processing Layer 15/27 ---
+  Running Attn Layer 15 (64556ca3d7f5425f468f55ed89450d816af1a9c6f8456877c22084224c0a20b8)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L15 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 15 (82ad5e380e335a78d27ff166986ccc394db24b0bd6190b4eb7aaa14adffc5493)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L15 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 15 in 1.244 seconds ---
+
+--- Processing Layer 16/27 ---
+  Running Attn Layer 16 (cfacecbaf6e51c03917b4a5621b71364e86acde011edca3e97bf01c74e703e32)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L16 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 16 (0202a95974699c954ddf897600347d9b8131e53a91c834748f7126346a8bbb4b)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L16 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 16 in 1.201 seconds ---
+
+--- Processing Layer 17/27 ---
+  Running Attn Layer 17 (44d38022daed9d3ecba98533107542d5d18a406933df864db02263fb5995ed47)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L17 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 17 (37c84881f491ecc697b95d5103a19a3b4637440839ff28f4da1edadd0c430653)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L17 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 17 in 1.139 seconds ---
+
+--- Processing Layer 18/27 ---
+  Running Attn Layer 18 (c674aedd40814de7f85c3186cbd8b8d833275cbef503eae3cbea4042b29d655f)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L18 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 18 (3a9b0992b02e95156c3f3c2db1ade6a4fb5d9cbb9a692a6d96a9f86cf2ccdf25)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L18 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 18 in 1.208 seconds ---
+
+--- Processing Layer 19/27 ---
+  Running Attn Layer 19 (aab937927654fef350ed0dd09a1e03b0202034a2c7537bfc229c8bb274e0df3e)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L19 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 19 (809df867886fd187f9671b8d3fe61c48445041135c2a81f77592229f80d9fa1b)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L19 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 19 in 1.189 seconds ---
+
+--- Processing Layer 20/27 ---
+  Running Attn Layer 20 (59f7742189f586a07e6e250c88671da7f96f37322906b405e64efc7f570f31d8)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L20 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 20 (e822c377439827581999ba6cb48c784ff847c40bf6947c191a444f6c6c1882d4)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L20 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 20 in 1.213 seconds ---
+
+--- Processing Layer 21/27 ---
+  Running Attn Layer 21 (98b21f6ef24dfcacbd640df8b28dc33e33b38718cb7156b29dc77db8e5e0a7d0)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L21 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 21 (dace53a6fb3a620019070051264d3ba3350dad8c5587da43e3481251accb859a)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L21 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 21 in 1.197 seconds ---
+
+--- Processing Layer 22/27 ---
+  Running Attn Layer 22 (ed8f41d0dad9b888a1f35cb9d6040cf64a6f43699091c3a8e5cb0c30b261b2ff)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L22 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 22 (2f530b26be9960932f898d2543f32b1793a27d38a4a53359061eca7d3e47a0be)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L22 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 22 in 1.219 seconds ---
+
+--- Processing Layer 23/27 ---
+  Running Attn Layer 23 (201d932aaa4968e0d4aba4f788ca2e6322167909d33ff4e23c8bbae8753d01ec)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L23 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 23 (c4dfc81d4061355eba63b9fd4bb0713db85d90386fd5f50b71c4c97e098b6bd1)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L23 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 23 in 1.152 seconds ---
+
+--- Processing Layer 24/27 ---
+  Running Attn Layer 24 (38aa7a3311c4b57c2608c57c585f11a9ac8c327bf683edbaa8f86becb7b883e1)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L24 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 24 (115810c96bb42652e7a4348498c47935b387fd9328a7d0fbd6eab5bfe5b90f43)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 8960)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(8960, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+  FFN L24 Output Shape: (1, 12, 1536), Dtype: float32
+--- Finished Layer 24 in 1.218 seconds ---
+
+--- Processing Layer 25/27 ---
+  Running Attn Layer 25 (76713249cf969988fc3806db75060458e4faa18287ce202eeb3e9e2464720e6f)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(1536,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 256)
+DEBUG MM_WRAP: 'bias' type=<class 'numpy.ndarray'>, shape=(256,)
+WARN: Placeholder op: apply_rope (Returning Q, K unchanged)
+INFO: Executing scaled_dot_product_attention
+DEBUG MM_WRAP: Input 'd' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 1536)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+MM_WRAP ERROR: Input 'd' is None.
+  Attn L25 Output Shape: (1, 12, 1536), Dtype: float32
+
+  Running FFN Layer 25 (730cd4c86f2c584b5027407fa94a0f59100754b6e8277fc950ac0a13b4e40145)...
+  Using target_knowledge_group from context: 100
+  Targeting Knowledge Group: 100, Nest: 1 (Processor Model Tag: 12)
+  Found 339 candidates via index filter G=100, N=1.
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+DEBUG MM_WRAP: Input 'd' type=<class 'numpy.ndarray'>, shape=(1, 12, 1536)
+DEBUG MM_WRAP: 'weights' type=<class 'numpy.ndarray'>, shape=(1536, 8960)
+DEBUG MM_WRAP: 'bias' type=<class 'NoneType'>, shape=None
+Terminated

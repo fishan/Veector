@@ -5,6 +5,10 @@ import numpy as np
 import time
 from collections import OrderedDict  # Для реализации LRU вручную
 
+# --- Version ---
+MEMORY_VERSION = "0.1.0"
+# --- End Version ---
+
 class Memory:
     def __init__(self, capacity=1000, use_lru_cache=True, use_hashing=True):
         self.use_lru_cache = use_lru_cache

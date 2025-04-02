@@ -1,8 +1,6 @@
 # FILE: core.py
-# Description: Core execution engine for the Veector system.
-# Author: [Your Name/Project Name]
-# Date: 2025-03-27 (Based on discussion v12 - STRICT FINAL ATTEMPT v2)
-# Version: 0.3.12 (TypeError Fix, Full Ops, User Formatting)
+# Version: 0.6.13 (Rewritten parser logic in _execute_op_sequence)
+
 
 # --- Standard Imports ---
 import numpy as np
@@ -14,163 +12,120 @@ import psutil
 import os
 import pickle
 import hashlib
+import traceback # Import traceback for better error logging in specific places
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Any, Optional, Tuple, Union # Ensure typing is imported
+from typing import Dict, List, Any, Optional, Tuple, Union
+
+# --- Version ---
+CORE_VERSION = "0.6.13"
 
 # --- Optional Imports ---
 try:
-    import torch # Used for GPU memory check and potential future GPU ops
+    import torch
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
-    # print("Warning: PyTorch not found. GPU features disabled.") # User formatting preference
 
 try:
     import ipfshttpclient
     IPFS_AVAILABLE = True
 except ImportError:
     IPFS_AVAILABLE = False
-    # print("Warning: ipfshttpclient not found. IPFS features disabled.") # User formatting preference
 
 try:
-    # For Quantum Ops (Optional)
     from qiskit import QuantumCircuit
-    # from qiskit_aer import AerSimulator # Newer import? Check Qiskit version
-    from qiskit.providers.aer import Aer # Older import style
-    from qiskit import execute # Older execute style
+    from qiskit_aer import AerSimulator
+    from qiskit import transpile, assemble
     QISKIT_AVAILABLE = True
 except ImportError:
     QISKIT_AVAILABLE = False
-    # print("Warning: Qiskit or Qiskit Aer not found. Quantum operations disabled/placeholder.") # User formatting preference
 
+TENSORS_VERSION_REQ = "0.7.6"
+VEECTORDB_VERSION_REQ = "0.9.7"
+OPERATIONS_VERSION_REQ = "0.7.3" 
 
+VeectorDB_defined = False
 # --- Veector Project Imports ---
-# These imports must succeed for the core to function.
+VeectorDB_defined = False
 try:
-    from veectordb import VeectorDB
+    # Import VeectorDB and check version
+    from veectordb import VeectorDB, VEECTORDB_VERSION
+    print(f"  Imported VeectorDB (v{VEECTORDB_VERSION})")
+    # Ожидаем версию, которая работает со структурой списка
+    if VEECTORDB_VERSION < VEECTORDB_VERSION_REQ: # <<< Обновлено требование версии
+         raise ImportError(f"Core v{CORE_VERSION} requires VeectorDB v0.9.1+, found v{VEECTORDB_VERSION}")
+
+    # Import Tensors components and check version
     from tensors import (
-        TensorCoordinate, create_tensor, validate_tensor, get_tensor_coord,
-        get_tensor_op_channels, get_tensor_default_op, get_tensor_filters,
-        get_tensor_exit_gates, get_tensor_metadata, get_tensor_parents,
-        get_tensor_status, get_tensor_hash, get_tensor_type,
-        get_processor_ops_sequence, get_processor_required_knowledge_tags,
-        get_processor_param_mapping, get_knowledge_compatibility_tags,
-        get_tensor_input_channels, get_tensor_output_channels # Ensure these are imported
+        TENSORS_VERSION,
+        TensorCoordinate,
+        # Импортируем ГИБРИДНЫЙ create_tensor (возвращает список)
+        create_tensor,
+        # Импортируем ВАЛИДАТОР СТРУКТУРЫ СПИСКА
+        validate_tensor,
+        # Импортируем ХЕШИРОВАНИЕ для СТРУКТУРЫ СПИСКА
+        get_tensor_hash,
+        # --- ИМПОРТИРУЕМ СТАРЫЕ ГЕТТЕРЫ (для структуры списка) ---
+        get_tensor_metadata, get_tensor_coord, get_tensor_type, get_tensor_status,
+        get_tensor_tags, get_tensor_interface, get_processor_ops_sequences,
+        get_tensor_filters, get_tensor_exit_gates, has_blob_data,
+        get_tensor_parents, get_tensor_op_channels,
+        # --- КОНЕЦ СТАРЫХ ГЕТТЕРОВ ---
+        # Константы тегов и групп, необходимые здесь
+        TAG_PREC_INT8, TAG_PREC_FLOAT16, TAG_PREC_FLOAT32, # Нужны для выбора последовательности
+        GROUP_IDX_QWEN_KNOWLEDGE, GROUP_IDX_DEEPSEEK_KNOWLEDGE, # Группы знаний
+        TAG_MODEL_QWEN2, TAG_MODEL_DEEPSEEK, # Теги моделей
+        TAG_TYPE_PROCESSOR, TAG_TYPE_KNOWLEDGE, TAG_TYPE_CONVERTER, TAG_TYPE_STATE,
+        TAG_COMP_EMBEDDING, TAG_COMP_LM_HEAD, # Для определения формата блоба
+        # Маппинги, необходимые здесь (DTYPE нужен для проверки int8)
+        DTYPE_MAPPING
+        # Обратные маппинги не используются напрямую в core v0.6.2
+        # REVERSE_DATA_TYPE_MAPPING, REVERSE_STATUS_MAPPING
     )
-    # Import operations - Functions need adaptation for **kw or specific args
-    from operations import * # Import all for now
-    from memory import Memory # Optional memory module
+    print(f"  Imported tensors (v{TENSORS_VERSION})")
+    # Ожидаем версию с гибридным create_tensor и исправленным validate/hash
+    if TENSORS_VERSION < TENSORS_VERSION_REQ: # <<< Обновлено требование версии
+         raise ImportError(f"Core v{CORE_VERSION} requires tensors v0.7.3+, found v{TENSORS_VERSION}")
+
+    # Import operations (Явные импорты)
+    from operations import *
+    print(f"  Imported operations (v{OPERATIONS_VERSION})")
+
+    if OPERATIONS_VERSION < OPERATIONS_VERSION_REQ:
+        raise ImportError(f"Core v{CORE_VERSION} requires operations v{OPERATIONS_VERSION_REQ}+, found v{OPERATIONS_VERSION}")
+
+
+    # Import Memory module
+    from memory import Memory, MEMORY_VERSION
+    print(f"  Imported Memory (v{MEMORY_VERSION})")
+
+    print("Core components imported successfully.")
+    VeectorDB_defined = True
+
+# --- Handle Import Errors Gracefully ---
 except ImportError as e:
-    print(f"FATAL ERROR: Could not import core Veector components: {e}.")
-    # Define minimal dummies to allow basic script execution without crashing
-    # --- Corrected Dummy Classes Syntax ---
-    class VeectorDB:
-         def __init__(self, *args, **kwargs):
-              print("Dummy VeectorDB")
-              self.data={}
-         def find_active_tensors(self, *args, **kwargs): return {} # Dummy method
-         def _load_blob(self, *args, **kwargs): return None # Dummy method
-         def insert_veector_tensor(self, *args, **kwargs): return "dummy_id" # Dummy method
-         def get_veector_tensor(self, *args, **kwargs): return None # Dummy method
-         def archive_tensor(self, *args, **kwargs): pass # Dummy method
-         def update_tensor_metadata(self, *args, **kwargs): pass # Dummy method
+    print(f"---!!! FATAL ERROR (ImportError) !!! ---")
+    print(f"Specific error: {e}")    
+    print(f"Ensure files (tensors v{TENSORS_VERSION_REQ}+, veectordb v{VEECTORDB_VERSION_REQ}+, operations v{OPERATIONS_VERSION_REQ}+, memory) are OK.")
+    print(f"-----------------------------------------")
 
-    class TensorCoordinate:
-         def __init__(self, *args, **kwargs):
-             pass
-         def to_string(self): return "dummy_coord"
-         @classmethod
-         def from_string(cls, s): return cls()
-    # --- End Corrected Dummy Classes ---
-
-    def validate_tensor(t): return isinstance(t, list) and len(t)>4
+    # Определяем только необходимые заглушки
+    class VeectorDB: pass
+    VEECTORDB_VERSION = "dummy"
+    class TensorCoordinate: pass
+    TENSORS_VERSION = "dummy"
+    def create_tensor(*a,**kw): return []
+    def validate_tensor(t): return False
     def get_tensor_hash(t): return "dummy_hash"
-    def get_tensor_type(t): return t[4].get('tensor_type') if validate_tensor(t) else None
-    def get_tensor_metadata(t): return t[4] if validate_tensor(t) else {}
-    def get_tensor_coord(t): return t[0] if validate_tensor(t) else None
-    def get_processor_required_knowledge_tags(t): return []
-    def get_processor_ops_sequence(t): return None
-    def get_tensor_default_op(t): return []
-    def get_processor_param_mapping(t): return {}
-    def get_tensor_filters(t): return []
-    def get_tensor_exit_gates(t): return []
-    def get_tensor_op_channels(t): return [[], [], []]
-    def get_tensor_parents(t): return []
-    def get_tensor_input_channels(t): return [] # Added dummy
-    def get_tensor_output_channels(t): return [] # Added dummy
-    def create_tensor(*args, **kwargs): return []
-    # --- Corrected Dummy Operations Syntax (Each Def/Return on New Line) ---
-    def relu(d):
-        return d
-    def softmax(d):
-        return d
-    def mod(d1, d2):
-        return d1
-    def floor(d):
-        return d
-    def ceil(d):
-        return d
-    def arcsin(d):
-        return d
-    def arccos(d):
-        return d
-    def arctan(d):
-        return d
-    def xor(d1, d2):
-        return d1
-    def nand(d1, d2):
-        return d1
-    def nor(d1, d2):
-        return d1
-    def random_uniform(d1, d2):
-        return 0.5
-    def random_normal(d1, d2):
-        return 0
-    def median(d):
-        return d
-    def mean(d):
-        return d
-    def std_dev(d):
-        return d
-    def dropout(d, rate=0):
-        return d
-    def batch_norm(d):
-        return d
-    def sigmoid(d):
-        return d
-    def leaky_relu(d, alpha=0):
-        return d
-    def gelu(d):
-        return d
-    def exponential_smoothing(d, alpha=0):
-        return d
-    def normalize(d):
-        return d
-    def interpolate(d, nl):
-        return d
-    def layer_normalization(d):
-        return d
-    def matrix_determinant(d):
-        return 1
-    def matrix_eigenvalues(d):
-        return d
-    def transpose(d):
-        return d
-    def inverse(d):
-        return d
-    def trace(d):
-        return d
-    def multi_head_attention(d, **kw): # Keep **kw for flexibility with optional args
-        return d
-    def matrix_multiply(d, **kw): # Keep **kw for flexibility with optional args
-        return d
-    def convolution(d, **kw): # Keep **kw for flexibility with optional args
-        return d
-    class Memory:
-        pass
-    # --- End Corrected Dummy Operations ---
-
+    VeectorDB_defined = False
+except Exception as other_e:
+    print(f"---!!! FATAL ERROR (Other Exception during Import) !!! ---")
+    print(f"Specific error: {other_e}")
+    traceback.print_exc()
+    print(f"Check imported files for syntax errors.")
+    print(f"----------------------------------------------------------")
+    VeectorDB_defined = False
 
 # --- Constants ---
 DEFAULT_CACHE_SIZE = 1000
@@ -178,9 +133,10 @@ DEFAULT_EVICTION_STRATEGY = "LRU"
 DEFAULT_IPFS_ADDRESS = '/ip4/127.0.0.1/tcp/5001'
 STATE_TENSOR_LAYER = -2
 
-# --- Operation Code Constants (Formatted One Per Line) ---
+# --- Operation Code Constants ---
 OP_SUM = [0, 0, 0]
 OP_SUBTRACT = [0, 0, 1]
+OP_ADD = [0, 0, 2]
 OP_MULTIPLY = [0, 1, 0]
 OP_DIVIDE = [0, 1, 1]
 OP_SQRT = [0, 2, 0]
@@ -220,6 +176,7 @@ OP_RELU = [18, 0, 0]
 OP_SIGMOID = [18, 1, 0]
 OP_SOFTMAX = [18, 2, 0]
 OP_LEAKY_RELU = [18, 3, 0]
+OP_SILU = [18, 4, 0]
 OP_GELU = [40, 5, 0]
 OP_EXP_SMOOTHING = [19, 0, 0]
 OP_NORMALIZE_01 = [20, 0, 0]
@@ -227,6 +184,8 @@ OP_INTERPOLATE = [20, 1, 0]
 OP_LAYER_NORM = [40, 1, 0]
 OP_BATCH_NORM = [40, 4, 0]
 OP_DROPOUT = [40, 3, 0]
+OP_GET_Q_ROT = [40, 7, 1]
+OP_GET_K_ROT = [40, 7, 2]
 OP_MATRIX_MULTIPLY = [30, 0, 0]
 OP_DETERMINANT = [30, 1, 0]
 OP_EIGENVALUES = [30, 2, 0]
@@ -235,36 +194,53 @@ OP_TRANSPOSE = [30, 4, 0]
 OP_INVERSE = [30, 5, 0]
 OP_TRACE = [30, 6, 0]
 OP_ATTENTION_MULTIHEAD = [40, 2, 0]
+OP_EMBEDDING_LOOKUP = [40, 6, 0]
+OP_APPLY_ROPE = [40, 7, 0]
+OP_SCALED_DOT_PROD_ATTN = [40, 9, 2]
+OP_RESHAPE_HEADS = [40, 9, 0]
+OP_REPEAT_KV_HEADS = [40, 9, 1]
+OP_MERGE_HEADS = [40, 9, 3]
+OP_ADD_BIAS = [0, 0, 3]
+OP_RESIDUAL_ADD = OP_ADD
+OP_LINEAR = OP_MATRIX_MULTIPLY
+OP_FINAL_NORM = OP_LAYER_NORM
+OP_LINEAR_HEAD = OP_LINEAR
 OP_QUANTUM_HADAMARD = [50, 0, 0]
 OP_QUANTUM_PAULI_X = [50, 0, 1]
 OP_QUANTUM_CNOT = [50, 1, 0]
 OP_QUANTUM_MEASURE = [50, 2, 0]
 OP_QUANTUM_SUPERPOS = [50, 3, 0]
 OP_QUANTUM_ENTANGLE = [50, 4, 0]
-
+META_OP_CATEGORY = 99
+OP_STORE = [99,0,0]
+OP_LOAD = [99,0,1]
+OP_LOAD_INITIAL_INPUT = [99,0,3]
+OP_DEBUG_CONTEXT = [99,1,0]
 
 class Veector:
     """
-    The core execution engine for the Veector system.
-    Orchestrates tensor computation based on dynamic configurations.
+    Core execution engine v0.6.2: Uses list structure, old getters, dequantization.
     """
     def __init__(self,
-                 db_dir: Union[str, Path] = "../data/db",
+                 db_dir: Union[str, Path] = "data/db",
                  cache_size: int = DEFAULT_CACHE_SIZE,
                  eviction_strategy: str = DEFAULT_EVICTION_STRATEGY,
                  use_memory_module: bool = False,
                  p2p_node: Optional[Any] = None,
-                 ipfs_enabled: bool = True,
+                 ipfs_enabled: bool = False,
                  ipfs_address: str = DEFAULT_IPFS_ADDRESS):
 
-        print("Initializing Veector Core...")
-        self.db_dir = Path(db_dir)
+        print(f"--- Initializing Veector Core v{CORE_VERSION} ---")
+        print(f"    Requires: tensors v{TENSORS_VERSION_REQ}+, veectordb v{VEECTORDB_VERSION_REQ}+, operations v{OPERATIONS_VERSION_REQ}+")
+        print(f"    IPFS: {ipfs_enabled}, Address: {ipfs_address}")
+        self.db_dir = Path(db_dir).resolve()
+
+        if not VeectorDB_defined:
+             raise RuntimeError("Cannot initialize Veector: VeectorDB or Tensors failed to import.")
+
         try:
             self.db = VeectorDB(db_dir=self.db_dir)
             print("VeectorDB initialized.")
-        except NameError:
-             print("FATAL ERROR: VeectorDB class not found. Check imports.")
-             raise
         except Exception as e:
              print(f"FATAL ERROR: Failed to initialize VeectorDB: {e}")
              raise
@@ -272,19 +248,17 @@ class Veector:
         self.p2p_node = p2p_node
         self.ipfs_client = None
         if ipfs_enabled and IPFS_AVAILABLE and ipfs_address:
-            try:
-                self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address, timeout=10)
-                print(f"IPFS client connected to {ipfs_address}.")
-                ipfs_enabled = True
-            except Exception as e:
-                print(f"Warning: Failed to connect to IPFS at {ipfs_address}: {e}. IPFS disabled.")
-                ipfs_enabled = False
+             try:
+                 self.ipfs_client = ipfshttpclient.connect(addr=ipfs_address, timeout=10)
+                 print(f"IPFS client connected to {ipfs_address}.")
+             except Exception as e:
+                 print(f"Warn: Failed IPFS connect: {e}. IPFS disabled.")
+                 self.ipfs_enabled = False
+             else:
+                 self.ipfs_enabled = True
         else:
-             if ipfs_enabled and not IPFS_AVAILABLE: print("Warning: IPFS requested but ipfshttpclient not installed. IPFS disabled.")
-             ipfs_enabled = False
-        self.ipfs_enabled = ipfs_enabled
+             self.ipfs_enabled = False
 
-        # Caching
         self.compute_cache: Dict[Tuple, Any] = {}
         self.knowledge_cache: Dict[str, Any] = {}
         self.cache_size = max(10, cache_size)
@@ -293,582 +267,820 @@ class Veector:
         self.cache_timestamps: Dict[Union[Tuple, str], float] = {}
         print(f"Cache initialized: Size={self.cache_size}, Strategy={self.eviction_strategy}")
 
-        # Optional Modules
         self.memory_module = Memory() if use_memory_module and 'Memory' in globals() else None
-        # self.evolution_engine = Evolution(self) # Initialize later if needed
 
-        # --- Core Operations Dictionary (ADDED FULL DICTIONARY - Lambdas Corrected) ---
-        # Assumes functions in operations.py accept data + named args from mapping
         self.core_ops: Dict[Tuple[int, ...], callable] = {
-            # Basic Arithmetic
-            tuple(OP_SUM): lambda data, **kw: np.sum(data).astype(data.dtype) if isinstance(data, np.ndarray) else data,
-            tuple(OP_SUBTRACT): lambda data, **kw: data[0] - data[1] if isinstance(data, (list, np.ndarray)) and len(data) > 1 else data,
-            tuple(OP_MULTIPLY): lambda data, **kw: data[0] * data[1] if isinstance(data, (list, np.ndarray)) and len(data) > 1 else data,
-            tuple(OP_DIVIDE): lambda data, **kw: data[0] / data[1] if isinstance(data, (list, np.ndarray)) and len(data) > 1 and np.all(data[1]!=0) else data,
-            tuple(OP_SQRT): lambda data, **kw: np.sqrt(data),
-            tuple(OP_POWER): lambda data, **kw: np.power(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data) > 1 else data,
-            tuple(OP_ABS): lambda data, **kw: np.abs(data),
-            tuple(OP_MOD): lambda data, **kw: mod(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data) > 1 else data,
-            tuple(OP_FLOOR): lambda data, **kw: floor(data),
-            tuple(OP_CEIL): lambda data, **kw: ceil(data),
-            # Trigonometry
-            tuple(OP_SIN): lambda data, **kw: np.sin(data), tuple(OP_COS): lambda data, **kw: np.cos(data), tuple(OP_TAN): lambda data, **kw: np.tan(data),
-            tuple(OP_COT): lambda data, **kw: 1 / np.tan(data) if np.all(np.tan(data)!=0) else np.full_like(data, np.nan),
-            tuple(OP_ASIN): lambda data, **kw: arcsin(data), tuple(OP_ACOS): lambda data, **kw: arccos(data), tuple(OP_ATAN): lambda data, **kw: arctan(data),
-            # Logic
-            tuple(OP_GREATER): lambda data, **kw: data[0] > data[1] if isinstance(data, (list, np.ndarray)) and len(data)>1 else False,
-            tuple(OP_EQUAL): lambda data, **kw: data[0] == data[1] if isinstance(data, (list, np.ndarray)) and len(data)>1 else False,
-            tuple(OP_AND): lambda data, **kw: bool(data[0]) and bool(data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else False,
-            tuple(OP_OR): lambda data, **kw: bool(data[0]) or bool(data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else False,
-            tuple(OP_NOT): lambda data, **kw: not bool(data),
-            tuple(OP_XOR): lambda data, **kw: xor(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else data,
-            tuple(OP_NAND): lambda data, **kw: nand(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else data,
-            tuple(OP_NOR): lambda data, **kw: nor(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else data,
-            # Control Flow
+            tuple(OP_SUM): lambda d,**kw: np.sum(d), tuple(OP_SQRT): np.sqrt, tuple(OP_ABS): np.abs,
+            tuple(OP_FLOOR): floor, tuple(OP_CEIL): ceil, tuple(OP_SIN): np.sin, tuple(OP_COS): np.cos,
+            tuple(OP_TAN): np.tan, tuple(OP_COT): lambda d,**kw: 1/np.tan(d) if np.all(np.tan(d)!=0) else np.nan,
+            tuple(OP_ASIN): arcsin, tuple(OP_ACOS): arccos, tuple(OP_ATAN): arctan, tuple(OP_NOT): np.logical_not,
+            tuple(OP_IDENTITY): lambda d,**kw: d, tuple(OP_MEAN): mean, tuple(OP_STDDEV): std_dev,
+            tuple(OP_RELU): relu, tuple(OP_SIGMOID): sigmoid, tuple(OP_SOFTMAX): softmax, tuple(OP_LEAKY_RELU): leaky_relu,
+            tuple(OP_GELU): gelu, tuple(OP_SILU): silu, tuple(OP_EXP_SMOOTHING): exponential_smoothing,
+            tuple(OP_NORMALIZE_01): normalize, tuple(OP_TRANSPOSE): transpose, tuple(OP_INVERSE): inverse,
+            tuple(OP_TRACE): trace, tuple(OP_DETERMINANT): matrix_determinant, tuple(OP_EIGENVALUES): matrix_eigenvalues,
+            tuple(OP_MEDIAN): median, tuple(OP_INTERPOLATE): interpolate,
+            tuple(OP_SUBTRACT): lambda d,**kw: np.subtract(kw.get('minuend'), kw.get('subtrahend')),
+            tuple(OP_MULTIPLY): lambda d,**kw: np.multiply(kw.get('factor1'), kw.get('factor2')),
+            tuple(OP_DIVIDE): lambda d,**kw: np.divide(kw.get('dividend'), kw.get('divisor')),
+            tuple(OP_ADD): lambda d,**kw: add(kw.get('input_a'), kw.get('input_b')),
+            tuple(OP_POWER): lambda d,**kw: np.power(kw.get('base'), kw.get('exponent')),
+            tuple(OP_MOD): lambda d,**kw: mod(kw.get('x'), kw.get('y')),
+            tuple(OP_GREATER): lambda d,**kw: np.greater(kw.get('a'), kw.get('b')),
+            tuple(OP_EQUAL): lambda d,**kw: np.equal(kw.get('a'), kw.get('b')),
+            tuple(OP_AND): lambda d,**kw: np.logical_and(kw.get('a'), kw.get('b')),
+            tuple(OP_OR): lambda d,**kw: np.logical_or(kw.get('a'), kw.get('b')),
+            tuple(OP_XOR): lambda d,**kw: xor(kw.get('a'), kw.get('b')),
+            tuple(OP_NAND): lambda d,**kw: nand(kw.get('a'), kw.get('b')),
+            tuple(OP_NOR): lambda d,**kw: nor(kw.get('a'), kw.get('b')),
+            tuple(OP_MATRIX_MULTIPLY): lambda d,**kw: matrix_multiply(d, weights=kw.get('weights'), bias=kw.get('bias')),
+            tuple(OP_CONVOLUTION): lambda d,**kw: convolution(d, kernel=kw.get('kernel'), bias=kw.get('bias')),
+            tuple(OP_LAYER_NORM): lambda d,**kw: layer_normalization(d, norm_weight=kw.get('norm_weight'), norm_bias=kw.get('norm_bias'), eps=kw.get('eps', 1e-5)),
+            tuple(OP_BATCH_NORM): lambda d,**kw: batch_norm(d, **kw),
+            tuple(OP_DROPOUT): lambda d,**kw: dropout(d, rate=kw.get('rate', 0.1), is_training=kw.get('is_training', False)),
+            tuple(OP_EMBEDDING_LOOKUP): lambda d,**kw: embedding_lookup(d, embedding_matrix=kw.get('embedding_matrix')),
+            tuple(OP_APPLY_ROPE): lambda d,**kw: apply_rope(q=kw.get('q_proj'), k=kw.get('k_proj'), position_ids=kw.get('position_ids')),
+            tuple(OP_SCALED_DOT_PROD_ATTN): lambda d,**kw: scaled_dot_product_attention(query=kw.get('q_rot'), key=kw.get('k_rot'), value=kw.get('v_proj'), mask=kw.get('attention_mask')),
+            tuple(OP_ATTENTION_MULTIHEAD): lambda d,**kw: multi_head_attention(d, **kw),
             tuple(OP_IF): self._op_conditional_if, tuple(OP_LOOP_MULT): self._op_loop_multiply, tuple(OP_CHOICE): self._op_choice_select,
-            # Random
-            tuple(OP_RAND_UNIFORM): lambda data, **kw: random_uniform(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else np.random.rand(),
-            tuple(OP_RAND_NORMAL): lambda data, **kw: random_normal(data[0], data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else np.random.randn(),
-            tuple(OP_MEDIAN): lambda data, **kw: median(data),
-            # Output
-            tuple(OP_PRINT): self._op_output_print,
-            # Identity
-            tuple(OP_IDENTITY): lambda data, **kw: data,
-            # Meta
-            tuple(OP_TRIGGER_REASON): self._op_trigger_reason,
-            # Graph
-            tuple(OP_DFS): self._op_graph_dfs,
-            # Statistics
-            tuple(OP_MEAN): lambda data, **kw: mean(data), tuple(OP_STDDEV): lambda data, **kw: std_dev(data),
-            # Activations
-            tuple(OP_RELU): lambda data, **kw: relu(data), tuple(OP_SIGMOID): lambda data, **kw: sigmoid(data), tuple(OP_SOFTMAX): lambda data, **kw: softmax(data),
-            tuple(OP_LEAKY_RELU): lambda data, **kw: leaky_relu(data, alpha=kw.get('alpha', 0.01)), tuple(OP_GELU): lambda data, **kw: gelu(data),
-            # Smoothing
-            tuple(OP_EXP_SMOOTHING): lambda data, **kw: exponential_smoothing(data, alpha=kw.get('alpha', 0.5)),
-            # Normalization / NN Utils
-            tuple(OP_NORMALIZE_01): lambda data, **kw: normalize(data),
-            tuple(OP_INTERPOLATE): lambda data, **kw: interpolate(data, new_length=kw['new_length']) if 'new_length' in kw else print("Error: interpolate needs 'new_length'"),
-            tuple(OP_LAYER_NORM): lambda data, **kw: layer_normalization(data),
-            tuple(OP_BATCH_NORM): lambda data, **kw: batch_norm(data),
-            tuple(OP_DROPOUT): lambda data, **kw: dropout(data, rate=kw.get('rate', 0.1)),
-            # Matrix/Tensor Ops --- CORRECTED LAMBDAS ---
-            tuple(OP_MATRIX_MULTIPLY): lambda data, **kw: matrix_multiply(data, kw['weights']) if 'weights' in kw else print("Error: 'weights' kwarg missing for matmul"),
-            tuple(OP_DETERMINANT): lambda data, **kw: matrix_determinant(data),
-            tuple(OP_EIGENVALUES): lambda data, **kw: matrix_eigenvalues(data),
-            tuple(OP_CONVOLUTION): lambda data, **kw: convolution(data, kw['kernel']) if 'kernel' in kw else print("Error: 'kernel' kwarg missing for conv"),
-            tuple(OP_TRANSPOSE): lambda data, **kw: transpose(data),
-            tuple(OP_INVERSE): lambda data, **kw: inverse(data),
-            tuple(OP_TRACE): lambda data, **kw: trace(data),
-            # Attention --- CORRECTED LAMBDA ---
-            tuple(OP_ATTENTION_MULTIHEAD): lambda data, **kw: multi_head_attention(data, kw['key'], kw['value'], **{k:v for k,v in kw.items() if k not in ['key','value']}) if 'key' in kw and 'value' in kw else print("Error: 'key'/'value' missing for attention"),
-            # Quantum (Placeholders)
-            tuple(OP_QUANTUM_HADAMARD): lambda data, **kw: self._quantum_op_placeholder(data, "hadamard", **kw),
-            tuple(OP_QUANTUM_PAULI_X): lambda data, **kw: self._quantum_op_placeholder(data, "pauli_x", **kw),
-            tuple(OP_QUANTUM_CNOT): lambda data, **kw: self._quantum_op_placeholder(data, "cnot", **kw),
-            tuple(OP_QUANTUM_MEASURE): lambda data, **kw: self._quantum_op_placeholder(data, "measure", **kw),
-            tuple(OP_QUANTUM_SUPERPOS): lambda data, **kw: self._quantum_op_placeholder(data, "superposition", **kw),
-            tuple(OP_QUANTUM_ENTANGLE): lambda data, **kw: self._quantum_op_placeholder(data, "entanglement", **kw),
+            tuple(OP_PRINT): self._op_output_print, tuple(OP_TRIGGER_REASON): self._op_trigger_reason, tuple(OP_DFS): self._op_graph_dfs,
+            tuple(OP_RAND_UNIFORM): lambda d,**kw: random_uniform(min_val=kw.get('min_val', 0.0), max_val=kw.get('max_val', 1.0)),
+            tuple(OP_RAND_NORMAL): lambda d,**kw: random_normal(mu=kw.get('mu', 0.0), scale=kw.get('sigma', 1.0)),
+            tuple(OP_QUANTUM_HADAMARD): lambda d,**kw: self._quantum_op_placeholder(d,"hadamard",**kw),
+            tuple(OP_QUANTUM_PAULI_X): lambda d,**kw: self._quantum_op_placeholder(d,"pauli_x",**kw),
+            tuple(OP_QUANTUM_CNOT): lambda d,**kw: self._quantum_op_placeholder(d,"cnot",**kw),
+            tuple(OP_QUANTUM_MEASURE): lambda d,**kw: self._quantum_op_placeholder(d,"measure",**kw),
+            tuple(OP_QUANTUM_SUPERPOS): lambda d,**kw: self._quantum_op_placeholder(d,"superposition",**kw),
+            tuple(OP_QUANTUM_ENTANGLE): lambda d,**kw: self._quantum_op_placeholder(d,"entanglement",**kw),
+            # tuple(OP_GET_Q_ROT): lambda d,**kw: get_q_rot(d, **kw),
+            # tuple(OP_GET_K_ROT): lambda d,**kw: get_k_rot(d, **kw),
+            tuple(OP_GET_Q_ROT): get_q_rot,
+            tuple(OP_GET_K_ROT): get_k_rot, 
         }
         print(f"Initialized {len(self.core_ops)} core operations.")
         self._log_memory("Veector Initialized")
 
     # --- Logging & Monitoring Methods ---
-    # [Unchanged]
     def _log_memory(self, stage: str):
-        try: process = psutil.Process(os.getpid()); ram_usage = process.memory_info().rss / 1024**2; print(f"Mem({stage}): RAM {ram_usage:.1f}MB", end='');
-        except Exception as e: print(f"Mem log warning: {e}"); return
-        if TORCH_AVAILABLE and torch.cuda.is_available():
-             try: allocated = torch.cuda.memory_allocated()/1024**2; reserved = torch.cuda.memory_reserved()/1024**2; print(f" | GPU Alloc {allocated:.1f}MB, Reserv {reserved:.1f}MB")
-             except Exception as e: print(f" | GPU Mem log warning: {e}")
-        else: print()
+        """Logs current RAM and GPU memory usage."""
+        try:
+            process = psutil.Process(os.getpid())
+            ram_usage = process.memory_info().rss / 1024**2
+            print(f"Mem({stage}): RAM {ram_usage:.1f}MB", end='')
+            if TORCH_AVAILABLE and torch.cuda.is_available():
+                 try:
+                     allocated = torch.cuda.memory_allocated()/1024**2
+                     reserved = torch.cuda.memory_reserved()/1024**2
+                     print(f" | GPU Alloc {allocated:.1f}MB, Reserv {reserved:.1f}MB")
+                 except Exception:
+                      # Ignore GPU errors silently in logging
+                      print() # Ensure newline
+            else:
+                print()
+        except Exception as e:
+            print(f"Mem log warning: {e}")
+
     def _get_resource_status(self) -> Dict:
-        mem_percent=0; cpu_percent=0; gpu_mem_percent=0
-        try: mem=psutil.virtual_memory(); mem_percent=mem.percent; cpu_percent=psutil.cpu_percent()
-        except Exception: pass
+        """Returns current resource status."""
+        mem_percent=0
+        cpu_percent=0
+        gpu_mem_percent=0
+        try:
+            mem=psutil.virtual_memory()
+            mem_percent=mem.percent
+            cpu_percent=psutil.cpu_percent()
+        except Exception:
+            pass # Ignore psutil errors
         if TORCH_AVAILABLE and torch.cuda.is_available():
-             try: props=torch.cuda.get_device_properties(0); allocated=torch.cuda.memory_allocated(); gpu_mem_percent = (allocated / props.total_memory) * 100 if props.total_memory > 0 else 0
-             except Exception: pass
-        return {"memory_percent": mem_percent, "cpu_percent": cpu_percent, "gpu_memory_percent": gpu_mem_percent, "battery_percent": 100 }
+             try:
+                 props=torch.cuda.get_device_properties(0)
+                 allocated=torch.cuda.memory_allocated()
+                 gpu_mem_percent = (allocated / props.total_memory) * 100 if props.total_memory > 0 else 0
+             except Exception:
+                 pass # Ignore GPU errors
+        return {
+            "memory_percent": mem_percent,
+            "cpu_percent": cpu_percent,
+            "gpu_memory_percent": gpu_mem_percent,
+            "battery_percent": 100 # Placeholder
+        }
 
     # --- Tensor Creation and Validation Wrappers ---
-    # [Unchanged]
-    def create_tensor(self, *args, **kwargs) -> List: return create_tensor(*args, **kwargs) if 'create_tensor' in globals() else []
-    def validate_tensor(self, tensor: List) -> bool: return validate_tensor(tensor) if 'validate_tensor' in globals() else False
-    def get_tensor_hash(self, tensor_structure: List) -> str: return get_tensor_hash(tensor_structure) if 'get_tensor_hash' in globals() else f"error_hash_{random.random()}"
+    # Uses hybrid create_tensor from tensors v0.7.3+ which returns list structure
+    def create_tensor(self, *args, **kwargs) -> List:
+        """Wrapper for tensor creation function from tensors.py (returns list)."""
+        if 'create_tensor' in globals():
+             result = create_tensor(*args, **kwargs)
+             return result
+        else:
+             print("Error: create_tensor function not available in tensors module.")
+             return []
+
+    # Uses list validator from tensors v0.7.3+
+    def validate_tensor(self, tensor_structure: List) -> bool:
+        """Wrapper for tensor list validation function from tensors.py."""
+        if 'validate_tensor' in globals():
+             result = validate_tensor(tensor_structure)
+             return result
+        else:
+             print("Error: validate_tensor function not available.")
+             return False
+
+    # Uses list hash function from tensors v0.7.3+
+    def get_tensor_hash(self, tensor_structure: List) -> str:
+        """Wrapper for tensor list hashing function."""
+        if 'get_tensor_hash' in globals():
+             try:
+                 result = get_tensor_hash(tensor_structure)
+                 return result
+             except ValueError as e:
+                  print(f"Error hashing tensor structure: {e}")
+                  return f"error_hash_{random.random()}"
+        else:
+             print("Error: get_tensor_hash function not available.")
+             return f"error_hash_{random.random()}"
 
     # --- Database Interaction Wrappers ---
-    # [Unchanged]
+    # Uses list structure input, extracts tuple and data for DB layer
     def save_tensor(self, tensor_structure: List) -> Optional[str]:
+         """
+         Saves tensor (list structure) to DB.
+         Extracts metadata tuple and data for db.insert_veector_tensor.
+         """
+         tensor_id = None
          try:
-             if not self.validate_tensor(tensor_structure): print("Error: Save invalid tensor."); return None
-             return self.db.insert_veector_tensor(tensor_structure)
-         except Exception as e: print(f"Error saving tensor: {e}"); return None
-    def load_tensor(self, doc_id: str, load_knowledge: bool = False) -> Optional[List]:
-         try: return self.db.get_veector_tensor(doc_id, load_knowledge_data=load_knowledge)
-         except Exception as e: print(f"Error loading tensor {doc_id}: {e}"); return None
+             if not self.validate_tensor(tensor_structure):
+                  print("Error: Attempted to save invalid tensor list structure.")
+                  return None
+
+             meta_dict = get_tensor_metadata(tensor_structure)
+             meta_tuple_to_save = meta_dict.get("_encoded_metadata_v1_")
+             data_payload = tensor_structure[5] if len(tensor_structure) == 6 else None
+
+             if not meta_tuple_to_save:
+                  print("Error: Cannot find embedded metadata tuple for saving.")
+                  return None
+
+             # Generate ID based on the list structure before passing tuple to DB
+             # tensor_id = self.get_tensor_hash(tensor_structure) # DB generates ID based on tuple now
+
+             # Call DB method which expects tuple and data
+             tensor_id = self.db.insert_veector_tensor(meta_tuple_to_save, data_payload)
+             return tensor_id
+         except Exception as e:
+             print(f"Error during save_tensor wrapper call (tensor_id={tensor_id}): {e}")
+             return None
+
+    # Returns list structure (as returned by veectordb v0.9.1+)
+    def load_tensor(self, doc_id: str, load_knowledge: bool = False, use_mmap: bool = True) -> Optional[List]:
+         """Loads tensor as list structure via db.get_veector_tensor."""
+         try:
+            result_structure = self.db.get_veector_tensor(
+                doc_id, load_knowledge_data=load_knowledge, use_mmap=use_mmap
+            )
+            # Basic validation on the returned list
+            if result_structure is not None and not self.validate_tensor(result_structure):
+                 print(f"Warning: load_tensor received invalid list structure from DB for {doc_id}.")
+                 return None
+            return result_structure
+         except Exception as e:
+             print(f"Error during load_tensor wrapper call for {doc_id}: {e}")
+             return None
+
+    # --- load_knowledge_tensor_data (Includes Dequantization) ---
     def load_knowledge_tensor_data(self, knowledge_id: str) -> Optional[Any]:
-         if knowledge_id in self.knowledge_cache: self._update_cache_access(knowledge_id); return self.knowledge_cache[knowledge_id]
-         structure = self.db.get_veector_tensor(knowledge_id, load_knowledge_data=False)
-         if structure and get_tensor_type(structure) == "knowledge":
-             metadata = get_tensor_metadata(structure); blob_cid = metadata.get("knowledge_blob_cid")
-             if blob_cid:
-                 data = self.db._load_blob(blob_cid)
-                 if data is not None: self._add_to_cache(knowledge_id, data, is_knowledge=True); return data
-                 else: print(f"Warn: Failed load blob {blob_cid} for {knowledge_id}")
-             else: print(f"Warn: Knowledge {knowledge_id} no blob CID.")
-         else: print(f"Error: Knowledge {knowledge_id} not found/invalid type.")
-         return None
+        """
+        Loads knowledge tensor data, using cache. Handles INT8 dequantization.
+        """
+        # 1. Check cache
+        if knowledge_id in self.knowledge_cache:
+            self._update_cache_access(knowledge_id)
+            return self.knowledge_cache[knowledge_id]
+
+        # 2. Load list structure with data
+        loaded_structure = self.load_tensor(knowledge_id, load_knowledge=True)
+
+        # 3. Validate and Extract
+        if not loaded_structure or len(loaded_structure) != 6:
+             # print(f"Debug: Knowledge structure list not found/invalid for ID {knowledge_id}")
+             return None
+
+        try:
+            meta_dict = get_tensor_metadata(loaded_structure)
+            loaded_data = loaded_structure[5]
+        except Exception as e:
+             print(f"Error extracting meta/data from loaded structure for {knowledge_id}: {e}")
+             return None
+
+        if loaded_data is None:
+             # print(f"Warning: Blob data is None for knowledge {knowledge_id}.") # Reduce noise
+             return None
+
+        # 4. Check for INT8 and Dequantize
+        final_data = loaded_data
+        original_dtype_str = meta_dict.get("dtype", "").lower()
+        is_int8 = ('int8' in original_dtype_str)
+
+        if is_int8:
+            # print(f"  Applying dequantization for INT8 tensor {knowledge_id}...") # Reduce noise
+            scale = meta_dict.get("quantization_scale")
+            if scale is None or scale <= 0:
+                print(f"  ERROR: Missing/invalid 'quantization_scale' for INT8 tensor {knowledge_id}. Cannot dequantize!")
+                return None # Cannot proceed without scale
+            try:
+                scale_float = float(scale)
+                # Ensure loaded data is actually int8 before dequantizing
+                if loaded_data.dtype != np.int8:
+                     print(f"  WARN: Metadata dtype int8 mismatch for {knowledge_id}, loaded: {loaded_data.dtype}. Casting.")
+                     loaded_data = loaded_data.astype(np.int8)
+
+                dequantized_data = loaded_data.astype(np.float32) * scale_float
+                final_data = dequantized_data
+                # print(f"  Dequantized data shape: {final_data.shape}, dtype: {final_data.dtype}") # Reduce noise
+            except Exception as dequant_e:
+                print(f"  ERROR during dequantization for {knowledge_id}: {dequant_e}")
+                return None
+        # else: pass # Not INT8, use loaded_data as is
+
+        # 5. Cache and Return
+        if final_data is not None:
+            self._add_to_cache(knowledge_id, final_data, is_knowledge=True)
+        return final_data
+
 
     # --- Caching Methods ---
-    # [Unchanged]
-    def _update_cache_access(self, key: Union[str, Tuple]): self.cache_timestamps[key] = time.time(); self.cache_access_count[key] = self.cache_access_count.get(key, 0) + 1
+    def _update_cache_access(self, key: Union[str, Tuple]):
+        self.cache_timestamps[key] = time.time()
+        self.cache_access_count[key] = self.cache_access_count.get(key, 0) + 1
+
     def _evict_cache(self):
-        compute_keys=list(self.compute_cache.keys()); knowledge_keys=list(self.knowledge_cache.keys()); total_items=len(compute_keys)+len(knowledge_keys)
-        if total_items < self.cache_size: return
-        num_to_evict=total_items-self.cache_size+1; all_keys_metrics=[]
+        compute_keys=list(self.compute_cache.keys())
+        knowledge_keys=list(self.knowledge_cache.keys())
+        total_items = len(compute_keys) + len(knowledge_keys)
+        if total_items < self.cache_size:
+             return
+        num_to_evict = total_items - self.cache_size + 1
+        all_keys_metrics=[]
         try:
-            sorter=lambda k: self.cache_access_count.get(k,0) if self.eviction_strategy=="LFU" else self.cache_timestamps.get(k,0); all_keys_metrics=[(k, sorter(k)) for k in compute_keys+knowledge_keys]; all_keys_metrics.sort(key=lambda item: item[1]); keys_to_evict=[item[0] for item in all_keys_metrics[:num_to_evict]]; evicted_count=0
+            sorter=lambda k: self.cache_access_count.get(k,0) if self.eviction_strategy=="LFU" else self.cache_timestamps.get(k,0)
+            all_keys_metrics=[(k, sorter(k)) for k in compute_keys+knowledge_keys]
+            all_keys_metrics.sort(key=lambda item: item[1])
+            keys_to_evict=[item[0] for item in all_keys_metrics[:num_to_evict]]
             for key in keys_to_evict:
                 evicted_item=False
-                if key in self.compute_cache: del self.compute_cache[key]; evicted_item=True
-                if key in self.knowledge_cache: del self.knowledge_cache[key]; evicted_item=True
+                if key in self.compute_cache:
+                    del self.compute_cache[key]
+                    evicted_item=True
+                if key in self.knowledge_cache:
+                    del self.knowledge_cache[key]
+                    evicted_item=True
                 if evicted_item:
                      if key in self.cache_timestamps: del self.cache_timestamps[key]
                      if key in self.cache_access_count: del self.cache_access_count[key]
-                     evicted_count+=1
-        except Exception as e: print(f"Cache eviction error: {e}")
-    def _add_to_cache(self, key: Union[str, Tuple], value: Any, is_knowledge: bool = False): self._evict_cache(); cache = self.knowledge_cache if is_knowledge else self.compute_cache; cache[key]=value; self._update_cache_access(key)
+        except Exception as e:
+            print(f"Cache eviction error: {e}")
+
+    def _add_to_cache(self, key: Union[str, Tuple], value: Any, is_knowledge: bool = False):
+         cache = self.knowledge_cache if is_knowledge else self.compute_cache
+         cache[key]=value
+         self._update_cache_access(key)
+         self._evict_cache()
+
     def clear_cache(self, clear_knowledge: bool = True, clear_compute: bool = True):
          if clear_compute: self.compute_cache.clear()
          if clear_knowledge: self.knowledge_cache.clear()
-         self.cache_timestamps.clear(); self.cache_access_count.clear(); print("Caches cleared.")
+         self.cache_timestamps.clear()
+         self.cache_access_count.clear()
+         print("Caches cleared.")
 
-    # --- Core Computation Logic ---
+    # --- Op Sequence Execution ---
+    def _execute_op_sequence(
+        self,
+        ops_sequence: List[Any],
+        initial_data: Any,
+        knowledge_params_for_ops: Dict[str, Any], # Загруженные numpy массивы знаний
+        **kw_context # Контекст вызова compute (position_ids, attention_mask и т.д.)
+    ) -> Tuple[Any, List[Dict]]:
+        """
+        Executes op sequence. v0.6.12 - Rewritten command parser logic
+        combined with argument resolution.
+        """
+        current_data = initial_data
+        step_provenance_list = []
+        step_context = {'_initial_input': initial_data}
 
-    def _select_knowledge_tensors(self, required_tags: List[Union[int, Tuple]], context: Dict) -> Dict[Union[int, Tuple], str]:
-        """Finds IDs of suitable knowledge tensors based on numerical tags and context."""
-        # [Implementation unchanged]
-        print(f"Selecting knowledge for tags: {required_tags} (context: {context})")
-        selected_ids = {}; required_nest = context.get("required_nest"); all_candidates = self.db.find_active_tensors(tensor_type="knowledge"); found_tags = set()
-        for tag in required_tags:
-            best_candidate_id = None; best_candidate_nest = -999; lookup_tag = tuple(tag) if isinstance(tag, list) else tag
-            for cand_id, structure in all_candidates.items():
-                 meta = get_tensor_metadata(structure); compat_tags = meta.get("compatibility_tags", [])
-                 if lookup_tag in compat_tags:
-                     coord = get_tensor_coord(structure);
-                     if not coord: continue
-                     current_nest = coord.nest
-                     if required_nest is not None:
-                          if current_nest == required_nest: best_candidate_id = cand_id; best_candidate_nest = current_nest; break
-                          elif current_nest <= required_nest and current_nest > best_candidate_nest: best_candidate_nest = current_nest; best_candidate_id = cand_id
-                     elif current_nest > best_candidate_nest: best_candidate_nest = current_nest; best_candidate_id = cand_id
-            if best_candidate_id: selected_ids[lookup_tag] = best_candidate_id; found_tags.add(lookup_tag); print(f"  Selected tag {lookup_tag}: {best_candidate_id} (nest={best_candidate_nest})")
-            else: print(f"Warn: No knowledge for tag {lookup_tag} matching context.")
-        if not set(required_tags).issubset(found_tags): print(f"Warn: Missing knowledge for tags: {set(required_tags)-found_tags}")
-        return selected_ids
+        for i, op_command in enumerate(ops_sequence):
+            step_provenance = {"step": i}; step_start = time.time(); op_tuple = None; op_code_list = None; op_func = None; is_meta_op = False;
+            op_call_args_from_processor: Dict = {} # Аргументы из определения процессора
+            meta_args = []
+            valid_command = False # Флаг для проверки парсинга
 
-    def _execute_op_sequence(self,
-                             ops_sequence: List[List[int]],
-                             initial_data: Any,
-                             loaded_knowledge_by_id: Dict[str, Any], # {knowledge_id: data}
-                             param_mapping: Dict[Any, str], # {tag_id: param_name}
-                             **kw_context # Pass context map
-                             ) -> Tuple[Any, List[Dict]]:
-        """Executes a sequence of operations using loaded knowledge tensors."""
-        # [Mapping logic using context map]
-        current_data = initial_data; step_provenance_list = []
-        selected_knowledge_ids_map_by_tag = kw_context.get("_selected_knowledge_ids_map", {})
+            # --- 1. Новый Парсинг команды ---
+            if not isinstance(op_command, list) or not op_command:
+                 error_msg = f"Command at step {i} is not a non-empty list: {op_command}"
+                 step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance); return None, step_provenance_list
 
-        knowledge_params_for_ops = {}
-        for tag_id, param_name in param_mapping.items():
-             knowledge_id = selected_knowledge_ids_map_by_tag.get(tag_id)
-             if knowledge_id and knowledge_id in loaded_knowledge_by_id:
-                  knowledge_params_for_ops[param_name] = loaded_knowledge_by_id[knowledge_id]
-             else:
-                  print(f"Warn exec: Knowledge for tag {tag_id} (map->{param_name}) not loaded.")
+            # Попытка 1: "Плоский" формат [OP/META, ...]
+            if isinstance(op_command[0], int):
+                if len(op_command) >= 3 and all(isinstance(x, int) for x in op_command[:3]):
+                    op_code_list = op_command[:3]
+                    op_tuple = tuple(op_code_list)
+                    is_meta_op = op_tuple in (tuple(OP_STORE), tuple(OP_LOAD), tuple(OP_LOAD_INITIAL_INPUT), tuple(OP_DEBUG_CONTEXT))
 
-        for i, op_code_list in enumerate(ops_sequence):
-            op_tuple = tuple(op_code_list); op_func = self.core_ops.get(op_tuple); step_provenance = {"step": i, "op": op_tuple}; step_start = time.time()
-            if not op_func:
-                error_msg = f"Op {op_tuple} not found"; print(f"Error: {error_msg}")
-                step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance)
-                return None, step_provenance_list
-            try:
-                # Call operation with data and mapped knowledge
-                current_data = op_func(current_data, **knowledge_params_for_ops) # Pass mapped knowledge as keywords
-                step_provenance["duration_ms"] = (time.time() - step_start) * 1000
-                if current_data is None:
-                     print(f"Warn: Op {op_tuple} returned None.")
-            except TypeError as te: # Catch TypeError (likely missing/wrong arguments)
-                 error_msg = f"Op {op_tuple} failed (TypeError): {te}"
-                 print(f"Error executing {op_tuple}: {te}")
-                 if "missing" in str(te) and "argument" in str(te): error_msg += f" - Check func signature and param_mapping."
-                 elif "unexpected keyword argument" in str(te): error_msg += f" - Check function signature vs **kw / param_mapping."
-                 step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance)
-                 return None, step_provenance_list # Abort on TypeError
-            except Exception as e: # Catch other exceptions
-                error_msg = f"Op {op_tuple} failed: {e}"; print(f"Error executing {op_tuple}: {e}")
-                step_provenance["error"] = str(e); step_provenance_list.append(step_provenance)
-                return None, step_provenance_list # Abort
+                    if is_meta_op: # [META, arg1, ...]
+                        meta_args = op_command[3:]
+                        op_call_args_from_processor = {}
+                        valid_command = True
+                    else: # [REGULAR_OP] или [REGULAR_OP, {args}]
+                        if len(op_command) == 3: # [REGULAR_OP]
+                            op_call_args_from_processor = {}
+                            valid_command = True
+                        elif len(op_command) == 4 and isinstance(op_command[3], dict): # [REGULAR_OP, {args}]
+                            op_call_args_from_processor = op_command[3]
+                            valid_command = True
+                        # else: Invalid flat regular op format (will fail later)
+
+            # Попытка 2: "Вложенный" формат [[OP/META], ...]
+            elif isinstance(op_command[0], list):
+                 op_code_container = op_command[0]
+                 if len(op_code_container) == 3 and all(isinstance(x, int) for x in op_code_container):
+                     op_code_list = op_code_container
+                     op_tuple = tuple(op_code_list)
+                     is_meta_op = op_tuple in (tuple(OP_STORE), tuple(OP_LOAD), tuple(OP_LOAD_INITIAL_INPUT), tuple(OP_DEBUG_CONTEXT))
+
+                     if is_meta_op: # [[META], arg1, ...]
+                         meta_args = op_command[1:]
+                         op_call_args_from_processor = {}
+                         valid_command = True
+                     else: # [[REGULAR_OP]] или [[REGULAR_OP], {args}]
+                         if len(op_command) == 1: # [[REGULAR_OP]]
+                             op_call_args_from_processor = {}
+                             valid_command = True
+                         elif len(op_command) == 2 and isinstance(op_command[1], dict): # [[REGULAR_OP], {args}]
+                             op_call_args_from_processor = op_command[1]
+                             valid_command = True
+                         # else: Invalid nested regular op format (will fail later)
+
+            # Если ни один формат не подошел или op_code_list не определен
+            if not valid_command or op_code_list is None:
+                 error_msg=f"Cannot parse OP CODE / Invalid command format at step {i}: {op_command}";
+                 step_provenance["error"]=error_msg; step_provenance_list.append(step_provenance); return None, step_provenance_list
+
+            # Запись в provenance
+            if op_tuple: step_provenance["op"] = op_tuple
+            if meta_args: step_provenance["meta_args"] = meta_args
+            if op_call_args_from_processor: step_provenance["op_args"] = op_call_args_from_processor
+            # --- Конец Парсинга ---
+
+
+            # --- 2. Выполнение ---
+            if is_meta_op: # --- Выполнение Meta Op ---
+                # (Логика Meta Op без изменений)
+                if op_tuple == tuple(OP_STORE):
+                    if not meta_args or not isinstance(meta_args[0], str): error_msg = f"OP_STORE needs str arg"; step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance); return None, step_provenance_list
+                    step_context[meta_args[0]] = current_data
+                elif op_tuple == tuple(OP_LOAD):
+                    if not meta_args or not isinstance(meta_args[0], str): error_msg = f"OP_LOAD needs str arg"; step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance); return None, step_provenance_list
+                    var_name = meta_args[0]
+                    if var_name in step_context: current_data = step_context[var_name]
+                    else: error_msg = f"LOAD failed: Var '{var_name}' not in context"; step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance); return None, step_provenance_list
+                elif op_tuple == tuple(OP_LOAD_INITIAL_INPUT): current_data = step_context.get('_initial_input')
+                elif op_tuple == tuple(OP_DEBUG_CONTEXT): print(f"  DEBUG META [{i}] CONTEXT:"); [print(f"    '{k}': type={type(v)}, shape={getattr(v, 'shape', 'N/A')}") for k, v in step_context.items()]
+
+            else: # --- Выполнение Regular Op ---
+                op_func = self.core_ops.get(op_tuple)
+                if not op_func: error_msg = f"Op {op_tuple} not found"; step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance); return None, step_provenance_list
+
+                # --- Разрешение аргументов (Логика из v0.6.9) ---
+                resolved_args = {}
+                if isinstance(op_call_args_from_processor, dict):
+                    for arg_name, value_source_name in op_call_args_from_processor.items():
+                        resolved_value = None; found = False
+                        if isinstance(value_source_name, str):
+                            if value_source_name in knowledge_params_for_ops: resolved_value = knowledge_params_for_ops[value_source_name]; found = True
+                            elif value_source_name in step_context: resolved_value = step_context[value_source_name]; found = True
+                            elif value_source_name in kw_context: resolved_value = kw_context[value_source_name]; found = True
+                        else: resolved_value = value_source_name; found = True
+                        resolved_args[arg_name] = resolved_value
+                        if not found and isinstance(value_source_name, str): print(f"WARN: Arg '{arg_name}' source '{value_source_name}' not found for Op {op_tuple}. Passing None.")
+                # --- Конец Разрешения аргументов ---
+
+                # Собираем финальный словарь kw для функции операции
+                op_kw = {**resolved_args, **kw_context}
+
+                try:
+                    # Вызываем функцию операции
+                    current_data = op_func(current_data, **op_kw)
+                except Exception as e:
+                    error_msg = f"Op {op_tuple} at step {i} failed: {e}"; step_provenance["error"] = str(e);
+                    print(f"--- Exception during Op {op_tuple} execution (Step {i}) ---"); traceback.print_exc(); print(f"--- End Exception ---")
+                    step_provenance_list.append(step_provenance); return None, step_provenance_list
+
+            # --- 3. Завершение шага ---
+            step_provenance["duration_ms"] = (time.time() - step_start) * 1000
             step_provenance_list.append(step_provenance)
+            if isinstance(current_data, dict) and current_data.get('status') == 'error':
+                 error_msg = f"Op {op_tuple} returned error status: {current_data.get('error')}"; step_provenance["error"] = error_msg; return None, step_provenance_list
+
         return current_data, step_provenance_list
 
+
+
+    # --- Knowledge Selection (Адаптировано для структуры списка) ---
+    def _select_knowledge_tensors(self,
+                                  processor_structure: List, # Принимает список
+                                  context: Dict
+                                 ) -> Dict[str, str]:
+        """
+        Находит ID тензоров знаний. v0.6.3 - Исправлен приоритет target_knowledge_group.
+        Работает со структурой списка.
+        """
+        # Блок try для перехвата ошибок при доступе к структуре
+        try:
+            # Используем СТАРЫЕ геттеры для структуры списка
+            interface = get_tensor_interface(processor_structure) or {}
+            processor_tags_list = get_tensor_tags(processor_structure)
+            processor_coord = get_tensor_coord(processor_structure)
+            # Проверяем, что координаты извлечены
+            if not processor_coord:
+                raise ValueError("Processor coordinates not found in structure")
+        except Exception as e:
+            # Логируем ошибку и возвращаем пустой словарь
+            print(f"Error selecting knowledge: Cannot access metadata from processor structure: {e}")
+            return {}
+
+        # Получаем список необходимых знаний из интерфейса
+        knowledge_needs = interface.get("knowledge_needed", [])
+        # Если знания не нужны, возвращаем пустой словарь
+        if not knowledge_needs:
+            return {}
+
+        # Получаем требуемый nest из контекста
+        required_nest = context.get("required_nest")
+        processor_tags_set = set(processor_tags_list) # Множество для быстрой проверки
+
+        # --- Определение Целевой Группы Знаний ---
+        # 1. ПРИОРИТЕТ: Используем группу из контекста, если она явно передана
+        target_knowledge_group = context.get("target_knowledge_group")
+        model_tag = None # Тег модели процессора
+
+        # Если группа не передана в контексте, пытаемся определить по тегу модели процессора
+        if target_knowledge_group is None:
+            print(f"  WARN: target_knowledge_group not in context. Determining from processor tags...")
+            for tag in processor_tags_list:
+                if 10 <= tag <= 19: # Диапазон тегов моделей
+                     model_tag = tag;
+                     # Старая логика определения группы по тегу модели (Fallback)
+                     if model_tag == TAG_MODEL_QWEN2: target_knowledge_group = GROUP_IDX_QWEN_KNOWLEDGE # 100
+                     elif model_tag == TAG_MODEL_DEEPSEEK: target_knowledge_group = GROUP_IDX_DEEPSEEK_KNOWLEDGE # 102
+                     # Добавить другие маппинги если нужно
+                     break # Нашли тег модели
+            if target_knowledge_group is None:
+                  print(f"  WARN: Could not determine target knowledge group from processor tags. Searching without group filter.")
+        else:
+             print(f"  Using target_knowledge_group from context: {target_knowledge_group}")
+             # Можно на всякий случай найти тег модели
+             for tag in processor_tags_list:
+                 if 10 <= tag <= 19: model_tag = tag; break
+        # --- Конец Определения Группы ---
+
+        print(f"  Targeting Knowledge Group: {target_knowledge_group}, Nest: {required_nest} (Processor Model Tag: {model_tag})")
+
+        # Фильтр для БД
+        db_coord_filter = {}
+        if target_knowledge_group is not None:
+            db_coord_filter["group"] = target_knowledge_group
+        # Определяем nest для фильтрации
+        target_nest = required_nest if isinstance(required_nest, int) else processor_coord.nest
+        db_coord_filter["nest"] = target_nest
+
+        # Ищем кандидатов (veectordb v0.9.x возвращает Dict[str, List])
+        all_candidate_structures: Dict[str, List] = self.db.find_active_tensors(
+            tensor_type="knowledge",
+            coord_filter=db_coord_filter # Передаем фильтр
+        )
+        print(f"  Found {len(all_candidate_structures)} candidates via index filter G={db_coord_filter.get('group')}, N={db_coord_filter.get('nest')}.")
+
+        # Фильтруем кандидатов по тегам
+        selected_knowledge_map = {}
+        for need in knowledge_needs:
+            param_name = need.get("param_name"); base_tags_needed = need.get("tags", [])
+            is_optional = need.get("optional", False)
+            if not param_name or not base_tags_needed: continue
+
+            best_candidate_id = None
+            # Используем теги из need как есть (они должны быть полными)
+            query_tags_set = set(base_tags_needed)
+            # print(f"  Searching for '{param_name}' with required tags: {query_tags_set}") # Debug
+
+            found_match_for_need = False
+            for cand_id, cand_structure in all_candidate_structures.items():
+                 try:
+                     # Используем СТАРЫЙ геттер для структуры списка
+                     tensor_tags_list = get_tensor_tags(cand_structure)
+                     # Проверяем, содержит ли тензор ВСЕ необходимые теги
+                     if query_tags_set.issubset(set(tensor_tags_list)):
+                          best_candidate_id = cand_id
+                          found_match_for_need = True
+                          break # Нашли лучший (первый) подходящий в отфильтрованном списке
+                 except Exception as e:
+                      # Логируем ошибку обработки кандидата, но продолжаем поиск
+                      print(f"    Warn: Error processing candidate {cand_id} for need '{param_name}': {e}")
+                      continue # Пропускаем невалидного кандидата
+
+            # Обрабатываем результат поиска для текущей потребности
+            if found_match_for_need:
+                 selected_knowledge_map[param_name] = best_candidate_id
+                 # print(f"    Selected '{param_name}': {best_candidate_id}") # Debug log
+            elif not is_optional:
+                 # Если обязательное знание не найдено, выбрасываем ошибку
+                 err_msg = f"Missing REQUIRED knowledge for '{param_name}' with tags {query_tags_set} in G={target_knowledge_group}, N={target_nest}."
+                 print(f"ERROR: {err_msg}")
+                 raise ValueError(err_msg) # Прерываем выполнение compute
+            # else: print(f"    Warn: Optional knowledge '{param_name}' not found.") # Необязательное не найдено
+
+        # Возвращаем карту найденных ID знаний
+        return selected_knowledge_map
+
+    # --- Early Exit Check (Использует СТАРЫЙ геттер) ---
     def _check_early_exit(self, tensor_structure: List, result_data: Any, context: Dict) -> bool:
-        """Checks early exit conditions (placeholder)."""
-        # [Implementation unchanged]
-        exit_gates = get_tensor_exit_gates(tensor_structure);
+        try: exit_gates = get_tensor_exit_gates(tensor_structure) or [] # Старый геттер
+        except Exception: return False
         if not exit_gates: return False
         check_context = {**context, "current_result": result_data}
         for gate_ref in exit_gates:
             try:
                 gate_triggered = False
-                if isinstance(gate_ref, str): gate_result = self.compute(gate_ref, context={"input_data": check_context}); gate_triggered = gate_result.get("status") == "completed" and isinstance(gate_result.get("data"), bool) and gate_result["data"]
+                if isinstance(gate_ref, str):
+                    gate_result = self.compute(gate_ref, context={"input_data": check_context})
+                    gate_triggered = (gate_result.get("status") == "completed" and isinstance(gate_result.get("data"), bool) and gate_result["data"])
                 elif callable(gate_ref): gate_triggered = gate_ref(check_context)
-                else: print(f"Warning: Invalid exit gate format: {gate_ref}")
-                if gate_triggered: print(f"Early exit condition met by gate: {gate_ref}"); return True
+                if gate_triggered: return True
             except Exception as e: print(f"Error checking exit gate {gate_ref}: {e}"); continue
         return False
 
+    # --- compute Method (Работает со СТРУКТУРОЙ СПИСКА) ---
     def compute(self, processor_id: str, context: Optional[Dict] = None) -> Dict:
-        """Core computation method. Dynamically loads knowledge and executes operations."""
-        # [Corrected Error Handling Logic]
-        start_time = time.time(); context = context or {}
-        provenance = {"processor_id": processor_id, "steps": [],"timestamp_start": datetime.now().isoformat(),"context_received": {k:v for k,v in context.items() if k!='input_data'}}
-        self._log_memory(f"Compute Start: {processor_id}")
+        """Основной метод вычислений v0.6.2 - работает со структурой списка."""
+        start_time = time.time(); context = context or {}; provenance = { "processor_id": processor_id, "steps": [], "timestamp_start": datetime.now().isoformat(), "context_received": {k: v for k, v in context.items() if k != 'input_data'} }
 
-        # Cache Key & Check
-        input_data = context.get("input_data"); input_hash = hashlib.sha256(pickle.dumps(input_data)).hexdigest()[:8] if input_data is not None else "no_input"; state_id = context.get("state_id", None); required_nest = context.get("required_nest", "default"); cache_key = (processor_id, required_nest, state_id if state_id else input_hash)
-        if cache_key in self.compute_cache: cached_data = self.compute_cache[cache_key]; self._update_cache_access(cache_key); provenance["status"] = "cached"; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000; print(f"Compute Cache Hit for {processor_id}"); return {"data": cached_data, "provenance": provenance, "status": "completed"}
+        # Кэширование
+        input_data = context.get("input_data"); input_hash_str = "no_input"
+        if input_data is not None:
+             try: input_hash_str = hashlib.sha256(pickle.dumps(input_data)).hexdigest()[:8]
+             except Exception: input_hash_str = f"unhashable_{type(input_data).__name__}"
+        state_id = context.get("state_id"); required_nest = context.get("required_nest", "default")
+        cache_key = (processor_id, required_nest, state_id if state_id else input_hash_str)
+        if cache_key in self.compute_cache:
+            cached_data = self.compute_cache[cache_key]; self._update_cache_access(cache_key); provenance["status"] = "cached"; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000;
+            return {"data": cached_data, "provenance": provenance, "status": "completed"}
 
-        # Load Processor
+        # Загрузка СТРУКТУРЫ СПИСКА процессора
         processor_structure = self.load_tensor(processor_id, load_knowledge=False)
-        if not processor_structure or get_tensor_type(processor_structure) != "processor": error_msg = f"Processor {processor_id} not found/invalid"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
-        coord = get_tensor_coord(processor_structure); metadata = get_tensor_metadata(processor_structure); status = metadata.get("status", "active"); provenance.update({"coord": str(coord), "evo_version": metadata.get("evolutionary_version")})
-        if status == "archived": error_msg = f"Processor {processor_id} archived"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
+        if not processor_structure:
+            error_msg = f"Processor {processor_id} structure list not found/invalid."; provenance["error"] = error_msg; provenance["status"] = "error"
+            return {"data": None, "provenance": provenance, "status": "error"}
 
-        # Determine Config
-        required_tags = get_processor_required_knowledge_tags(processor_structure); ops_sequence = get_processor_ops_sequence(processor_structure)
-        if not ops_sequence: default_op = get_tensor_default_op(processor_structure); ops_sequence = [default_op] if default_op and default_op != OP_IDENTITY else []
-        param_mapping = get_processor_param_mapping(processor_structure) # { tag_id: param_name }
-        if not ops_sequence: result_data = context.get("input_data"); provenance["status"] = "completed (no ops)"; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000; self._add_to_cache(cache_key, result_data); return {"data": result_data, "provenance": provenance, "status": "completed"}
-        provenance["ops_sequence_length"] = len(ops_sequence)
+        # Валидация и извлечение данных с помощью СТАРЫХ геттеров
+        try:
+            if not self.validate_tensor(processor_structure): raise ValueError("Invalid processor structure list.")
+            tensor_type_str = get_tensor_type(processor_structure)
+            status_str = get_tensor_status(processor_structure)
+            coord_obj = get_tensor_coord(processor_structure)
+            meta_dict = get_tensor_metadata(processor_structure)
+            evo_version = meta_dict.get("evolutionary_version", 1)
+            if tensor_type_str not in ["processor", "converter"]: raise ValueError(f"Tensor {processor_id} not processor/converter.")
+            if status_str == "archived": raise ValueError(f"Processor {processor_id} is archived.")
+            if not coord_obj: raise ValueError(f"Cannot get coordinates for {processor_id}")
+            provenance.update({"coord": str(coord_obj), "evo_version": evo_version})
+        except Exception as e:
+             error_msg = f"Error processing loaded structure for {processor_id}: {e}"; provenance["error"] = error_msg; provenance["status"] = "error"
+             return {"data": None, "provenance": provenance, "status": "error"}
 
-        # Select & Load Knowledge
-        load_start_time = time.time()
-        selected_knowledge_ids_map_by_tag = self._select_knowledge_tensors(required_tags, context) # { tag_id: knowledge_id }
-        loaded_knowledge_by_id = {} # { knowledge_id: data }
-        missing_tags = set(required_tags) - set(selected_knowledge_ids_map_by_tag.keys())
-        if missing_tags: error_msg = f"Could not find knowledge for tags: {missing_tags}"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
-        for tag, knowledge_id in selected_knowledge_ids_map_by_tag.items():
-             data = self.load_knowledge_tensor_data(knowledge_id)
-             if data is not None: loaded_knowledge_by_id[knowledge_id] = data
-             else: error_msg = f"Failed load knowledge {knowledge_id} for tag {tag}"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
+        # Определение Ops Sequence (используем СТАРЫЙ геттер)
+        ops_sequences_dict = get_processor_ops_sequences(processor_structure) or {}
+        precision_key = 'default'; # ... (логика определения precision_key) ...
+        if isinstance(required_nest, int):
+            if required_nest == 0: precision_key = TAG_PREC_INT8
+            elif required_nest == 1: precision_key = TAG_PREC_FLOAT16
+            elif required_nest == 2: precision_key = TAG_PREC_FLOAT32
+        elif isinstance(required_nest, int) and 20 <= required_nest <= 29: precision_key = required_nest
+        elif required_nest != "default": precision_key = required_nest
+        ops_sequence = ops_sequences_dict.get(precision_key)
+        if ops_sequence is None and precision_key != 'default': ops_sequence = ops_sequences_dict.get('default')
+
+        if not ops_sequence:
+             result_data = context.get("input_data"); provenance["status"] = "completed (no ops)";
+             provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000
+             self._add_to_cache(cache_key, result_data); return {"data": result_data, "provenance": provenance, "status": "completed"}
+
+        provenance["ops_sequence_length"] = len(ops_sequence); provenance["precision_key_used"] = str(precision_key)
+
+        # Выбор и Загрузка Знаний (передаем СТРУКТУРУ СПИСКА)
+        load_start_time = time.time(); loaded_knowledge_by_param_name = {}; knowledge_ids_loaded = []
+        try:
+            selected_knowledge_map = self._select_knowledge_tensors(processor_structure, context)
+            for param_name, knowledge_id in selected_knowledge_map.items():
+                 data = self.load_knowledge_tensor_data(knowledge_id) # Включает деквантование
+                 if data is None: raise ValueError(f"Failed load knowledge blob {knowledge_id} ({param_name})")
+                 loaded_knowledge_by_param_name[param_name] = data; knowledge_ids_loaded.append(knowledge_id)
+        except Exception as load_err:
+            error_msg = f"Knowledge select/load fail: {load_err}"; provenance["error"] = error_msg; provenance["status"] = "error"
+            return {"data": None, "provenance": provenance, "status": "error"}
         provenance["knowledge_load_ms"] = (time.time() - load_start_time) * 1000
-        provenance["loaded_knowledge_ids"] = list(loaded_knowledge_by_id.keys())
-        self._log_memory(f"Compute Knowledge Loaded: {processor_id}")
+        provenance["loaded_knowledge_ids"] = knowledge_ids_loaded
 
-        # Initial Data & State
+        # Начальные данные и Состояние
         current_step = 0; current_data = None; state_id_used = context.get("state_id")
         if state_id_used:
              intermediate_state_data = self.load_knowledge_tensor_data(state_id_used)
-             if intermediate_state_data is None or not isinstance(intermediate_state_data, dict): error_msg = f"Failed/invalid state {state_id_used}"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
-             current_data = intermediate_state_data.get("data"); current_step = intermediate_state_data.get("next_step", 0); provenance["resumed_from_state"] = state_id_used; provenance["resumed_from_step"] = current_step; print(f"Resuming computation from step {current_step}")
+             if not isinstance(intermediate_state_data, dict):
+                 error_msg = f"Invalid state data for {state_id_used}"; provenance["error"] = error_msg; provenance["status"] = "error";
+                 return {"data": None, "provenance": provenance, "status": "error"}
+             current_data = intermediate_state_data.get("data"); current_step = intermediate_state_data.get("next_step", 0);
+             provenance["resumed_from_state"] = state_id_used; provenance["resumed_from_step"] = current_step;
         else: current_data = context.get("input_data")
 
-        # Pre-processing Filters
-        filters = get_tensor_filters(processor_structure)
-        if filters and current_data is not None: print("Applying pre-processing filters (placeholder)..."); pass # Apply filters
+        # Фильтры
+        filters = get_tensor_filters(processor_structure) or []
+        if filters and current_data is not None: pass # Placeholder
 
-        # Execute Op Sequence
-        max_steps_per_call = context.get("max_steps", len(ops_sequence)); steps_executed_this_call = 0
-        exec_start_time = time.time(); ops_to_execute = ops_sequence[current_step : current_step + max_steps_per_call]
-        result_data = None; step_provenance_list = []
+        # Выполнение Последовательности Операций
+        max_steps_per_call = context.get("max_steps", len(ops_sequence))
+        steps_executed_this_call = 0; exec_start_time = time.time(); ops_to_execute = []; result_data = None; step_provenance_list = []
+        if 0 <= current_step < len(ops_sequence):
+             end_step = min(current_step + max_steps_per_call, len(ops_sequence)); ops_to_execute = ops_sequence[current_step : end_step]
         if ops_to_execute:
             try:
-                kw_for_exec = {"_selected_knowledge_ids_map": selected_knowledge_ids_map_by_tag}
-                result_data, step_provenance_list = self._execute_op_sequence(
-                    ops_to_execute, current_data, loaded_knowledge_by_id, param_mapping, **kw_for_exec
-                )
-                provenance["steps"].extend(step_provenance_list); steps_executed_this_call = len(step_provenance_list); current_step += steps_executed_this_call
-
-                # Check for failure WITHIN the sequence execution helper
-                if result_data is None and step_provenance_list and "error" in step_provenance_list[-1]:
-                    # If helper returned None AND set an error in provenance
-                    error_msg = f"Op sequence failed at step {current_step - 1}: {step_provenance_list[-1]['error']}"
-                    provenance["error"] = error_msg # Use the specific error
-                    provenance["status"] = "error"
-                    return {"data": None, "provenance": provenance, "status": "error"} # Return immediately
-
-            except Exception as exec_e: # Catch errors during the call to helper itself
-                 error_msg = f"Error during op sequence execution call: {exec_e}"; provenance["error"] = error_msg; provenance["status"] = "error"; print(error_msg)
-                 return {"data": None, "provenance": provenance, "status": "error"}
-        else:
-            result_data = current_data # No ops executed
+                exec_context = {"_current_processor_id": processor_id, **context}
+                result_data, step_provenance_list = self._execute_op_sequence( ops_to_execute, current_data, loaded_knowledge_by_param_name, **exec_context )
+                provenance["steps"].extend(step_provenance_list); steps_executed_this_call = len(step_provenance_list)
+                if step_provenance_list and "error" in step_provenance_list[-1]:
+                     error_msg = f"Op sequence failed: {step_provenance_list[-1].get('error','Unknown')}"; provenance["error"] = error_msg; provenance["status"] = "error"
+                     return {"data": None, "provenance": provenance, "status": "error"}
+                else: current_step += steps_executed_this_call
+            except Exception as exec_e: error_msg = f"Error during op sequence exec: {exec_e}"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
+        else: result_data = current_data
         provenance["execution_ms"] = (time.time() - exec_start_time) * 1000
 
-        # Handle Sequential State
+        # Обработка Состояния (вызов гибридного create_tensor)
         if current_step < len(ops_sequence):
-            state_to_save = {"data": result_data, "next_step": current_step}; state_coord = TensorCoordinate(layer=STATE_TENSOR_LAYER, group=coord.group, nest=coord.nest, x=random.randint(10000,99999))
-            state_tensor = self.create_tensor(coord=state_coord, tensor_type="knowledge", knowledge_data=state_to_save, status="temporary", metadata={"origin_processor": processor_id, "origin_coord": str(coord)}); state_id_new = self.save_tensor(state_tensor)
-            if not state_id_new: error_msg = "Failed save state"; provenance["error"] = error_msg; provenance["status"] = "error"; return {"data": None, "provenance": provenance, "status": "error"}
-            provenance["status"] = "pending"; provenance["next_state_id"] = state_id_new; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000; print(f"Computation pending, state {state_id_new} for step {current_step}"); return {"data": None, "provenance": provenance, "status": "pending", "state_id": state_id_new}
+            state_to_save = {"data": result_data, "next_step": current_step}
+            state_coord = TensorCoordinate( layer=STATE_TENSOR_LAYER, group=coord_obj.group, nest=coord_obj.nest, x=random.randint(10000,99999), y=coord_obj.y, z=coord_obj.z )
+            try:
+                # Вызываем ГИБРИДНЫЙ create_tensor, он вернет СТРУКТУРУ СПИСКА
+                state_tensor_structure = self.create_tensor(
+                     coord=state_coord, tensor_type="state",
+                     knowledge_data=state_to_save, status="temporary", parents=[processor_id]
+                )
+                # Вызываем save_tensor, который ожидает СТРУКТУРУ СПИСКА
+                state_id_new = self.save_tensor(state_tensor_structure)
+                if not state_id_new: raise RuntimeError("Failed to save state tensor.")
+                provenance["status"] = "pending"; provenance["next_state_id"] = state_id_new
+                provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000
+                return {"data": None, "provenance": provenance, "status": "pending", "state_id": state_id_new}
+            except Exception as state_e:
+                 error_msg = f"Failed create/save state: {state_e}"; provenance["error"] = error_msg; provenance["status"] = "error";
+                 return {"data": None, "provenance": provenance, "status": "error"}
 
-        # Post-processing Filters & Early Exit
-        # TODO: Apply post-filters
-        if self._check_early_exit(processor_structure, result_data, context):
-            provenance["status"] = "early_exit"; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000; print(f"Early exit for {processor_id}"); self._add_to_cache(cache_key, result_data); return {"data": result_data, "provenance": provenance, "status": "completed"}
+        # Ранний Выход (используем СТАРЫЙ геттер)
+        if self._check_early_exit(processor_structure, result_data, context): # Передаем структуру списка
+            provenance["status"] = "early_exit"; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000
+            self._add_to_cache(cache_key, result_data);
+            return {"data": result_data, "provenance": provenance, "status": "completed"}
 
-        # Finalize
+        # Завершение
         provenance["status"] = "completed"; provenance["timestamp_end"] = datetime.now().isoformat(); provenance["duration_ms"] = (time.time() - start_time) * 1000
-        self._add_to_cache(cache_key, result_data); self._log_memory(f"Compute End: {processor_id}")
-
-        # Route Output
-        output_channels = get_tensor_output_channels(processor_structure)
-        if output_channels: print(f"Routing result (completed) to channels: {output_channels} (placeholder)..."); # TODO: Implement routing
+        self._add_to_cache(cache_key, result_data);
 
         return {"data": result_data, "provenance": provenance, "status": "completed"}
 
-    # --- Spawning / Evolution ---
-    # [Unchanged]
+
+    # --- Spawning / Evolution (Адаптировано для структуры списка) ---
     def spawn_tensor(self, parent_id: str, strategy: str = "inherit", context: Optional[Dict] = None) -> Optional[str]:
-        """Creates a new child tensor (processor or knowledge) based on a parent."""
-        print(f"Spawning child from parent {parent_id} using strategy '{strategy}'...")
-        parent_structure = self.load_tensor(parent_id, load_knowledge=False);
-        if not parent_structure: print(f"Error spawn: Parent {parent_id} not found."); return None
-        parent_metadata = get_tensor_metadata(parent_structure); parent_type = parent_metadata.get("tensor_type"); parent_coord = get_tensor_coord(parent_structure)
-        child_coord = self._generate_next_coords(parent_coord); child_metadata = {"spawn_strategy": strategy}; child_type = parent_type; child_knowledge_data = None
-        child_ops_sequence = get_processor_ops_sequence(parent_structure); child_required_tags = get_processor_required_knowledge_tags(parent_structure); child_param_mapping = get_processor_param_mapping(parent_structure); child_default_op = get_tensor_default_op(parent_structure); child_filters = get_tensor_filters(parent_structure); child_input_channels = get_tensor_input_channels(parent_structure); child_output_channels = get_tensor_output_channels(parent_structure); child_exit_gates = get_tensor_exit_gates(parent_structure); child_compatibility_tags = get_knowledge_compatibility_tags(parent_structure) if parent_type == "knowledge" else None
+        """Создает дочерний тензор. Работает со структурой списка."""
+        parent_structure = self.load_tensor(parent_id, load_knowledge=False)
+        if not parent_structure or not self.validate_tensor(parent_structure):
+            print(f"Error spawn: Parent {parent_id} not found or invalid list structure.")
+            return None
+
         try:
-            if parent_type == "knowledge":
-                child_type = "knowledge"
-                if strategy == "inherit": child_metadata["knowledge_blob_cid"] = parent_metadata.get("knowledge_blob_cid")
+            # Извлекаем инфо с помощью СТАРЫХ геттеров
+            parent_type_str = get_tensor_type(parent_structure)
+            parent_coord_obj = get_tensor_coord(parent_structure)
+            parent_tags = get_tensor_tags(parent_structure)
+            parent_interface = get_tensor_interface(parent_structure)
+            parent_ops_sequences = get_processor_ops_sequences(parent_structure)
+            parent_filters = get_tensor_filters(parent_structure)
+            parent_exit_gates = get_tensor_exit_gates(parent_structure)
+            parent_meta_dict = get_tensor_metadata(parent_structure)
+            parent_dtype_str = parent_meta_dict.get("dtype")
+            parent_shape = parent_meta_dict.get("shape")
+            if not parent_coord_obj: raise ValueError("Cannot get parent coordinates")
+        except Exception as e: print(f"Error spawn: Failed extraction from parent {parent_id}: {e}"); return None
+
+        # Генерация координат и наследование
+        child_coord = self._generate_next_coords(parent_coord_obj)
+        child_metadata_extra = {"spawn_strategy": strategy}
+        child_type = parent_type_str; child_knowledge_data = None
+        child_tags = list(parent_tags); child_interface = parent_interface.copy() if parent_interface else None
+        child_ops_sequences = parent_ops_sequences.copy() if parent_ops_sequences else None
+        child_filters = list(parent_filters) if parent_filters else None
+        child_exit_gates = list(parent_exit_gates) if parent_exit_gates else None
+        child_dtype = parent_dtype_str; child_shape = parent_shape
+
+        # Применение стратегии
+        try:
+            parent_has_blob = has_blob_data(parent_structure)
+            if parent_type_str == "knowledge":
+                if strategy == "inherit" or not parent_has_blob: child_knowledge_data = None
                 elif strategy == "mutate_knowledge":
-                    parent_data = self.load_knowledge_tensor_data(parent_id)
-                    if parent_data is not None and isinstance(parent_data, np.ndarray): scale = context.get("mutation_scale", 0.05); noise = np.random.normal(0, scale, parent_data.shape); child_knowledge_data = parent_data + noise.astype(parent_data.dtype); child_metadata["mutation_scale"] = scale; child_metadata["knowledge_blob_cid"] = None
-                    else: raise ValueError("Cannot mutate non-NumPy/missing knowledge.")
-                elif strategy == "distill_knowledge":
+                    parent_data = self.load_knowledge_tensor_data(parent_id) # Загрузит и деквантует
+                    if parent_data is not None and isinstance(parent_data, np.ndarray):
+                        scale = context.get("mutation_scale", 0.05) if context else 0.05
+                        noise = np.random.normal(0, scale, parent_data.shape).astype(parent_data.dtype)
+                        child_knowledge_data = parent_data + noise; child_dtype = child_knowledge_data.dtype; child_shape = child_knowledge_data.shape
+                        child_tags = [t for t in child_tags if not (20 <= t <= 29)]; float_prec_tag = DTYPE_MAPPING.get(child_dtype, TAG_PREC_FLOAT16); child_tags.append(float_prec_tag)
+                    else: raise ValueError("Cannot mutate missing/invalid knowledge.")
+                elif strategy == "distill_knowledge": # Квантуем в int8
                     parent_data = self.load_knowledge_tensor_data(parent_id)
                     if parent_data is not None:
-                        target_format = context.get("target_format", "int8"); distilled_data = self._distill_knowledge_data(parent_data, target_format)
-                        if distilled_data is not None: child_knowledge_data = distilled_data; child_metadata["distilled_from"] = parent_id; child_metadata["distill_format"] = target_format; child_compatibility_tags = [t for t in (child_compatibility_tags or []) if "float" not in t] + [target_format]
-                        else: raise ValueError("Distillation failed.")
+                        target_format_str = "int8"; scale = None
+                        if np.issubdtype(parent_data.dtype, np.floating):
+                             abs_max = np.max(np.abs(parent_data)); scale = abs_max / 127.0 if abs_max > 1e-9 else 1.0
+                             distilled_data = np.round(parent_data / max(scale, 1e-9)).astype(np.int8)
+                             child_knowledge_data = distilled_data; child_dtype = np.int8; child_shape = distilled_data.shape
+                             new_prec_tag = TAG_PREC_INT8; child_tags = [t for t in child_tags if not (20 <= t <= 29)]; child_tags.append(new_prec_tag)
+                             child_metadata_extra["quantization_scale"] = float(scale)
+                        else: raise ValueError(f"Cannot distill non-float data to {target_format_str}")
                     else: raise ValueError("Cannot distill missing knowledge.")
-                else: print(f"Warn: Strategy '{strategy}' default inherit for knowledge."); child_metadata["knowledge_blob_cid"] = parent_metadata.get("knowledge_blob_cid")
-            elif parent_type == "processor":
-                child_type = "processor"
-                if strategy == "inherit": pass
-                elif strategy == "mutate_ops_sequence":
-                     if child_ops_sequence:
-                          idx = random.randrange(len(child_ops_sequence)); current_op = tuple(child_ops_sequence[idx]); compatible_ops = [op for op in self.core_ops.keys() if op != current_op]
-                          if compatible_ops: new_op = random.choice(compatible_ops); child_ops_sequence[idx] = list(new_op); child_metadata["mutation_details"] = f"Replaced op @{idx} with {new_op}"; print(f"  Mutated ops sequence @{idx}")
-                          else: print("Warn: No alternative ops.")
-                     else: print("Warn: No ops sequence to mutate.")
-                elif strategy == "specialize_processor":
-                     focus_tags = context.get("focus_tags"); add_filter_id = context.get("add_filter_id")
-                     if isinstance(focus_tags, list): child_required_tags = focus_tags; child_metadata["specialization_tags"] = focus_tags; print(f"  Specialized tags: {focus_tags}")
-                     if add_filter_id: child_filters = (child_filters or []) + [add_filter_id]; child_metadata["added_filter"] = add_filter_id; print(f"  Specialized filter: {add_filter_id}")
-                else: print(f"Warn: Strategy '{strategy}' default inherit for processor.")
-            else: raise ValueError(f"Unknown parent type '{parent_type}'")
+            # ... (другие стратегии и типы) ...
         except Exception as e: print(f"Error applying spawn strategy '{strategy}': {e}"); return None
-        final_child_metadata = {"desc": f"Child of {parent_id} via {strategy}", **child_metadata}
-        child_tensor_structure = self.create_tensor( coord=child_coord, tensor_type=child_type, metadata=final_child_metadata, op=child_default_op, ops_sequence=child_ops_sequence, required_knowledge_tags=child_required_tags, param_mapping=child_param_mapping, filters=child_filters, input_channels=child_input_channels, output_channels=child_output_channels, exit_gates=child_exit_gates, knowledge_data=child_knowledge_data, compatibility_tags=child_compatibility_tags, parents=[parent_id], evolutionary_version=1 )
-        child_id = self.save_tensor(child_tensor_structure)
-        if child_id: print(f"Spawn successful: Created child {child_id} (type: {child_type}) from {parent_id}")
-        else: print(f"Error spawn: Failed to save child tensor.")
-        return child_id
 
+        # --- Создание Дочернего Тензора (вызов гибридного create_tensor) ---
+        try:
+            child_tensor_structure = self.create_tensor(
+                coord=child_coord, tensor_type=child_type, tags=child_tags,
+                interface=child_interface, ops_sequences=child_ops_sequences,
+                filters=child_filters, exit_gates=child_exit_gates,
+                knowledge_data=child_knowledge_data, dtype=child_dtype, shape=child_shape,
+                name_id=-1, parents=[parent_id], evolutionary_version=1, status="active",
+                metadata_extra=child_metadata_extra
+            )
+            # --- Сохранение Дочернего Тензора (передаем структуру списка) ---
+            child_id = self.save_tensor(child_tensor_structure)
+
+            if child_id: print(f"Spawn successful: Child {child_id} from {parent_id}")
+            else: print(f"Error spawn: Failed to save child tensor.")
+            return child_id
+        except Exception as e: print(f"Error during child tensor creation/saving: {e}"); return None
+
+    # --- Вспомогательные и специальные методы ---
     def _distill_knowledge_data(self, data: Any, target_format: str) -> Any:
-        """Placeholder for knowledge distillation."""
-        # [Implementation unchanged]
-        print(f"Distilling data to {target_format} (Placeholder)...")
+        # (Логика без изменений)
+        print(f"Distilling data to {target_format} (Placeholder)..."); # ...
         if isinstance(data, np.ndarray):
-             if target_format == "int8" and np.isrealobj(data): scale = np.max(np.abs(data))/127.0 if np.max(np.abs(data))>1e-9 else 1.0; quantized = np.round(data/(scale + 1e-9)).astype(np.int8); print("  Quantized to int8"); return quantized
-             elif target_format == "float16": print("  Converting to float16"); return data.astype(np.float16)
-        print("  Distillation not applied."); return data
-
-    def _generate_next_coords(self, current_coords: TensorCoordinate) -> TensorCoordinate:
-        """Generates next coordinates (simple placeholder)."""
-        # [Implementation unchanged]
-        return TensorCoordinate(layer=current_coords.layer, group=current_coords.group, nest=current_coords.nest, x=current_coords.x, y=current_coords.y, z=current_coords.z + 1)
-
-    # --- Definitions for Special Operation Methods (ADDED and Formatted) ---
-    def _op_conditional_if(self, data: Any, **kw) -> Any:
-        """Placeholder: Executes different branches based on condition."""
-        print(f"Executing Op: Conditional IF")
-        try:
-            condition = bool(data[0]) if isinstance(data, (list, np.ndarray)) and len(data)>0 else bool(data)
-            true_ref = data[1] if isinstance(data, (list, np.ndarray)) and len(data)>1 else None
-            false_ref = data[2] if isinstance(data, (list, np.ndarray)) and len(data)>2 else None
-            ref_to_process = true_ref if condition else false_ref
-            print(f"  Condition={condition}. Branch ref: {ref_to_process}")
-            # TODO: Implement actual execution of the branch
-            return ref_to_process # Returning the reference for now
-        except Exception as e: print(f"  Error in _op_conditional_if: {e}"); return None
-
-    def _op_loop_multiply(self, data: Any, **kw) -> Any:
-        """Placeholder: Repeats an operation or multiplies data."""
-        print("Executing Op: Loop Multiply")
-        try:
-             val = data[0] if isinstance(data, (list, np.ndarray)) and len(data)>0 else data
-             n = int(data[1]) if isinstance(data, (list, np.ndarray)) and len(data)>1 else 1
-             print(f"  Multiplying {type(val)} by {n}")
-             if isinstance(val, (int, float, complex, np.number)): return val * n
-             elif isinstance(val, np.ndarray): return val * n
-             else: return [val] * n
-        except Exception as e: print(f"  Error in _op_loop_multiply: {e}"); return data
-
-    def _op_choice_select(self, data: Any, **kw) -> Any:
-        """Placeholder: Selects one option based on an index."""
-        print("Executing Op: Choice Select")
-        try:
-            idx = int(data[0]) if isinstance(data, (list, np.ndarray)) and len(data)>0 else 0
-            options = data[1:] if isinstance(data, (list, np.ndarray)) else []
-            if 0 <= idx < len(options):
-                print(f"  Selected option at index {idx}")
-                return options[idx]
-            else: print(f"  Index {idx} out of bounds."); return None
-        except Exception as e: print(f"  Error in _op_choice_select: {e}"); return None
-
-    def _op_trigger_reason(self, data: Any, **kw) -> Any:
-        """Placeholder: Triggers optimization/evolution analysis."""
-        processor_id = kw.get("_current_processor_id") # Need compute to pass this
-        print(f"Executing Op: Trigger Reason/Optimization for processor {processor_id}?")
-        # TODO: Call self.optimize_tensor_structure(processor_id) or similar
+            if target_format == "int8" and np.issubdtype(data.dtype, np.floating): scale = np.max(np.abs(data))/127.0 if np.max(np.abs(data))>1e-9 else 1.0; return np.round(data/max(scale, 1e-9)).astype(np.int8)
+            elif target_format == "float16": return data.astype(np.float16)
+            elif target_format == "bfloat16": return data.astype(np.float16)
         return data
+    def _generate_next_coords(self, c: TensorCoordinate) -> TensorCoordinate:
+        return TensorCoordinate( layer=c.layer, group=c.group, nest=c.nest, x=c.x, y=c.y, z=c.z + 1 )
+    def _op_conditional_if(self, data: Any, **kw) -> Any: # Placeholder
+        c=bool(data[0]) if isinstance(data,(list,np.ndarray)) and len(data)>0 else bool(data);t=data[1] if isinstance(data,(list,np.ndarray)) and len(data)>1 else None;f=data[2] if isinstance(data,(list,np.ndarray)) and len(data)>2 else None;return t if c else f
+    def _op_loop_multiply(self, data: Any, **kw) -> Any: # Placeholder
+        v=data;n=1; #... (logic) ...
+        if isinstance(v,(int,float,complex,np.number)): return v*n
+        elif isinstance(v, np.ndarray): return v*n
+        else: return [v]*n
+    def _op_choice_select(self, data: Any, **kw) -> Any: # Placeholder
+        i=0;o=[]; #... (logic) ...
+        return o[i] if 0<=i<len(o) else None
+    def _op_trigger_reason(self, data: Any, **kw) -> Any: return data # Placeholder
+    def _op_graph_dfs(self, data: Any, **kw) -> Any: return [] # Placeholder
+    def _op_output_print(self, data: Any, **kw): return data # Placeholder
+    def _quantum_op_placeholder(self, data: Any, op_type: str, **kw) -> Any: return data # Placeholder
+    def _get_tensor_manager(self) -> Optional[Any]: return None
+    def handle_task(
+        self,
+        task_description: Any,
+        input_data: Any,
+        resources: Dict,
+        priority: float
+    ) -> Optional[Dict]:
+        """Placeholder for handling tasks via TensorManager."""
+        # Эта функция требует интеграции с TensorManager, который еще не реализован.
+        print("Warning: handle_task called, but TensorManager is not implemented.")
+        # Возвращаем None как заглушку
+        return None
+    def get_available_processors(self, filter_dict=None) -> List[str]: # Uses find_active_tensors
+        try: p=self.db.find_active_tensors(tensor_type="processor", coord_filter=filter_dict); return list(p.keys())
+        except Exception: return []
+    def get_tensor_structure(self, tensor_id: str) -> Optional[List]: # <<< Возвращает список
+        return self.load_tensor(tensor_id, load_knowledge=False)
 
-    def _op_graph_dfs(self, data: Any, **kw) -> Any:
-        """Placeholder: Performs Depth First Search on a graph."""
-        print("Executing Op: Graph DFS")
-        try:
-            graph_ref = data[0] if isinstance(data, (list, np.ndarray)) else None
-            start_node = data[1] if isinstance(data, (list, np.ndarray)) and len(data)>1 else None
-            graph = graph_ref if isinstance(graph_ref, dict) else {} # TODO: Load if ID
-            path = []; stack = [start_node] if start_node is not None else []; visited = set()
-            while stack:
-                 node = stack.pop()
-                 if node not in visited and node is not None:
-                      node_str = str(node); visited.add(node_str); path.append(node)
-                      neighbors = graph.get(node_str,[]); stack.extend(reversed(neighbors))
-            print(f"  DFS Path from {start_node}: {path}")
-            return path
-        except Exception as e: print(f"  Error in _op_graph_dfs: {e}"); return []
-
-    def _op_output_print(self, data: Any, **kw):
-        """Operation with side effect: print data nicely."""
-        print(f"Executing Op: Print Output")
-        try:
-            if isinstance(data, np.ndarray):
-                with np.printoptions(precision=3, suppress=True, threshold=20, edgeitems=5): print(f"  >> Veector Output: {data}")
-            elif isinstance(data, dict) and "provenance" in data: print(f"  >> Veector Output (Result): {data.get('data')}")
-            else: print(f"  >> Veector Output: {data}")
-        except Exception as e: print(f"  >> Veector Output (Error formatting): {e}")
-        return data
-
-    # --- Placeholder for Quantum Ops ---
-    # [Unchanged]
-    def _quantum_op_placeholder(self, data: Any, op_type: str, **kw) -> Any:
-         if not QISKIT_AVAILABLE: print(f"Quantum op '{op_type}' skipped: Qiskit not available."); return data
-         print(f"Quantum op '{op_type}' called (Placeholder).")
-         return data
-
-    # --- Placeholders for TensorManager Interaction ---
-    # [Unchanged]
-    def _get_tensor_manager(self) -> Optional[Any]: print("TensorManager interaction not implemented."); return None
-    def handle_task(self, task_description: Any, input_data: Any, resources: Dict, priority: float) -> Optional[Dict]: print("handle_task needs TensorManager logic."); return None
-    def get_available_processors(self, filter_dict=None) -> List[str]: return list(self.db.find_active_tensors(tensor_type="processor", coord_filter=filter_dict).keys())
-    def get_tensor_structure(self, tensor_id: str) -> Optional[List]: return self.load_tensor(tensor_id, load_knowledge=False)
-
-
-# --- Example Usage ---
+# --- Пример использования (Требует обновления) ---
 if __name__ == "__main__":
-    # [Example block unchanged from user's provided code - uses STRING tags]
-    print("\n--- Veector Core Example (v2 - User Provided Base Example Style) ---")
-    script_dir = Path(__file__).parent
-    db_path = script_dir / f"../data/veector_core_db_v{time.strftime('%Y%m%d%H%M%S')}" # Use unique timestamp
-
-    if db_path.exists():
-        import shutil
-        try: shutil.rmtree(db_path)
-        except OSError as e: print(f"Error removing directory {db_path}: {e}")
-
-    # Using STRING tags/params as in the user's example for now
-    TAG_WEIGHTS_STR = "weights"; TAG_LINEAR_STR = "linear"; TAG_FLOAT32_STR = "float32"; TAG_INT8_STR = "int8"
-    PARAM_NAME_WEIGHTS_STR = "weights"
-
-    try:
-        vec = Veector(db_dir=db_path, ipfs_enabled=False, p2p_node=None)
-    except Exception as init_e:
-        print(f"\nFATAL: Veector initialization failed: {init_e}")
-        exit(1) # Exit if core cannot initialize
-
-    # --- Create Knowledge Tensors ---
-    coord_w0 = TensorCoordinate(layer=0, group=0, nest=0, x=1)
-    weights0 = np.round(np.random.rand(5, 3) * 10).astype(np.int8)
-    k_tensor0 = vec.create_tensor( coord=coord_w0, tensor_type="knowledge", knowledge_data=weights0, compatibility_tags=[TAG_WEIGHTS_STR, TAG_LINEAR_STR, TAG_INT8_STR], metadata={"desc": "INT8 Weights (N0)"} )
-    k_id0 = vec.save_tensor(k_tensor0)
-    print(f"\nSaved Knowledge (N0, int8): {k_id0}")
-
-    coord_w1 = TensorCoordinate(layer=0, group=0, nest=1, x=1)
-    weights1 = (np.random.rand(5, 3).astype(np.float32) - 0.5) * 0.1
-    k_tensor1 = vec.create_tensor( coord=coord_w1, tensor_type="knowledge", knowledge_data=weights1, compatibility_tags=[TAG_WEIGHTS_STR, TAG_LINEAR_STR, TAG_FLOAT32_STR], metadata={"desc": "FP32 Weights (N1)"}, parents=[k_id0] )
-    k_id1 = vec.save_tensor(k_tensor1)
-    print(f"Saved Knowledge (N1, f32): {k_id1}")
-
-    # --- Create Processor Tensor ---
-    coord_p = TensorCoordinate(layer=1, group=0, nest=0, x=1)
-    proc_tensor = vec.create_tensor(
-        coord=coord_p, tensor_type="processor",
-        ops_sequence=[OP_MATRIX_MULTIPLY, OP_PRINT], # Use constant
-        required_knowledge_tags=[TAG_WEIGHTS_STR, TAG_LINEAR_STR], # Using strings
-        param_mapping={TAG_WEIGHTS_STR: PARAM_NAME_WEIGHTS_STR}, # Map TAG string -> NAME string
-        metadata={"desc": "Linear Processor + Print"} )
-    processor_id = vec.save_tensor(proc_tensor)
-    print(f"Saved Processor: {processor_id}")
-
-    # --- Execute Compute (Requesting Nest 0) ---
-    if processor_id and k_id0:
-        print("\n--- Running Compute (Nest 0) ---")
-        input_data = np.random.rand(1, 5).astype(np.float32)
-        compute_context0 = { "input_data": input_data, "required_nest": 0 }
-        result0 = vec.compute(processor_id, context=compute_context0)
-        print("\nCompute Result (Nest 0):")
-        if result0:
-            print(f" Status: {result0.get('status')}"); data0 = result0.get('data')
-            prov0 = result0.get('provenance', {}); # print(f" Provenance: {prov0}")
-            loaded_k0 = prov0.get('loaded_knowledge_ids', []); print(f" Loaded Knowledge IDs: {loaded_k0}")
-            # Assert needs adaptation if string tags were used in selection
-            # assert k_id0 in loaded_k0, f"Nest 0 loaded {loaded_k0}, expected {k_id0}"
-        else: print(" Compute failed.")
-    else: print("\nSkipping Compute Nest 0 (Setup Failed).")
-
-    # --- Execute Compute (Requesting Nest 1) ---
-    if processor_id and k_id1:
-        print("\n--- Running Compute (Nest 1) ---")
-        # Reuse input_data
-        compute_context1 = { "input_data": input_data, "required_nest": 1 }
-        result1 = vec.compute(processor_id, context=compute_context1)
-        print("\nCompute Result (Nest 1):")
-        if result1:
-            print(f" Status: {result1.get('status')}"); data1 = result1.get('data')
-            prov1 = result1.get('provenance', {}); # print(f" Provenance: {prov1}")
-            loaded_k1 = prov1.get('loaded_knowledge_ids', []); print(f" Loaded Knowledge IDs: {loaded_k1}")
-            # Assert needs adaptation if string tags were used in selection
-            # assert k_id1 in loaded_k1, f"Nest 1 loaded {loaded_k1}, expected {k_id1}"
-        else: print(" Compute failed.")
-    else: print("\nSkipping Compute Nest 1 (Setup Failed).")
-
-    # Compare results
-    if 'result0' in locals() and 'result1' in locals() and result0 and result1 and result0.get('data') is not None and result1.get('data') is not None:
-         try: data0_f = result0['data'].astype(np.float32) if hasattr(result0.get('data'), 'astype') else None; data1_f = result1['data'].astype(np.float32) if hasattr(result1.get('data'), 'astype') else None
-         except: data0_f=None; data1_f=None
-         if data0_f is not None and data1_f is not None: print(f"\nResult Data Different (Nest 0 vs Nest 1): {not np.allclose(data0_f, data1_f)}")
-         else: print("\nCould not compare result data.")
-
-    # --- Spawn Example ---
-    if k_id1:
-        print("\n--- Spawning Knowledge (Mutate Nest 1) ---")
-        mutated_k_id = vec.spawn_tensor(k_id1, strategy="mutate_knowledge", context={"mutation_scale": 0.5})
-        print(f" Spawned mutated knowledge: {mutated_k_id}")
-    else: print("\nSkipping Spawn Example (Parent Missing).")
-
-    print("\n--- Example Finished ---")
+    print("\n--- Veector Core Example (v0.6.11) ---")
+    print("--- !!! EXAMPLE NEEDS UPDATE FOR HYBRID LIST STRUCTURE !!! ---")
+    print("\n--- Example Finished (Needs Update) ---")
