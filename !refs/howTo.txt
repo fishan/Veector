@@ -30,6 +30,6 @@ git add .
 git commit -m "Updated core, operations, tensors"
 git push origin base --force
 
-gdown "https://drive.google.com/uc?id=1-44oz7VeKEPCCyesgqXq0A-Zs9ZzkddD" -O deepseek.zip
+gdown "https://drive.google.com/uc?id=1Wq4AFZoDQMOY98P01o_H75ADcvFEC16X" -O deepseek.zip
 
-https://drive.google.com/file/d/1-44oz7VeKEPCCyesgqXq0A-Zs9ZzkddD/view?usp=sharing
+https://drive.google.com/file/d/1Wq4AFZoDQMOY98P01o_H75ADcvFEC16X/view?usp=sharing
