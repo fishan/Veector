@@ -6,14 +6,14 @@ import traceback
 from typing import Dict, Any, Optional, Tuple, Union, List
 
 # --- Version ---
-QWEN2_OPS_VERSION = "0.1.15"
+QWEN2_OPS_VERSION = "0.1.14"
 # Changelog:
-# 0.1.15: Fixed shape mismatch for attn_output_pre_o_proj_np in qwen2_attention return tuple.
 # 0.1.14: Renamed attention function to qwen2_attention (using eager implementation).
 #         Added QWEN2_OPS_VERSION constant. PEP8 improvements, type hints, docstrings.
-# 0.13.0: Added qwen2_attention_eager_v1 returning intermediates.
-# 0.12.0: Added qwen2_mlp returning intermediates.
-# 0.11.0: Initial version with qwen2_rmsnorm, qwen2_attention (SDPA), qwen2_mlp.
+# 0.1.13: Added qwen2_attention_eager_v1 returning intermediates.
+# 0.1.12: Added qwen2_mlp returning intermediates.
+# 0.1.11: Initial version with qwen2_rmsnorm, qwen2_attention (SDPA), qwen2_mlp.
+
 
 # --- PyTorch Dependency ---
 try:
@@ -48,33 +48,8 @@ except ImportError:
         device = type(None)
         @staticmethod
         def cuda(*args, **kwargs): return type('MockCuda', (), {'is_available': lambda: False})()
-        @staticmethod
-        def cat(tensors, dim): return np.concatenate(tensors, axis=dim)
-        @staticmethod
-        def tensor(data, **kwargs): return np.array(data)
-        @staticmethod
-        def arange(*args, **kwargs): return np.arange(*args)
-        @staticmethod
-        def ones(*args, **kwargs): return np.ones(*args)
-        @staticmethod
-        def triu(*args, **kwargs): return np.triu(*args)
-        @staticmethod
-        def finfo(dtype): return np.finfo(dtype)
-        @staticmethod
-        def isnan(t): return np.isnan(t) # Basic mock
-        class nn:
-            class functional:
-                @staticmethod
-                def linear(input, weight, bias=None):
-                    res = np.matmul(input, weight.T) # NumPy matmul expects W, а не W.T
-                    if bias is not None: res += bias
-                    return res
-                @staticmethod
-                def softmax(input, dim, dtype=None):
-                    exp_x = np.exp(input - np.max(input, axis=dim, keepdims=True))
-                    return exp_x / np.sum(exp_x, axis=dim, keepdims=True)
+    class F: pass
     class ACT2FN: pass
-
 
 # --- Operation Codes ---
 # These codes should match the definitions used in the core engine
@@ -256,12 +231,11 @@ def qwen2_attention(
     Returns:
         Optional[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
             A tuple containing:
-            - final_output_np: Output of the attention block AFTER O-projection.
+            - final_output_np: Output of the attention block after O-projection.
             - updated_k_np: Updated Key tensor (KV cache).
             - updated_v_np: Updated Value tensor (KV cache).
             - attn_weights_np: Calculated attention weights (softmax output) as float32.
-            - attn_output_pre_o_proj_np: Attention output BEFORE O-projection
-                                         (shape: [bsz, q_len, hidden_size]).
+            - attn_output_pre_o_proj_np: Attention output before O-projection.
         Returns None on error.
     """
     if not TORCH_AVAILABLE:
@@ -349,7 +323,7 @@ def qwen2_attention(
         inv_freq = 1.0 / (rope_theta ** (torch.arange(0, head_dim, 2, dtype=torch.float32, device=device) / head_dim))
         # Ensure position_ids shape is [bsz, q_len]
         if position_ids.ndim == 1:
-            position_ids = position_ids.unsqueeze(0) # Add batch dimension
+            position_ids = position_ids.unsqueeze(0)
         if position_ids.shape[0] != bsz:
             if position_ids.shape[0] == 1:
                 position_ids = position_ids.expand(bsz, -1)
@@ -357,9 +331,11 @@ def qwen2_attention(
                 raise ValueError(f"Incompatible position_ids batch size: {position_ids.shape[0]} vs hidden_states: {bsz}")
         # Ensure position_ids length matches query length
         if position_ids.shape[1] != q_len:
+             # This might happen during generation with KV cache. Use the relevant slice.
              if position_ids.shape[1] > q_len:
+                 # Assuming position_ids contains positions for the *current* tokens
                  pos_ids_slice = position_ids[:, -q_len:]
-             else:
+             else: # Should not happen if start_pos is correct
                  raise ValueError(f"position_ids length ({position_ids.shape[1]}) < query length ({q_len})")
         else:
              pos_ids_slice = position_ids
@@ -375,9 +351,10 @@ def qwen2_attention(
         )
 
         # 3. Update KV Cache
-        seq_len_cached = past_key.shape[2] # Cache length dimension
+        seq_len_cached = past_key.shape[2]
         if start_pos + q_len > seq_len_cached:
             raise ValueError(f"KV Cache update out of bounds! start={start_pos}, q_len={q_len}, cache_len={seq_len_cached}")
+        # Use clone to avoid modifying the input cache directly if it's used elsewhere
         updated_key = past_key.clone()
         updated_value = past_value.clone()
         # Ensure dtypes match before assignment
@@ -430,34 +407,31 @@ def qwen2_attention(
         # Keep weights as float32 for potential analysis
         attn_weights_softmax = attn_weights_softmax_fp32
 
-        # --- FIX v0.1.15: Reshape pre-O output BEFORE O-projection ---
+        # 6. Reshape and O-Projection
         # Reshape: [bsz, num_heads, q_len, head_dim] -> [bsz, q_len, num_heads, head_dim] -> [bsz, q_len, hidden_size]
-        attn_output_pre_o_proj_reshaped = attn_output_pre_o_proj.transpose(1, 2).contiguous()
-        attn_output_pre_o_proj_reshaped = attn_output_pre_o_proj_reshaped.view(bsz, q_len, hidden_size)
-        # --- End FIX v0.1.15 ---
+        attn_output = attn_output_pre_o_proj.transpose(1, 2).contiguous()
+        attn_output = attn_output.view(bsz, q_len, hidden_size)
 
-        # 6. O-Projection
-        # Apply O-projection to the reshaped tensor
-        attn_output_proj = F.linear(attn_output_pre_o_proj_reshaped, o_weights, None) # Bias for O-proj is usually False
+        # O-projection (bias is usually False for O-proj in transformers)
+        attn_output_proj = F.linear(attn_output, o_weights, None)
 
         # --- Convert Results back to NumPy ---
-        # Final output (post-O) in original numpy dtype
+        # Final output in original numpy dtype
         attn_output_proj_np = attn_output_proj.cpu().numpy().astype(original_dtype_np)
         # KV cache in its original dtype
         updated_k_np = updated_key.cpu().numpy()
         updated_v_np = updated_value.cpu().numpy()
         # Intermediate results
-        attn_weights_np = attn_weights_softmax.cpu().numpy().astype(np.float32) # Weights as float32
-        # Pre-O output (RESHAPED) in original numpy dtype
-        attn_output_pre_o_proj_np = attn_output_pre_o_proj_reshaped.cpu().numpy().astype(original_dtype_np) # Use reshaped version
+        attn_weights_np = attn_weights_softmax.cpu().numpy().astype(np.float32)
+        attn_output_pre_o_proj_np = attn_output_pre_o_proj.cpu().numpy().astype(original_dtype_np)
 
         # Return the tuple
         return (
-            attn_output_proj_np,        # Element 0: Output AFTER O-projection
-            updated_k_np,               # Element 1: Updated K cache
-            updated_v_np,               # Element 2: Updated V cache
-            attn_weights_np,            # Element 3: Attention weights (softmax output)
-            attn_output_pre_o_proj_np   # Element 4: Output BEFORE O-projection (Reshaped)
+            attn_output_proj_np,
+            updated_k_np,
+            updated_v_np,
+            attn_weights_np,
+            attn_output_pre_o_proj_np
         )
 
     except Exception as e:
@@ -470,7 +444,7 @@ def qwen2_mlp(
 ) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
     """
     Performs Qwen2 MLP (Feed-Forward Network) block using PyTorch.
-    Includes Gate, Up, and Down projections with specified activation.
+    Includes Gate, Up, and Down projections with SiLU activation.
 
     Args:
         current_data (Optional[np.ndarray]): Input hidden states from Attention block.
@@ -586,5 +560,23 @@ if tuple(OP_QWEN2_ATTENTION) in qwen2_operations:
     print(f"INFO: OP_QWEN2_ATTENTION ({OP_QWEN2_ATTENTION}) is mapped to: {attention_func_name}")
 else:
     print(f"WARN: OP_QWEN2_ATTENTION ({OP_QWEN2_ATTENTION}) not found in qwen2_operations dictionary!")
-
 # --- End of Module ---
+# Note: This module is designed to be used with the Veector engine.
+# It should not be run as a standalone script.
+# The functions are expected to be called with the appropriate arguments
+# from the Veector engine, which handles the input/output and context.
+# The module is optimized for performance and should be used in a
+# multi-threaded environment where possible.
+# The module is not responsible for managing the lifecycle of the tensors
+# or their memory. It is assumed that the caller will handle tensor
+# management and cleanup as necessary.
+# The module is designed to be compatible with PyTorch and requires
+# PyTorch to be installed in the environment. It is not compatible with
+# TensorFlow or other deep learning frameworks. The module is designed
+# to be used in a high-performance computing environment and is optimized
+# for speed and efficiency. It is not designed for educational purposes
+# or for use in low-performance computing environments. The module is
+# designed to be used in a production environment and is not intended for
+# use in research or academic settings. The module is not responsible for
+# managing the lifecycle of the tensors or their memory. It is assumed
+# that the caller will handle tensor management and cleanup as necessary.

@@ -1,5 +1,5 @@
 # FILE: core.py
-# Version: 0.7.13 (Import validate_tensor_tuple from tensors)
+# Version: 0.7.16 (Fixed Arg Resolution for Placeholder)
 
 # --- Standard Imports ---
 import numpy as np
@@ -19,7 +19,7 @@ import importlib # Dlja dinamicheskogo importa
 
 # --- Version ---
 # ИЗМЕНЕНО: Обновлена версия и описание
-CORE_VERSION = "0.7.13" # Import validate_tensor_tuple from tensors
+CORE_VERSION = "0.7.17" # Core operations update
 
 # --- Optional Imports ---
 try:
@@ -156,6 +156,7 @@ OP_DEBUG_CONTEXT=[99,1,0]; OP_MAKE_TUPLE = [99, 2, 0]
 OP_GET_TUPLE_ELEM_0 = [99, 3, 0]
 OP_GET_TUPLE_ELEM_1 = [99, 3, 1]
 OP_GET_TUPLE_ELEM_2 = [99, 3, 2]
+OP_GET_TUPLE_ELEM_3 = [99, 3, 3]
 # Vysokourovnevye Qwen2
 OP_QWEN2_RMSNORM = [300, 0, 0]
 OP_QWEN2_ATTENTION = [300, 1, 0]
@@ -258,27 +259,89 @@ class Veector:
 
     # --- Регистрация стандартных операций (без изменений) ---
     def _register_standard_ops(self):
-        """Registriruet standartnye nizkourovnevye operacii."""
+        """Registers standard low-level operations."""
+
+
         standard_ops = {
-            tuple(OP_SUM): np.sum, tuple(OP_SQRT): np.sqrt, tuple(OP_ABS): np.abs, tuple(OP_FLOOR): floor, tuple(OP_CEIL): ceil, tuple(OP_SIN): np.sin, tuple(OP_COS): np.cos, tuple(OP_TAN): np.tan, tuple(OP_COT): lambda d,**kw: 1/np.tan(d) if np.all(np.tan(d)!=0) else np.nan, tuple(OP_ASIN): arcsin, tuple(OP_ACOS): arccos, tuple(OP_ATAN): arctan, tuple(OP_NOT): np.logical_not, tuple(OP_IDENTITY): lambda d,**kw: d, tuple(OP_MEAN): mean, tuple(OP_STDDEV): std_dev, tuple(OP_MEDIAN): median, tuple(OP_INTERPOLATE): interpolate,
-            tuple(OP_SUBTRACT): lambda d,**kw: np.subtract(kw.get('minuend'), kw.get('subtrahend')), tuple(OP_MULTIPLY): lambda d,**kw: np.multiply(kw.get('factor1'), kw.get('factor2')), tuple(OP_DIVIDE): lambda d,**kw: np.divide(kw.get('dividend'), kw.get('divisor')), tuple(OP_ADD): lambda d,**kw: add(kw.get('input_a'), kw.get('input_b')), tuple(OP_POWER): lambda d,**kw: np.power(kw.get('base'), kw.get('exponent')), tuple(OP_MOD): lambda d,**kw: mod(kw.get('x'), kw.get('y')), tuple(OP_GREATER): lambda d,**kw: np.greater(kw.get('a'), kw.get('b')), tuple(OP_EQUAL): lambda d,**kw: np.equal(kw.get('a'), kw.get('b')), tuple(OP_AND): lambda d,**kw: np.logical_and(kw.get('a'), kw.get('b')), tuple(OP_OR): lambda d,**kw: np.logical_or(kw.get('a'), kw.get('b')), tuple(OP_XOR): lambda d,**kw: xor(kw.get('a'), kw.get('b')), tuple(OP_NAND): lambda d,**kw: nand(kw.get('a'), kw.get('b')), tuple(OP_NOR): lambda d,**kw: nor(kw.get('a'), kw.get('b')), tuple(OP_RAND_UNIFORM): lambda d,**kw: random_uniform(min_val=kw.get('min_val', 0.0), max_val=kw.get('max_val', 1.0)), tuple(OP_RAND_NORMAL): lambda d,**kw: random_normal(mu=kw.get('mu', 0.0), scale=kw.get('sigma', 1.0)),
-            tuple(OP_RELU): relu, tuple(OP_SIGMOID): sigmoid, tuple(OP_SOFTMAX): softmax, tuple(OP_LEAKY_RELU): leaky_relu, tuple(OP_GELU): gelu, tuple(OP_SILU): silu,
-            tuple(OP_MATRIX_MULTIPLY): lambda d,**kw: matrix_multiply(d, weights=kw.get('weights'), bias=kw.get('bias')), tuple(OP_CONVOLUTION): lambda d,**kw: convolution(d, kernel=kw.get('kernel'), bias=kw.get('bias')), tuple(OP_LAYER_NORM): lambda d,**kw: layer_normalization(d, norm_weight=kw.get('norm_weight'), norm_bias=kw.get('norm_bias'), eps=kw.get('eps', 1e-5)), tuple(OP_BATCH_NORM): lambda d,**kw: batch_norm(d, **kw), tuple(OP_DROPOUT): lambda d,**kw: dropout(d, rate=kw.get('rate', 0.1), is_training=kw.get('is_training', False)), tuple(OP_EMBEDDING_LOOKUP): lambda d,**kw: embedding_lookup(d, embedding_matrix=kw.get('embedding_matrix')), tuple(OP_RESHAPE_HEADS): lambda d,**kw: reshape_heads(d, num_heads=kw.get('num_heads')), tuple(OP_MERGE_HEADS): lambda d,**kw: merge_heads(d), tuple(OP_TRANSPOSE): transpose, tuple(OP_INVERSE): inverse, tuple(OP_TRACE): trace, tuple(OP_DETERMINANT): matrix_determinant, tuple(OP_EIGENVALUES): matrix_eigenvalues, tuple(OP_EXP_SMOOTHING): exponential_smoothing, tuple(OP_NORMALIZE_01): normalize,
-            tuple(OP_APPLY_ROPE): self._execute_apply_rope, tuple(OP_GET_Q_ROT): get_q_rot, tuple(OP_GET_K_ROT): get_k_rot, tuple(OP_SCALED_DOT_PROD_ATTN): self._execute_sdpa, tuple(OP_UPDATE_KV_CACHE): lambda d,**kw: update_kv_cache(kw.get('cache'), kw.get('new_values'), kw.get('start_pos')), tuple(OP_CREATE_CAUSAL_MASK): lambda d,**kw: create_causal_mask(d, size=kw.get('size')), tuple(OP_ATTENTION_MULTIHEAD): lambda d,**kw: multi_head_attention(d, **kw), tuple(OP_REPEAT_KV_HEADS): lambda d,**kw: repeat_kv_heads(d, repeats=kw.get('repeats')),
-            tuple(OP_IF): self._op_conditional_if, tuple(OP_LOOP_MULT): self._op_loop_multiply, tuple(OP_CHOICE): self._op_choice_select, tuple(OP_PRINT): self._op_output_print, tuple(OP_TRIGGER_REASON): self._op_trigger_reason, tuple(OP_DFS): self._op_graph_dfs,
+            # Basic Math/Logic (existing definitions omitted for brevity)
+            tuple(OP_SUM): np.sum, tuple(OP_SQRT): np.sqrt, tuple(OP_ABS): np.abs,
+            tuple(OP_FLOOR): floor, tuple(OP_CEIL): ceil, tuple(OP_SIN): np.sin,
+            tuple(OP_COS): np.cos, tuple(OP_TAN): np.tan,
+            tuple(OP_COT): lambda d,**kw: 1/np.tan(d) if np.all(np.tan(d)!=0) else np.nan,
+            tuple(OP_ASIN): arcsin, tuple(OP_ACOS): arccos, tuple(OP_ATAN): arctan,
+            tuple(OP_NOT): np.logical_not, tuple(OP_IDENTITY): lambda d,**kw: d,
+            tuple(OP_MEAN): mean, tuple(OP_STDDEV): std_dev, tuple(OP_MEDIAN): median,
+            tuple(OP_INTERPOLATE): interpolate,
+            tuple(OP_SUBTRACT): lambda d,**kw: np.subtract(kw.get('minuend'), kw.get('subtrahend')),
+            tuple(OP_MULTIPLY): lambda d,**kw: np.multiply(kw.get('factor1'), kw.get('factor2')),
+            tuple(OP_DIVIDE): lambda d,**kw: np.divide(kw.get('dividend'), kw.get('divisor')),
+            tuple(OP_ADD): lambda d,**kw: add(kw.get('input_a'), kw.get('input_b')),
+            tuple(OP_POWER): lambda d,**kw: np.power(kw.get('base'), kw.get('exponent')),
+            tuple(OP_MOD): lambda d,**kw: mod(kw.get('x'), kw.get('y')),
+            tuple(OP_GREATER): lambda d,**kw: np.greater(kw.get('a'), kw.get('b')),
+            tuple(OP_EQUAL): lambda d,**kw: np.equal(kw.get('a'), kw.get('b')),
+            tuple(OP_AND): lambda d,**kw: np.logical_and(kw.get('a'), kw.get('b')),
+            tuple(OP_OR): lambda d,**kw: np.logical_or(kw.get('a'), kw.get('b')),
+            tuple(OP_XOR): lambda d,**kw: xor(kw.get('a'), kw.get('b')),
+            tuple(OP_NAND): lambda d,**kw: nand(kw.get('a'), kw.get('b')),
+            tuple(OP_NOR): lambda d,**kw: nor(kw.get('a'), kw.get('b')),
+            tuple(OP_RAND_UNIFORM): lambda d,**kw: random_uniform(min_val=kw.get('min_val', 0.0), max_val=kw.get('max_val', 1.0)),
+            tuple(OP_RAND_NORMAL): lambda d,**kw: random_normal(mu=kw.get('mu', 0.0), scale=kw.get('sigma', 1.0)),
+
+            # Activations (existing definitions omitted for brevity)
+            tuple(OP_RELU): relu, tuple(OP_SIGMOID): sigmoid, tuple(OP_SOFTMAX): softmax,
+            tuple(OP_LEAKY_RELU): leaky_relu, tuple(OP_GELU): gelu, tuple(OP_SILU): silu,
+
+            # Linear Algebra / NN Ops (existing definitions omitted for brevity)
+            tuple(OP_MATRIX_MULTIPLY): lambda d,**kw: matrix_multiply(d, weights=kw.get('weights'), bias=kw.get('bias')),
+            tuple(OP_CONVOLUTION): lambda d,**kw: convolution(d, kernel=kw.get('kernel'), bias=kw.get('bias')),
+            tuple(OP_LAYER_NORM): lambda d,**kw: layer_normalization(d, norm_weight=kw.get('norm_weight'), norm_bias=kw.get('norm_bias'), eps=kw.get('eps', 1e-5)),
+            tuple(OP_BATCH_NORM): lambda d,**kw: batch_norm(d, **kw),
+            tuple(OP_DROPOUT): lambda d,**kw: dropout(d, rate=kw.get('rate', 0.1), is_training=kw.get('is_training', False)),
+            tuple(OP_EMBEDDING_LOOKUP): lambda d,**kw: embedding_lookup(d, embedding_matrix=kw.get('embedding_matrix')),
+            tuple(OP_RESHAPE_HEADS): lambda d,**kw: reshape_heads(d, num_heads=kw.get('num_heads')),
+            tuple(OP_MERGE_HEADS): lambda d,**kw: merge_heads(d),
+            tuple(OP_TRANSPOSE): transpose, tuple(OP_INVERSE): inverse, tuple(OP_TRACE): trace,
+            tuple(OP_DETERMINANT): matrix_determinant, tuple(OP_EIGENVALUES): matrix_eigenvalues,
+            tuple(OP_EXP_SMOOTHING): exponential_smoothing, tuple(OP_NORMALIZE_01): normalize,
+            tuple(OP_APPLY_ROPE): self._execute_apply_rope,
+            tuple(OP_GET_Q_ROT): get_q_rot, tuple(OP_GET_K_ROT): get_k_rot,
+            tuple(OP_SCALED_DOT_PROD_ATTN): self._execute_sdpa,
+            tuple(OP_UPDATE_KV_CACHE): lambda d,**kw: update_kv_cache(kw.get('cache'), kw.get('new_values'), kw.get('start_pos')),
+            tuple(OP_CREATE_CAUSAL_MASK): lambda d,**kw: create_causal_mask(d, size=kw.get('size')),
+            tuple(OP_ATTENTION_MULTIHEAD): lambda d,**kw: multi_head_attention(d, **kw),
+            tuple(OP_REPEAT_KV_HEADS): lambda d,**kw: repeat_kv_heads(d, repeats=kw.get('repeats')),
+
+            # Control Flow / Meta / Debug (existing definitions omitted for brevity)
+            tuple(OP_IF): self._op_conditional_if,
+            tuple(OP_LOOP_MULT): self._op_loop_multiply,
+            tuple(OP_CHOICE): self._op_choice_select,
+            tuple(OP_PRINT): self._op_output_print,
+            tuple(OP_TRIGGER_REASON): self._op_trigger_reason,
+            tuple(OP_DFS): self._op_graph_dfs,
             tuple(OP_MAKE_TUPLE): lambda d,**kw: make_tuple(d, **kw),
+            # --- Tuple Access ---
             tuple(OP_GET_TUPLE_ELEM_0): self._op_get_tuple_elem(0),
             tuple(OP_GET_TUPLE_ELEM_1): self._op_get_tuple_elem(1),
             tuple(OP_GET_TUPLE_ELEM_2): self._op_get_tuple_elem(2),
+            # --- ДОБАВЛЕНО: Регистрация обработчика для элемента 3 ---
+            tuple(OP_GET_TUPLE_ELEM_3): self._op_get_tuple_elem(3),
+            # --- КОНЕЦ ДОБАВЛЕНИЯ ---
             tuple(OP_STORE): self._op_store_context,
             tuple(OP_LOAD): self._op_load_context,
             tuple(OP_LOAD_INITIAL_INPUT): self._op_load_initial_input,
             tuple(OP_DEBUG_CONTEXT): self._op_debug_context,
-            tuple(OP_QUANTUM_HADAMARD): lambda d,**kw: self._quantum_op_placeholder(d,"hadamard",**kw), tuple(OP_QUANTUM_PAULI_X): lambda d,**kw: self._quantum_op_placeholder(d,"pauli_x",**kw), tuple(OP_QUANTUM_CNOT): lambda d,**kw: self._quantum_op_placeholder(d,"cnot",**kw), tuple(OP_QUANTUM_MEASURE): lambda d,**kw: self._quantum_op_placeholder(d,"measure",**kw), tuple(OP_QUANTUM_SUPERPOS): lambda d,**kw: self._quantum_op_placeholder(d,"superposition",**kw), tuple(OP_QUANTUM_ENTANGLE): lambda d,**kw: self._quantum_op_placeholder(d,"entanglement",**kw),
+
+            # Quantum Placeholders (existing definitions omitted for brevity)
+            tuple(OP_QUANTUM_HADAMARD): lambda d,**kw: self._quantum_op_placeholder(d,"hadamard",**kw),
+            tuple(OP_QUANTUM_PAULI_X): lambda d,**kw: self._quantum_op_placeholder(d,"pauli_x",**kw),
+            tuple(OP_QUANTUM_CNOT): lambda d,**kw: self._quantum_op_placeholder(d,"cnot",**kw),
+            tuple(OP_QUANTUM_MEASURE): lambda d,**kw: self._quantum_op_placeholder(d,"measure",**kw),
+            tuple(OP_QUANTUM_SUPERPOS): lambda d,**kw: self._quantum_op_placeholder(d,"superposition",**kw),
+            tuple(OP_QUANTUM_ENTANGLE): lambda d,**kw: self._quantum_op_placeholder(d,"entanglement",**kw),
         }
         self.core_ops.update(standard_ops)
         print(f"Registered {len(standard_ops)} standard operations.")
-
     # --- Регистрация специфичных для модели операций (без изменений) ---
     def _register_model_specific_ops(self):
         """Pytaetsja importirovat' i registrirovat' operacii iz veector_models."""
@@ -599,7 +662,8 @@ class Veector:
              self.cache_timestamps.clear(); self.cache_access_count.clear()
              print(f"Cache cleared: {', '.join(cleared_str)}")
 
-    # --- Op Sequence Execution (v0.7.12 - передает контекст в хелперы) ---
+
+# --- Op Sequence Execution (v0.7.16 - Fixed Arg Resolution for Placeholder '_') ---
     def _execute_op_sequence(
         self,
         ops_sequence: List[Any],
@@ -607,11 +671,13 @@ class Veector:
         knowledge_params_for_ops: Dict[str, Any],
         **kw_context # Внешний контекст (например, position_ids)
     ) -> Tuple[Any, List[Dict], Dict]:
-        """ Executes op sequence. v0.7.12 - passes context to meta op helpers. """
+        """ Executes op sequence. v0.7.16 - Fixed Arg Resolution for Placeholder '_' """
         current_data = initial_data
         step_provenance_list = []
         step_context = {'_initial_input': initial_data, **kw_context}
-        _log_core_tensor_stats("Initial Data", current_data)
+        # _log_core_tensor_stats("Initial Data", current_data) # Optional log
+
+        # print(f"DEBUG CORE: Starting execution of sequence with {len(ops_sequence)} steps.") # Keep if needed
 
         for i, op_command in enumerate(ops_sequence):
             step_provenance = {"step": i}
@@ -621,7 +687,9 @@ class Veector:
             meta_args = []
             valid_command = False
 
-            # --- Parsing command ---
+            # print(f"\nDEBUG CORE Step {i}: Processing op_command: {op_command}") # Keep if needed
+
+            # --- Parsing command (no changes needed here) ---
             if not isinstance(op_command, list) or not op_command:
                 error_msg = f"Command at step {i} is not a non-empty list: {op_command}"
                 step_provenance["error"] = error_msg; step_provenance_list.append(step_provenance)
@@ -630,29 +698,29 @@ class Veector:
             op_code_source = op_command[0]
             args_source = op_command[1:]
 
+            # print(f"DEBUG CORE Step {i}: op_code_source = {op_code_source}") # Keep if needed
+            # print(f"DEBUG CORE Step {i}: args_source = {args_source}") # Keep if needed
+
             if isinstance(op_code_source, list) and len(op_code_source) == 3 and all(isinstance(x, int) for x in op_code_source):
                 op_code_list = op_code_source; op_tuple = tuple(op_code_list)
                 if len(args_source) == 1 and isinstance(args_source[0], dict):
-                    op_call_args_from_processor = args_source[0]; valid_command = True
+                    op_call_args_from_processor = args_source[0]
+                    valid_command = True
+                    # print(f"DEBUG CORE Step {i}: Parsed args as dict: op_call_args_from_processor = {op_call_args_from_processor}") # Keep if needed
                 elif not args_source:
                     valid_command = True
+                    # print(f"DEBUG CORE Step {i}: Parsed as op without args.") # Keep if needed
                 elif all(isinstance(arg, (str, int, float, bool, list, tuple)) for arg in args_source):
                      is_meta_op_expecting_args = op_tuple in (tuple(OP_STORE), tuple(OP_LOAD), tuple(OP_LOAD_INITIAL_INPUT), tuple(OP_DEBUG_CONTEXT))
                      if is_meta_op_expecting_args:
                          meta_args = list(args_source); valid_command = True
-                     else:
-                          error_msg = f"Invalid arguments format for non-meta op {op_tuple} at step {i}: {args_source}"
-                          step_provenance["error"] = error_msg; valid_command = False
-                else:
-                    error_msg = f"Cannot parse arguments format at step {i}: {args_source}"
-                    step_provenance["error"] = error_msg; valid_command = False
-            else:
-                 error_msg = f"Cannot parse OP CODE at step {i}: {op_code_source}"
-                 step_provenance["error"] = error_msg; valid_command = False
+                         # print(f"DEBUG CORE Step {i}: Parsed as meta-op with meta_args: {meta_args}") # Keep if needed
+                     else: error_msg = f"Invalid arguments format for non-meta op {op_tuple} at step {i}: {args_source}"; step_provenance["error"] = error_msg; valid_command = False
+                else: error_msg = f"Cannot parse arguments format at step {i}: {args_source}"; step_provenance["error"] = error_msg; valid_command = False
+            else: error_msg = f"Cannot parse OP CODE at step {i}: {op_code_source}"; step_provenance["error"] = error_msg; valid_command = False
 
             if not valid_command or op_code_list is None:
-                if "error" not in step_provenance:
-                     step_provenance["error"] = f"Invalid command structure or OP CODE at step {i}: {op_command}"
+                if "error" not in step_provenance: step_provenance["error"] = f"Invalid command structure or OP CODE at step {i}: {op_command}"
                 step_provenance_list.append(step_provenance)
                 return None, step_provenance_list, step_context
 
@@ -667,25 +735,55 @@ class Veector:
                 op_func = self.core_ops.get(op_tuple)
                 if not op_func: raise ValueError(f"Operation {op_tuple} not found in core_ops.")
 
-                call_kwargs = {**op_call_args_from_processor, '_step_context': step_context, '_meta_args': meta_args, '_provenance': step_provenance}
-                resolved_args = {}
-                for arg_name, value_source_name in op_call_args_from_processor.items():
-                    resolved_value = None; found = False
-                    if isinstance(value_source_name, str):
-                        if value_source_name in knowledge_params_for_ops: resolved_value = knowledge_params_for_ops[value_source_name]; found = True
-                        elif value_source_name in step_context: resolved_value = step_context[value_source_name]; found = True
-                    else: resolved_value = value_source_name; found = True
-                    resolved_args[arg_name] = resolved_value
-                call_kwargs.update(resolved_args)
+                # --- ИСПРАВЛЕННАЯ ЛОГИКА v2: Учитываем плейсхолдер "_" ---
+                final_op_args = {} # Собираем финальные аргументы здесь
+                for arg_name, value_source in op_call_args_from_processor.items():
+                    if isinstance(value_source, str):
+                        # СНАЧАЛА проверяем на плейсхолдер текущих данных
+                        if value_source == '_':
+                            final_op_args[arg_name] = current_data # Подставляем current_data
+                            # print(f"DEBUG CORE Step {i}: Resolved '{arg_name}' as current_data placeholder") # Optional
+                        # ПОТОМ проверяем, ссылка ли это на знания или контекст
+                        elif value_source in knowledge_params_for_ops:
+                            final_op_args[arg_name] = knowledge_params_for_ops[value_source]
+                            # print(f"DEBUG CORE Step {i}: Resolved '{arg_name}' from knowledge") # Optional
+                        elif value_source in step_context:
+                            final_op_args[arg_name] = step_context[value_source]
+                            # print(f"DEBUG CORE Step {i}: Resolved '{arg_name}' from context") # Optional
+                        else:
+                            # Если строка не плейсхолдер и не ссылка, считаем её литералом
+                            final_op_args[arg_name] = value_source
+                            # print(f"DEBUG CORE Step {i}: Kept literal string '{arg_name}'") # Optional
+                    else:
+                        # Если значение - не строка, используем как есть (литерал)
+                        final_op_args[arg_name] = value_source
+                        # print(f"DEBUG CORE Step {i}: Kept literal non-string '{arg_name}'") # Optional
+                # --- КОНЕЦ ИСПРАВЛЕННОЙ ЛОГИКИ v2 ---
 
+                # Собираем полный набор аргументов для вызова функции
+                call_kwargs = {**final_op_args} # Начинаем с обработанных аргументов операции
+                # Добавляем внутренние переменные контекста
+                call_kwargs.update({'_step_context': step_context, '_meta_args': meta_args, '_provenance': step_provenance})
+
+                # --- DEBUG PRINT: Print the final arguments passed to the op function ---
+                # print(f"DEBUG CORE Step {i}: Calling op_func {op_tuple} with final call_kwargs keys: {list(call_kwargs.keys())}") # Keep if needed
+                # Особенно важно проверить для MLP и ADD:
+                # if op_tuple == tuple(OP_QWEN2_MLP):
+                #     print(f"DEBUG CORE Step {i} (MLP CALL): hidden_act in call_kwargs = '{call_kwargs.get('hidden_act')}'")
+                # if op_tuple == tuple(OP_ADD):
+                #     print(f"DEBUG CORE Step {i} (ADD CALL): input_a type = {type(call_kwargs.get('input_a'))}, input_b type = {type(call_kwargs.get('input_b'))}")
+
+                # Вызываем функцию операции
                 op_result = op_func(current_data, **call_kwargs)
 
+                # Обновляем current_data, если операция не мета-операция сохранения
                 if op_tuple not in (tuple(OP_STORE), tuple(OP_DEBUG_CONTEXT)):
                     current_data = op_result
-                    _log_core_tensor_stats(f"Step {i} AFTER {op_tuple}", current_data)
-                else:
-                    _log_core_tensor_stats(f"Step {i} AFTER {op_tuple} (data unchanged)", current_data)
+                    # _log_core_tensor_stats(f"Step {i} AFTER {op_tuple}", current_data) # Optional
+                # else:
+                    # _log_core_tensor_stats(f"Step {i} AFTER {op_tuple} (data unchanged)", current_data) # Optional
 
+                # Проверяем, сообщила ли операция об ошибке через provenance
                 if "error" in step_provenance and step_provenance["error"]:
                      print(f"--- Error reported by Op {op_tuple} at Step {i} ---"); print(f"    Error: {step_provenance['error']}"); print(f"--- End Error Report ---")
                      step_provenance["duration_ms"] = (time.time() - step_start) * 1000; step_provenance_list.append(step_provenance)
@@ -701,12 +799,14 @@ class Veector:
             step_provenance["duration_ms"] = (time.time() - step_start) * 1000
             step_provenance_list.append(step_provenance)
 
+            # Проверка статуса ошибки после выполнения шага (на всякий случай)
             if isinstance(current_data, dict) and current_data.get('status') == 'error':
                 error_msg = f"Op {op_tuple} returned error status: {current_data.get('error')}"
                 step_provenance_list[-1]["error"] = error_msg; print(f"ERROR: {error_msg}")
                 return None, step_provenance_list, step_context
             # --- End Step Finish ---
 
+        # print(f"DEBUG CORE: Finished execution of sequence.") # Keep if needed
         return current_data, step_provenance_list, step_context
 
     # --- Knowledge Selection (v0.7.9 - Без изменений) ---

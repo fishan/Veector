@@ -51,7 +51,6 @@ class TensorCoordinate:
 
 
 # --- Tags, Groups, Mappings ---
-# (Без изменений)
 TAG_TYPE_PROCESSOR = 1; TAG_TYPE_KNOWLEDGE = 2; TAG_TYPE_CONVERTER = 3; TAG_TYPE_STATE = 4
 TAG_MODEL_QWEN2 = 10; TAG_MODEL_LLAMA3 = 11; TAG_MODEL_DEEPSEEK = 12
 TAG_PREC_FLOAT32 = 20; TAG_PREC_FLOAT16 = 21; TAG_PREC_BFLOAT16 = 22; TAG_PREC_INT8 = 23; TAG_PREC_INT4 = 24
@@ -72,7 +71,7 @@ DTYPE_MAPPING = { 'float32': 1, 'float16': 2, 'bfloat16': 3, 'int8': 4, 'int4': 
 REVERSE_DTYPE_MAPPING = { 1: 'float32', 2: 'float16', 3: 'bfloat16', 4: 'int8', 5: 'int4', 6: 'int32', 7: 'int64', 8: 'bool', 9: 'complex64', 10: 'complex128', }
 STATUS_MAPPING = {"active": 1, "archived": 0}
 REVERSE_STATUS_MAPPING = {1: "active", 0: "archived"}
-METADATA_STRUCTURE_VERSION = 1.2 # <<< ИЗМЕНЕНО >>> Увеличиваем версию из-за нового поля
+METADATA_STRUCTURE_VERSION = 1.2 # 
 
 # --- Encoding Helpers ---
 # (Функции _encode_coord, _encode_tags, _encode_data_description, _encode_shape, _encode_lifecycle без изменений)

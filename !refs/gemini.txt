@@ -1,10 +1,760 @@
+Привет! мы работаем с тобой над децентрализованным ИИ длйа устройств с ораницхенными ресурсами и не только. проект называетсйа Veector. загрузил тебе фаилы ядра, конвертор google colab в котором мы конвртируем модель в тензоры знаний и тензоры процессоры для Veector. сейчас работаем над правильным инференсом разложенной модели и над высокоуровнивыми операциями в veector_models/qwen2/ops.py Мы сравниваем етапы работы Veector с работой эталонной модели записанной в промежуточный файл. это полезная информация со страницы модели: Usage Recommendations
 
-ОДНА КОМАНДА НА ОДНУ СТРОКУ: Никогда не использовать точку с запятой (`;`) для размещения нескольких команд Python на одной строке. Каждая команда (`def`, `class`, присваивание, `if`, `for`, `return`, `print` и т.д.) должна начинаться на новой строке.
+We recommend adhering to the following configurations when utilizing the DeepSeek-R1 series models, including benchmarking, to achieve the expected performance:
 
-ЧЕТКОЕ ФОРМАТИРОВАНИЕ: Использовать стандартный отступ в 4 пробела. Добавлять пустые строки для разделения логических блоков (функций, методов, классов). Длинные и сложные строки разбивать для удобочитаемости.
+Set the temperature within the range of 0.5-0.7 (0.6 is recommended) to prevent endless repetitions or incoherent outputs.
 
-ПОЛНОТА: Если запрошен полный код файла или блока – предоставлять весь код, включая импорты, определения, комментарии. Никаких сокращений или пропусков.
+Avoid adding a system prompt; all instructions should be contained within the user prompt.
 
-ПРОВЕРКА: Перед отправкой кода выполнять тщательную проверку на синтаксические ошибки и на соблюдение правила "одна команда на строку".
+For mathematical problems, it is advisable to include a directive in your prompt such as: "Please reason step by step, and put your final answer within \boxed{}."
 
-Я обязуюсь применять это правило ко всему коду, который буду генерировать дальше.
+When evaluating model performance, it is recommended to conduct multiple tests and average the results.
+
+Additionally, we have observed that the DeepSeek-R1 series models tend to bypass thinking pattern (i.e., outputting "<think>\n\n</think>") when responding to certain queries, which can adversely affect the model's performance. To ensure that the model engages in thorough reasoning, we recommend enforcing the model to initiate its response with "<think>\n" at the beginning of every output. generation_config.json: { "_from_model_config": true, "bos_token_id": 151646, "eos_token_id": 151643, "do_sample": true, "temperature": 0.6, "top_p": 0.95, "transformers_version": "4.39.3"} , tokenizer_config.json: { "add_bos_token": true, "add_eos_token": false, "bos_token": { "__type": "AddedToken", "content": "<｜begin▁of▁sentence｜>", "lstrip": false, "normalized": true, "rstrip": false, "single_word": false }, "clean_up_tokenization_spaces": false, "eos_token": { "__type": "AddedToken", "content": "<｜end▁of▁sentence｜>", "lstrip": false, "normalized": true, "rstrip": false, "single_word": false }, "legacy": true, "model_max_length": 16384, "pad_token": { "__type": "AddedToken", "content": "<｜end▁of▁sentence｜>", "lstrip": false, "normalized": true, "rstrip": false, "single_word": false }, "sp_model_kwargs": {}, "unk_token": null, "tokenizer_class": "LlamaTokenizerFast", "chat_template": "{% if not add_generation_prompt is defined %}{% set add_generation_prompt = false %}{% endif %}{% set ns = namespace(is_first=false, is_tool=false, is_output_first=true, system_prompt='') %}{%- for message in messages %}{%- if message['role'] == 'system' %}{% set ns.system_prompt = message['content'] %}{%- endif %}{%- endfor %}{{bos_token}}{{ns.system_prompt}}{%- for message in messages %}{%- if message['role'] == 'user' %}{%- set ns.is_tool = false -%}{{'<｜User｜>' + message['content']}}{%- endif %}{%- if message['role'] == 'assistant' and message['content'] is none %}{%- set ns.is_tool = false -%}{%- for tool in message['tool_calls']%}{%- if not ns.is_first %}{{'<｜Assistant｜><｜tool▁calls▁begin｜><｜tool▁call▁begin｜>' + tool['type'] + '<｜tool▁sep｜>' + tool['function']['name'] + '\\n' + '```json' + '\\n' + tool['function']['arguments'] + '\\n' + '```' + '<｜tool▁call▁end｜>'}}{%- set ns.is_first = true -%}{%- else %}{{'\\n' + '<｜tool▁call▁begin｜>' + tool['type'] + '<｜tool▁sep｜>' + tool['function']['name'] + '\\n' + '```json' + '\\n' + tool['function']['arguments'] + '\\n' + '```' + '<｜tool▁call▁end｜>'}}{{'<｜tool▁calls▁end｜><｜end▁of▁sentence｜>'}}{%- endif %}{%- endfor %}{%- endif %}{%- if message['role'] == 'assistant' and message['content'] is not none %}{%- if ns.is_tool %}{{'<｜tool▁outputs▁end｜>' + message['content'] + '<｜end▁of▁sentence｜>'}}{%- set ns.is_tool = false -%}{%- else %}{% set content = message['content'] %}{% if '</think>' in content %}{% set content = content.split('</think>')[-1] %}{% endif %}{{'<｜Assistant｜>' + content + '<｜end▁of▁sentence｜>'}}{%- endif %}{%- endif %}{%- if message['role'] == 'tool' %}{%- set ns.is_tool = true -%}{%- if ns.is_output_first %}{{'<｜tool▁outputs▁begin｜><｜tool▁output▁begin｜>' + message['content'] + '<｜tool▁output▁end｜>'}}{%- set ns.is_output_first = false %}{%- else %}{{'\\n<｜tool▁output▁begin｜>' + message['content'] + '<｜tool▁output▁end｜>'}}{%- endif %}{%- endif %}{%- endfor -%}{% if ns.is_tool %}{{'<｜tool▁outputs▁end｜>'}}{% endif %}{% if add_generation_prompt and not ns.is_tool %}{{'<｜Assistant｜><think>\\n'}}{% endif %}"}. config.json : { "architectures": [ "Qwen2ForCausalLM" ], "attention_dropout": 0.0, "bos_token_id": 151643, "eos_token_id": 151643, "hidden_act": "silu", "hidden_size": 1536, "initializer_range": 0.02, "intermediate_size": 8960, "max_position_embeddings": 131072, "max_window_layers": 21, "model_type": "qwen2", "num_attention_heads": 12, "num_hidden_layers": 28, "num_key_value_heads": 2, "rms_norm_eps": 1e-06, "rope_theta": 10000, "sliding_window": 4096, "tie_word_embeddings": false, "torch_dtype": "bfloat16", "transformers_version": "4.44.0", "use_cache": true, "use_mrope": false, "use_sliding_window": false, "vocab_size": 151936}.
+
+в фаиле modeling_qwen2.py.txt находится код transforners inference этой модели. мы его используем как reference.
+
+это информацийа предыдущего чата:
+
+Привет! Я прочитал файл message.txt. Он содержит лог успешного выполнения теста процессора RMSNorm L0 (v1.19), что подтверждает: ядро Veector корректно выполняет операцию OP_QWEN2_RMSNORM и правильно обрабатывает зависимости от весов (knowledge). Это хороший шаг вперед.
+
+Учитывая этот результат и всю нашу предыдущую отладку, вот текущее состояние и план дальнейших действий, который можно использовать для продолжения в новом чате (из-за проблем со связью в этом):
+
+Текущее Состояние Отладки (Слой L0):
+
+Подтверждено Корректно (CLOSE):
+
+Input RMSNorm (как функция qwen2_rmsnorm И как процессор OP_QWEN2_RMSNORM)
+
+QKV Projections (линейные слои)
+
+RoPE Application (применение поворотных эмбеддингов)
+
+O-Projection (финальный линейный слой Attention, протестирован с референсным входом)
+
+MLP Block (qwen2_mlp, протестирован изолированно с референсным входом)
+
+Residual Add (операция сложения)
+
+Входы для SDPA/Manual Attention (Q_rot, K_rep, V_rep)
+
+Проблема Сохраняется:
+
+Выход всего блока Attention до первого residual connection (сравнение с референсным L0_attn_out) дает большую ошибку (!!! DIFFERENT !!!).
+
+Эта ошибка возникает независимо от того, используется ли F.scaled_dot_product_attention или ручной расчет внимания ("eager attention") внутри qwen2_attention.
+
+Попытки исправить обработку dtype и маскирование в ручном расчете внимания не устранили ошибку.
+
+Вывод: Ошибка локализована внутри последовательности операций, выполняемых процессором attn_0, а конкретно — внутри шага OP_QWEN2_ATTENTION (функция qwen2_attention), но после подготовки входов (QKV, RoPE, RepeatKV) и до финального сложения с residual. Поскольку O-проекция сама по себе работает, проблема, скорее всего, в расчете весов внимания (scores + softmax) или в финальном умножении этих весов на Value (attn_weights @ V).
+
+План Дальнейших Действий (для нового чата):
+
+Следующие шаги помогут точно определить источник ошибки внутри qwen2_attention:
+
+Тест Весов Внимания (attn_weights):
+
+Цель: Сравнить тензор весов внимания (результат Softmax) из Veector с референсным. Это изолирует шаги расчета score, маскирования и softmax.
+
+Действия:
+
+Убедиться, что в veector_models/qwen2/ops.py используется функция qwen2_attention версии 1.8 (из артефакта qwen2_attention_return_weights_v1), которая возвращает attn_weights_np четвертым элементом.
+
+Запустить Ячейку 5, используя код для теста весов внимания (из артефакта cell5_complete_attn_weights_test_v1).
+
+Проанализировать результат сравнения Veector Attn Weights и Ref Attention Weights.
+
+Тест Выхода Attention до O-Проекции (attn_output raw):
+
+Цель: Если тест весов (Шаг 1) пройдет успешно (CLOSE), нужно проверить результат финального умножения attn_weights @ V до применения O-проекции.
+
+Действия:
+
+Убедиться, что в veector_models/qwen2/ops.py используется функция qwen2_attention версии 1.7 (из артефакта qwen2_attention_return_attn_output_v1), которая возвращает attn_output_raw_np четвертым элементом.
+
+Запустить Ячейку 5, используя код для теста выхода Attention до O-проекции (из артефакта cell5_complete_attn_output_test_v1).
+
+Проанализировать результат сравнения Veector Attn Output (Pre O-Proj) и Ref Attention Output (Pre O-Proj).
+
+Дальнейшая Отладка (если Шаги 1 и 2 не выявили проблему):
+
+Перепроверить реализацию каузальной маски в ручном расчете.
+
+Рассмотреть возможность ошибки в core.py при передаче контекста/выполнении последовательности.
+
+Проверить корректность референсных данных в .pkl файле.
+
+Надеюсь, эта сводка и план помогут продолжить отладку в новой сессии. Удачи!
+
+это логи конвертации модели: 
+
+ячейка 2: 
+
+--- Running Cell 2: Knowledge Conversion for DeepSeek-R1-Distill-Qwen-1.5B ---
+    Target DB: /content/data/db
+    Conversion Dtype: torch.float16
+    Quantize Embed/LMHead: True
+
+Loading HF Model: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B...
+config.json: 100%
+ 679/679 [00:00<00:00, 36.8kB/s]
+model.safetensors: 100%
+ 3.55G/3.55G [00:24<00:00, 229MB/s]
+Sliding Window Attention is enabled but not implemented for `sdpa`; unexpected results may be encountered.
+generation_config.json: 100%
+ 181/181 [00:00<00:00, 12.1kB/s]
+HF Model 'DeepSeek-R1-Distill-Qwen-1.5B' loaded successfully.
+
+Initializing Veector instance for knowledge conversion...
+--- Initializing Veector Core v0.7.17 ---
+    Requires: tensors v0.7.6+, veectordb v0.9.8+, operations v0.8.9+
+    IPFS: False, Address: /ip4/127.0.0.1/tcp/5001
+--- Initializing VeectorDB v0.9.8 ---
+DEBUG INDEX LOAD: Index file 'tensor_index.pkl' not found. Starting with empty index.
+VeectorDB initialized at /content/data/db. Index entries loaded: 0 from 'tensor_index.pkl'.
+VeectorDB initialized by Veector Core.
+Cache initialized: Size=1000, Strategy=LRU
+Registered 83 standard operations.
+  Successfully registered 3 operations for Qwen2.
+Registered 3 model-specific operations.
+Initialized 86 total core operations.
+  [MEM_LOG] Veector Initialized: RSS=7815.91 MB, RAM Used=67.1%
+Veector initialized. DB Index entries: 0
+
+Starting parameter conversion...
+Found 339 parameters to process.
+
+Processing Param 1/339: model.embed_tokens.weight
+  Original Shape: torch.Size([151936, 1536]) | Dtype: torch.float32
+  Quantizing model.embed_tokens.weight to INT8...
+    Quantized Shape: (151936, 1536), Scale: 0.0026
+  Final Tags: [2, 12, 23, 30, 32]
+  Coordinate: L-1_G102_N1_X0_Y0_Z0
+  Data to save: dtype=<class 'numpy.int8'>, shape=(151936, 1536)
+  Extra Metadata: {'quantization_scale': 0.0025990402791649103}
+DEBUG INDEX UPDATE: Adding/Updating ID 046889061e268366de4bfa2945ddcd03e6f17835b1b422fc459eadd885a189f9 -> Type: knowledge, Status: active, Coords: L-1_G102_N1_X0_Y0_Z0
+    Saved knowledge tensor with ID: 046889061e268366de4bfa2945ddcd03e6f17835b1b422fc459eadd885a189f9
+
+Processing Param 2/339: model.layers.0.self_attn.q_proj.weight
+  Original Shape: torch.Size([1536, 1536]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.q_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.self_attn.q_proj.weight weights...
+    Transposed Shape: (1536, 1536)
+  Final Tags: [2, 12, 21, 30, 33, 100]
+  Coordinate: L0_G102_N1_X10_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID d3adae1107eda0cf8ae71c83edb3f826e2998e9d09b7066993399929440672f4 -> Type: knowledge, Status: active, Coords: L0_G102_N1_X10_Y0_Z0
+    Saved knowledge tensor with ID: d3adae1107eda0cf8ae71c83edb3f826e2998e9d09b7066993399929440672f4
+
+Processing Param 3/339: model.layers.0.self_attn.q_proj.bias
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.q_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 33, 100]
+  Coordinate: L0_G102_N1_X11_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID f7977e53bcc468beb2c8484f0e67df845920f16e154c438d6b486f4b53e7ccb1 -> Type: knowledge, Status: active, Coords: L0_G102_N1_X11_Y0_Z0
+    Saved knowledge tensor with ID: f7977e53bcc468beb2c8484f0e67df845920f16e154c438d6b486f4b53e7ccb1
+
+Processing Param 4/339: model.layers.0.self_attn.k_proj.weight
+  Original Shape: torch.Size([256, 1536]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.k_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.self_attn.k_proj.weight weights...
+    Transposed Shape: (1536, 256)
+  Final Tags: [2, 12, 21, 30, 34, 100]
+  Coordinate: L0_G102_N1_X20_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 256)
+DEBUG INDEX UPDATE: Adding/Updating ID 6ca8ea1d6ca5ccc5d354904ee5d9dd0da48898643e3170116791029b4e8834cf -> Type: knowledge, Status: active, Coords: L0_G102_N1_X20_Y0_Z0
+    Saved knowledge tensor with ID: 6ca8ea1d6ca5ccc5d354904ee5d9dd0da48898643e3170116791029b4e8834cf
+
+Processing Param 5/339: model.layers.0.self_attn.k_proj.bias
+  Original Shape: torch.Size([256]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.k_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 34, 100]
+  Coordinate: L0_G102_N1_X21_Y0_Z0
+  Data to save: dtype=float16, shape=(256,)
+DEBUG INDEX UPDATE: Adding/Updating ID 91442ea82ef3cb196ff4f1357d95b3780ee6590d30d27f3d76cccfe3fe04f11d -> Type: knowledge, Status: active, Coords: L0_G102_N1_X21_Y0_Z0
+    Saved knowledge tensor with ID: 91442ea82ef3cb196ff4f1357d95b3780ee6590d30d27f3d76cccfe3fe04f11d
+
+Processing Param 6/339: model.layers.0.self_attn.v_proj.weight
+  Original Shape: torch.Size([256, 1536]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.v_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.self_attn.v_proj.weight weights...
+    Transposed Shape: (1536, 256)
+  Final Tags: [2, 12, 21, 30, 35, 100]
+  Coordinate: L0_G102_N1_X30_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 256)
+DEBUG INDEX UPDATE: Adding/Updating ID d29087c51850a20cbe40729efc6167eff410446b61204ca095e7eda0a4aeed2d -> Type: knowledge, Status: active, Coords: L0_G102_N1_X30_Y0_Z0
+    Saved knowledge tensor with ID: d29087c51850a20cbe40729efc6167eff410446b61204ca095e7eda0a4aeed2d
+
+Processing Param 7/339: model.layers.0.self_attn.v_proj.bias
+  Original Shape: torch.Size([256]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.v_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 35, 100]
+  Coordinate: L0_G102_N1_X31_Y0_Z0
+  Data to save: dtype=float16, shape=(256,)
+DEBUG INDEX UPDATE: Adding/Updating ID 2181f9f2b0e5e9305585e633032f02fbecf1be4c9b30843af614332e12e0d36c -> Type: knowledge, Status: active, Coords: L0_G102_N1_X31_Y0_Z0
+    Saved knowledge tensor with ID: 2181f9f2b0e5e9305585e633032f02fbecf1be4c9b30843af614332e12e0d36c
+
+Processing Param 8/339: model.layers.0.self_attn.o_proj.weight
+  Original Shape: torch.Size([1536, 1536]) | Dtype: torch.float32
+  Casting model.layers.0.self_attn.o_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.self_attn.o_proj.weight weights...
+    Transposed Shape: (1536, 1536)
+  Final Tags: [2, 12, 21, 30, 36, 100]
+  Coordinate: L0_G102_N1_X40_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID 3004deb4d799b871503b0d492d62dbf77bdbdacf346dfb61183952a3686f192c -> Type: knowledge, Status: active, Coords: L0_G102_N1_X40_Y0_Z0
+    Saved knowledge tensor with ID: 3004deb4d799b871503b0d492d62dbf77bdbdacf346dfb61183952a3686f192c
+
+Processing Param 9/339: model.layers.0.mlp.gate_proj.weight
+  Original Shape: torch.Size([8960, 1536]) | Dtype: torch.float32
+  Casting model.layers.0.mlp.gate_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.mlp.gate_proj.weight weights...
+    Transposed Shape: (1536, 8960)
+  Final Tags: [2, 12, 21, 30, 38, 100]
+  Coordinate: L0_G102_N1_X50_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 8960)
+DEBUG INDEX UPDATE: Adding/Updating ID 0ac360bf82b1f7b2a73b72c20adfc531d67fcf726dd205a0790ee3717d500e7c -> Type: knowledge, Status: active, Coords: L0_G102_N1_X50_Y0_Z0
+    Saved knowledge tensor with ID: 0ac360bf82b1f7b2a73b72c20adfc531d67fcf726dd205a0790ee3717d500e7c
+
+Processing Param 10/339: model.layers.0.mlp.up_proj.weight
+  Original Shape: torch.Size([8960, 1536]) | Dtype: torch.float32
+  Casting model.layers.0.mlp.up_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.mlp.up_proj.weight weights...
+    Transposed Shape: (1536, 8960)
+  Final Tags: [2, 12, 21, 30, 39, 100]
+  Coordinate: L0_G102_N1_X60_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 8960)
+DEBUG INDEX UPDATE: Adding/Updating ID 2531ee2290b1d2353f1d10d21765e7f5fdd8b76c012b26269c14eeb186afeaec -> Type: knowledge, Status: active, Coords: L0_G102_N1_X60_Y0_Z0
+    Saved knowledge tensor with ID: 2531ee2290b1d2353f1d10d21765e7f5fdd8b76c012b26269c14eeb186afeaec
+
+Processing Param 11/339: model.layers.0.mlp.down_proj.weight
+  Original Shape: torch.Size([1536, 8960]) | Dtype: torch.float32
+  Casting model.layers.0.mlp.down_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.0.mlp.down_proj.weight weights...
+    Transposed Shape: (8960, 1536)
+  Final Tags: [2, 12, 21, 30, 40, 100]
+  Coordinate: L0_G102_N1_X70_Y0_Z0
+  Data to save: dtype=float16, shape=(8960, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID d2b09ed810ce4e124faeb5c4b807175f9fa6914298db768f91ffe30a66a667c9 -> Type: knowledge, Status: active, Coords: L0_G102_N1_X70_Y0_Z0
+    Saved knowledge tensor with ID: d2b09ed810ce4e124faeb5c4b807175f9fa6914298db768f91ffe30a66a667c9
+
+Processing Param 12/339: model.layers.0.input_layernorm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.0.input_layernorm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41, 100]
+  Coordinate: L0_G102_N1_X1_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID 053c6505bcfd426870de6626af067ed320fcd119fd60053604a13498f989a238 -> Type: knowledge, Status: active, Coords: L0_G102_N1_X1_Y0_Z0
+    Saved knowledge tensor with ID: 053c6505bcfd426870de6626af067ed320fcd119fd60053604a13498f989a238
+
+Processing Param 13/339: model.layers.0.post_attention_layernorm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.0.post_attention_layernorm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41, 100]
+  Coordinate: L0_G102_N1_X2_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID d835eecd704ccbb26fd2adb7c72e371a5a8ec82468043056edf53143dc72a2f3 -> Type: knowledge, Status: active, Coords: L0_G102_N1_X2_Y0_Z0
+    Saved knowledge tensor with ID: d835eecd704ccbb26fd2adb7c72e371a5a8ec82468043056edf53143dc72a2f3
+
+Processing Param 14/339: model.layers.1.self_attn.q_proj.weight
+  Original Shape: torch.Size([1536, 1536]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.q_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.self_attn.q_proj.weight weights...
+    Transposed Shape: (1536, 1536)
+  Final Tags: [2, 12, 21, 30, 33, 101]
+  Coordinate: L1_G102_N1_X10_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID 87b0beb324000c59d88aecca3cc4fd8c83fbd73df55b7c2780e0b32f38fd5ca9 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X10_Y0_Z0
+    Saved knowledge tensor with ID: 87b0beb324000c59d88aecca3cc4fd8c83fbd73df55b7c2780e0b32f38fd5ca9
+
+Processing Param 15/339: model.layers.1.self_attn.q_proj.bias
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.q_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 33, 101]
+  Coordinate: L1_G102_N1_X11_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID 4d6e2e33b17e4327fd05ea9e7c6c22d1d6c317c5245e7c9425eacdaa635e315c -> Type: knowledge, Status: active, Coords: L1_G102_N1_X11_Y0_Z0
+    Saved knowledge tensor with ID: 4d6e2e33b17e4327fd05ea9e7c6c22d1d6c317c5245e7c9425eacdaa635e315c
+
+Processing Param 16/339: model.layers.1.self_attn.k_proj.weight
+  Original Shape: torch.Size([256, 1536]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.k_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.self_attn.k_proj.weight weights...
+    Transposed Shape: (1536, 256)
+  Final Tags: [2, 12, 21, 30, 34, 101]
+  Coordinate: L1_G102_N1_X20_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 256)
+DEBUG INDEX UPDATE: Adding/Updating ID 51ca433a28402d5f026f63b0f2989a0eb1bd817216d30c729328bbe35c4e8c7f -> Type: knowledge, Status: active, Coords: L1_G102_N1_X20_Y0_Z0
+    Saved knowledge tensor with ID: 51ca433a28402d5f026f63b0f2989a0eb1bd817216d30c729328bbe35c4e8c7f
+
+Processing Param 17/339: model.layers.1.self_attn.k_proj.bias
+  Original Shape: torch.Size([256]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.k_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 34, 101]
+  Coordinate: L1_G102_N1_X21_Y0_Z0
+  Data to save: dtype=float16, shape=(256,)
+DEBUG INDEX UPDATE: Adding/Updating ID fc41bbb3ef3aa2c2075e4903a124120b7b3718d77a27db4a9ab2612727bbca9d -> Type: knowledge, Status: active, Coords: L1_G102_N1_X21_Y0_Z0
+    Saved knowledge tensor with ID: fc41bbb3ef3aa2c2075e4903a124120b7b3718d77a27db4a9ab2612727bbca9d
+
+Processing Param 18/339: model.layers.1.self_attn.v_proj.weight
+  Original Shape: torch.Size([256, 1536]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.v_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.self_attn.v_proj.weight weights...
+    Transposed Shape: (1536, 256)
+  Final Tags: [2, 12, 21, 30, 35, 101]
+  Coordinate: L1_G102_N1_X30_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 256)
+DEBUG INDEX UPDATE: Adding/Updating ID cce2494fc593058ee109d45ae6b9eb0ff9ad1c8313a97db75d02c3c215e30a59 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X30_Y0_Z0
+    Saved knowledge tensor with ID: cce2494fc593058ee109d45ae6b9eb0ff9ad1c8313a97db75d02c3c215e30a59
+
+Processing Param 19/339: model.layers.1.self_attn.v_proj.bias
+  Original Shape: torch.Size([256]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.v_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 35, 101]
+  Coordinate: L1_G102_N1_X31_Y0_Z0
+  Data to save: dtype=float16, shape=(256,)
+DEBUG INDEX UPDATE: Adding/Updating ID b95b10f8ee96a7e9c561070cbbe52a276449fee4a8f0145a9b6274d9f9eaaeb8 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X31_Y0_Z0
+    Saved knowledge tensor with ID: b95b10f8ee96a7e9c561070cbbe52a276449fee4a8f0145a9b6274d9f9eaaeb8
+
+Processing Param 20/339: model.layers.1.self_attn.o_proj.weight
+  Original Shape: torch.Size([1536, 1536]) | Dtype: torch.float32
+  Casting model.layers.1.self_attn.o_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.self_attn.o_proj.weight weights...
+    Transposed Shape: (1536, 1536)
+  Final Tags: [2, 12, 21, 30, 36, 101]
+  Coordinate: L1_G102_N1_X40_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID cf254eea60c2c5096450df0e1171a62bae8589eb3d8a61f75990ac964f28bb94 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X40_Y0_Z0
+    Saved knowledge tensor with ID: cf254eea60c2c5096450df0e1171a62bae8589eb3d8a61f75990ac964f28bb94
+
+Processing Param 21/339: model.layers.1.mlp.gate_proj.weight
+  Original Shape: torch.Size([8960, 1536]) | Dtype: torch.float32
+  Casting model.layers.1.mlp.gate_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.mlp.gate_proj.weight weights...
+    Transposed Shape: (1536, 8960)
+  Final Tags: [2, 12, 21, 30, 38, 101]
+  Coordinate: L1_G102_N1_X50_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 8960)
+DEBUG INDEX UPDATE: Adding/Updating ID ebd903b5137efcd6fdbc2c1d45be345bc85f49c0907b716304e67ba6b4c6aca7 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X50_Y0_Z0
+    Saved knowledge tensor with ID: ebd903b5137efcd6fdbc2c1d45be345bc85f49c0907b716304e67ba6b4c6aca7
+
+Processing Param 22/339: model.layers.1.mlp.up_proj.weight
+  Original Shape: torch.Size([8960, 1536]) | Dtype: torch.float32
+  Casting model.layers.1.mlp.up_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.mlp.up_proj.weight weights...
+    Transposed Shape: (1536, 8960)
+  Final Tags: [2, 12, 21, 30, 39, 101]
+  Coordinate: L1_G102_N1_X60_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 8960)
+DEBUG INDEX UPDATE: Adding/Updating ID e0afacb9b6828c31dd602b2eac93eb036c0f31247ad8225a2bc54c7378679ca9 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X60_Y0_Z0
+    Saved knowledge tensor with ID: e0afacb9b6828c31dd602b2eac93eb036c0f31247ad8225a2bc54c7378679ca9
+
+Processing Param 23/339: model.layers.1.mlp.down_proj.weight
+  Original Shape: torch.Size([1536, 8960]) | Dtype: torch.float32
+  Casting model.layers.1.mlp.down_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.1.mlp.down_proj.weight weights...
+    Transposed Shape: (8960, 1536)
+  Final Tags: [2, 12, 21, 30, 40, 101]
+  Coordinate: L1_G102_N1_X70_Y0_Z0
+  Data to save: dtype=float16, shape=(8960, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID 0ea318ef79208ee3d8e2e22f940e162cfe56c875cda073b1c2b28e3bda47d846 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X70_Y0_Z0
+    Saved knowledge tensor with ID: 0ea318ef79208ee3d8e2e22f940e162cfe56c875cda073b1c2b28e3bda47d846
+
+Processing Param 24/339: model.layers.1.input_layernorm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.1.input_layernorm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41, 101]
+  Coordinate: L1_G102_N1_X1_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID af905d5b3ea0083c3e3dba9a9c98f9ee2655f1fd1c8ed840fe928fea841682e5 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X1_Y0_Z0
+    Saved knowledge tensor with ID: af905d5b3ea0083c3e3dba9a9c98f9ee2655f1fd1c8ed840fe928fea841682e5
+
+Processing Param 25/339: model.layers.1.post_attention_layernorm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.1.post_attention_layernorm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41, 101]
+  Coordinate: L1_G102_N1_X2_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID 83470adc992fc29aad619e6da19a8d7325a9afa4c910b055b72cb427d3778ab1 -> Type: knowledge, Status: active, Coords: L1_G102_N1_X2_Y0_Z0
+    Saved knowledge tensor with ID: 83470adc992fc29aad619e6da19a8d7325a9afa4c910b055b72cb427d3778ab1
+
+.....................................
+
+Processing Param 326/339: model.layers.27.self_attn.q_proj.weight
+  Original Shape: torch.Size([1536, 1536]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.q_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.self_attn.q_proj.weight weights...
+    Transposed Shape: (1536, 1536)
+  Final Tags: [2, 12, 21, 30, 33, 127]
+  Coordinate: L27_G102_N1_X10_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID 40fb9e0531d989edd0c32241dc5f55c0bff892e34d9c527280d452af323f3f9d -> Type: knowledge, Status: active, Coords: L27_G102_N1_X10_Y0_Z0
+    Saved knowledge tensor with ID: 40fb9e0531d989edd0c32241dc5f55c0bff892e34d9c527280d452af323f3f9d
+
+Processing Param 327/339: model.layers.27.self_attn.q_proj.bias
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.q_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 33, 127]
+  Coordinate: L27_G102_N1_X11_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID 6e1f79e6e227b1910ecd3cb233ae9b89fd46350a8b7bf118ab6ac3e902ce3941 -> Type: knowledge, Status: active, Coords: L27_G102_N1_X11_Y0_Z0
+    Saved knowledge tensor with ID: 6e1f79e6e227b1910ecd3cb233ae9b89fd46350a8b7bf118ab6ac3e902ce3941
+
+Processing Param 328/339: model.layers.27.self_attn.k_proj.weight
+  Original Shape: torch.Size([256, 1536]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.k_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.self_attn.k_proj.weight weights...
+    Transposed Shape: (1536, 256)
+  Final Tags: [2, 12, 21, 30, 34, 127]
+  Coordinate: L27_G102_N1_X20_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 256)
+DEBUG INDEX UPDATE: Adding/Updating ID 73ab7bdac3cc90b82d697eaf0b9d277e723c8905eb596b97d8cc69b207d54aef -> Type: knowledge, Status: active, Coords: L27_G102_N1_X20_Y0_Z0
+    Saved knowledge tensor with ID: 73ab7bdac3cc90b82d697eaf0b9d277e723c8905eb596b97d8cc69b207d54aef
+
+Processing Param 329/339: model.layers.27.self_attn.k_proj.bias
+  Original Shape: torch.Size([256]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.k_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 34, 127]
+  Coordinate: L27_G102_N1_X21_Y0_Z0
+  Data to save: dtype=float16, shape=(256,)
+DEBUG INDEX UPDATE: Adding/Updating ID 528497133afcf55d2ca23ba102534573d4797a080fb9ba42254f85cbed5732e2 -> Type: knowledge, Status: active, Coords: L27_G102_N1_X21_Y0_Z0
+    Saved knowledge tensor with ID: 528497133afcf55d2ca23ba102534573d4797a080fb9ba42254f85cbed5732e2
+
+Processing Param 330/339: model.layers.27.self_attn.v_proj.weight
+  Original Shape: torch.Size([256, 1536]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.v_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.self_attn.v_proj.weight weights...
+    Transposed Shape: (1536, 256)
+  Final Tags: [2, 12, 21, 30, 35, 127]
+  Coordinate: L27_G102_N1_X30_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 256)
+DEBUG INDEX UPDATE: Adding/Updating ID c45879d67823e229fc69ff7b4347e908ad96c1db28f504c2abdf1b54406b70f5 -> Type: knowledge, Status: active, Coords: L27_G102_N1_X30_Y0_Z0
+    Saved knowledge tensor with ID: c45879d67823e229fc69ff7b4347e908ad96c1db28f504c2abdf1b54406b70f5
+
+Processing Param 331/339: model.layers.27.self_attn.v_proj.bias
+  Original Shape: torch.Size([256]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.v_proj.bias to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 31, 35, 127]
+  Coordinate: L27_G102_N1_X31_Y0_Z0
+  Data to save: dtype=float16, shape=(256,)
+DEBUG INDEX UPDATE: Adding/Updating ID 93cc6cdbf9783e48e65ae129b1c9b9ac748517db2fee795fdc7c9fc0e7f58be6 -> Type: knowledge, Status: active, Coords: L27_G102_N1_X31_Y0_Z0
+    Saved knowledge tensor with ID: 93cc6cdbf9783e48e65ae129b1c9b9ac748517db2fee795fdc7c9fc0e7f58be6
+
+Processing Param 332/339: model.layers.27.self_attn.o_proj.weight
+  Original Shape: torch.Size([1536, 1536]) | Dtype: torch.float32
+  Casting model.layers.27.self_attn.o_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.self_attn.o_proj.weight weights...
+    Transposed Shape: (1536, 1536)
+  Final Tags: [2, 12, 21, 30, 36, 127]
+  Coordinate: L27_G102_N1_X40_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID c3737140b7ccda1e3a7c7eaf0fbdb9464826f0309c08c4a4e495a0f217f764ce -> Type: knowledge, Status: active, Coords: L27_G102_N1_X40_Y0_Z0
+    Saved knowledge tensor with ID: c3737140b7ccda1e3a7c7eaf0fbdb9464826f0309c08c4a4e495a0f217f764ce
+
+Processing Param 333/339: model.layers.27.mlp.gate_proj.weight
+  Original Shape: torch.Size([8960, 1536]) | Dtype: torch.float32
+  Casting model.layers.27.mlp.gate_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.mlp.gate_proj.weight weights...
+    Transposed Shape: (1536, 8960)
+  Final Tags: [2, 12, 21, 30, 38, 127]
+  Coordinate: L27_G102_N1_X50_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 8960)
+DEBUG INDEX UPDATE: Adding/Updating ID cf9eea4e4edf4a72f403764dcb12693ddd59a8d2f0281bfce2b2495d50761bbd -> Type: knowledge, Status: active, Coords: L27_G102_N1_X50_Y0_Z0
+    Saved knowledge tensor with ID: cf9eea4e4edf4a72f403764dcb12693ddd59a8d2f0281bfce2b2495d50761bbd
+
+Processing Param 334/339: model.layers.27.mlp.up_proj.weight
+  Original Shape: torch.Size([8960, 1536]) | Dtype: torch.float32
+  Casting model.layers.27.mlp.up_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.mlp.up_proj.weight weights...
+    Transposed Shape: (1536, 8960)
+  Final Tags: [2, 12, 21, 30, 39, 127]
+  Coordinate: L27_G102_N1_X60_Y0_Z0
+  Data to save: dtype=float16, shape=(1536, 8960)
+DEBUG INDEX UPDATE: Adding/Updating ID 5b125eec6766eda7edd5c5a85715291a9241faee7ece10a91545e7f532b39007 -> Type: knowledge, Status: active, Coords: L27_G102_N1_X60_Y0_Z0
+    Saved knowledge tensor with ID: 5b125eec6766eda7edd5c5a85715291a9241faee7ece10a91545e7f532b39007
+
+Processing Param 335/339: model.layers.27.mlp.down_proj.weight
+  Original Shape: torch.Size([1536, 8960]) | Dtype: torch.float32
+  Casting model.layers.27.mlp.down_proj.weight to <class 'numpy.float16'>...
+    Transposing model.layers.27.mlp.down_proj.weight weights...
+    Transposed Shape: (8960, 1536)
+  Final Tags: [2, 12, 21, 30, 40, 127]
+  Coordinate: L27_G102_N1_X70_Y0_Z0
+  Data to save: dtype=float16, shape=(8960, 1536)
+DEBUG INDEX UPDATE: Adding/Updating ID 556b7fa053a7d267849fb9903593469a3c8ef2a4670cfde40cfc03e0d5c1efcb -> Type: knowledge, Status: active, Coords: L27_G102_N1_X70_Y0_Z0
+    Saved knowledge tensor with ID: 556b7fa053a7d267849fb9903593469a3c8ef2a4670cfde40cfc03e0d5c1efcb
+
+Processing Param 336/339: model.layers.27.input_layernorm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.27.input_layernorm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41, 127]
+  Coordinate: L27_G102_N1_X1_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID c25731fb32da4060cc0a796921f3fd3907dd3ac675e1f77af3fb754eb383eaed -> Type: knowledge, Status: active, Coords: L27_G102_N1_X1_Y0_Z0
+    Saved knowledge tensor with ID: c25731fb32da4060cc0a796921f3fd3907dd3ac675e1f77af3fb754eb383eaed
+
+Processing Param 337/339: model.layers.27.post_attention_layernorm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.layers.27.post_attention_layernorm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41, 127]
+  Coordinate: L27_G102_N1_X2_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID 250470b6f2eddc7b12fada1a4ab1c171d3ada965dc7d878eabc45f2acc75114a -> Type: knowledge, Status: active, Coords: L27_G102_N1_X2_Y0_Z0
+    Saved knowledge tensor with ID: 250470b6f2eddc7b12fada1a4ab1c171d3ada965dc7d878eabc45f2acc75114a
+
+Processing Param 338/339: model.norm.weight
+  Original Shape: torch.Size([1536]) | Dtype: torch.float32
+  Casting model.norm.weight to <class 'numpy.float16'>...
+  Final Tags: [2, 12, 21, 30, 41]
+  Coordinate: L28_G102_N1_X0_Y0_Z0
+  Data to save: dtype=float16, shape=(1536,)
+DEBUG INDEX UPDATE: Adding/Updating ID af98f27dab64826fe1f5c09207ec92302a19e81c63d5a044e849afec6a4c3ca5 -> Type: knowledge, Status: active, Coords: L28_G102_N1_X0_Y0_Z0
+    Saved knowledge tensor with ID: af98f27dab64826fe1f5c09207ec92302a19e81c63d5a044e849afec6a4c3ca5
+
+Processing Param 339/339: lm_head.weight
+  Original Shape: torch.Size([151936, 1536]) | Dtype: torch.float32
+  Quantizing lm_head.weight to INT8...
+    Quantized Shape: (151936, 1536), Scale: 0.0026
+    Transposing quantized LM Head weights...
+    Transposed Shape: (1536, 151936)
+  Final Tags: [2, 12, 23, 30, 42]
+  Coordinate: L-1_G102_N1_X1_Y0_Z0
+  Data to save: dtype=<class 'numpy.int8'>, shape=(1536, 151936)
+  Extra Metadata: {'quantization_scale': 0.002583661349490285}
+DEBUG INDEX UPDATE: Adding/Updating ID a9b1bfeb157e4fc8a1492886963a78089fc9a7dcc6a265b3a124841680e89b39 -> Type: knowledge, Status: active, Coords: L-1_G102_N1_X1_Y0_Z0
+    Saved knowledge tensor with ID: a9b1bfeb157e4fc8a1492886963a78089fc9a7dcc6a265b3a124841680e89b39
+
+--- Finished saving 339 knowledge tensors to /content/data/db ---
+
+Saving Name <-> ID map (339 entries) to /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_name_id_map.pkl...
+Name ID map saved successfully.
+
+Saving Knowledge map (339 entries) to /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_knowledge_map.pkl...
+Knowledge map saved successfully.
+
+Saving Knowledge index (339 entries) to /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl...
+DEBUG INDEX SAVE AS: Attempting save to 'DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl'.
+DEBUG INDEX SAVE AS: Size in memory: 339
+DEBUG INDEX SAVE AS: Index saved successfully to /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl.
+Knowledge index saved successfully to DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl.
+
+Cleaning up resources for Cell 2...
+Closing VeectorDB connection (saving default index to 'tensor_index.pkl')...
+DEBUG INDEX SAVE: Attempting save to 'tensor_index.pkl'.
+DEBUG INDEX SAVE: Size in memory BEFORE save: 339
+DEBUG INDEX SAVE: Last 5 keys in memory: ['556b7fa053a7d267849fb9903593469a3c8ef2a4670cfde40cfc03e0d5c1efcb', 'c25731fb32da4060cc0a796921f3fd3907dd3ac675e1f77af3fb754eb383eaed', '250470b6f2eddc7b12fada1a4ab1c171d3ada965dc7d878eabc45f2acc75114a', 'af98f27dab64826fe1f5c09207ec92302a19e81c63d5a044e849afec6a4c3ca5', 'a9b1bfeb157e4fc8a1492886963a78089fc9a7dcc6a265b3a124841680e89b39']
+DEBUG INDEX SAVE: pickle.dump and rename completed for /content/data/db/tensor_index.pkl.
+DEBUG INDEX SAVE: Attempting immediate reload for verification...
+DEBUG INDEX SAVE: Immediate reload SUCCESS. Size loaded: 339
+DEBUG INDEX SAVE: Size in memory AFTER save: 339
+
+External and Veector libraries imported successfully.
+--- Running Cell 3 (v1.1): Processor Creation for DeepSeek-R1-Distill-Qwen-1.5B ---
+    Target DB: /content/data/db
+
+Loading Model Config from: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B...
+Model Config loaded. HiddenAct='silu', RopeTheta=10000
+
+Loading maps from /content/data/db...
+Loaded knowledge map (339 entries).
+Loaded name ID map.
+
+Initializing Veector instance for processor creation...
+Loading initial index from: 'DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl'
+--- Initializing Veector Core v0.7.17 ---
+    Requires: tensors v0.7.6+, veectordb v0.9.8+, operations v0.8.9+
+    IPFS: False, Address: /ip4/127.0.0.1/tcp/5001
+--- Initializing VeectorDB v0.9.8 ---
+DEBUG INDEX LOAD: Attempting to load from /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl...
+DEBUG INDEX LOAD: Success. Loaded 339 entries from DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl.
+VeectorDB initialized at /content/data/db. Index entries loaded: 339 from 'DeepSeek-R1-Distill-Qwen-1.5B_knowledge_index.pkl'.
+VeectorDB initialized by Veector Core.
+Cache initialized: Size=1000, Strategy=LRU
+Registered 83 standard operations.
+  Successfully registered 3 operations for Qwen2.
+Registered 3 model-specific operations.
+Initialized 86 total core operations.
+  [MEM_LOG] Veector Initialized: RSS=2420.36 MB, RAM Used=27.9%
+Veector initialized. DB Index entries loaded: 339
+Default index save path set to: 'tensor_index.pkl'
+
+--- Defining and Saving Veector Processor Tensors ---
+
+--- Defining Embedding Processor ---
+  Defining Processor: Embedding Processor at L-1_G500_N0_X0_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID fb769b8034ba0aae87a82183e23c06bab7160aaea5b151b94080a49f5fa7abc9 -> Type: processor, Status: active, Coords: L-1_G500_N0_X0_Y0_Z0
+    SUCCESS: Saved Embedding Processor with ID: fb769b8034ba0aae87a82183e23c06bab7160aaea5b151b94080a49f5fa7abc9 (Key: embedding)
+
+--- Defining Transformer Layer Processors (0 to 27) ---
+  Processing Layer 0...
+  Defining Processor: Attention Processor L0 at L0_G500_N0_X0_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID 637fa4ff0945661a2373135c652dc8406ecef73c01fbf3884fb0d10196529c32 -> Type: processor, Status: active, Coords: L0_G500_N0_X0_Y0_Z0
+    SUCCESS: Saved Attention Processor L0 with ID: 637fa4ff0945661a2373135c652dc8406ecef73c01fbf3884fb0d10196529c32 (Key: attn_0)
+  Defining Processor: FFN Processor L0 at L0_G500_N0_X1_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID 550644eeb529f7b42d61eb4f3776d6403548a1c5935db231a8637b9e391bf982 -> Type: processor, Status: active, Coords: L0_G500_N0_X1_Y0_Z0
+    SUCCESS: Saved FFN Processor L0 with ID: 550644eeb529f7b42d61eb4f3776d6403548a1c5935db231a8637b9e391bf982 (Key: ffn_0)
+  Processing Layer 1...
+  Defining Processor: Attention Processor L1 at L1_G500_N0_X0_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID 0861d409409e03f0d6368f3850356593610a0a210380e05bc824a26886f9cd3d -> Type: processor, Status: active, Coords: L1_G500_N0_X0_Y0_Z0
+    SUCCESS: Saved Attention Processor L1 with ID: 0861d409409e03f0d6368f3850356593610a0a210380e05bc824a26886f9cd3d (Key: attn_1)
+  Defining Processor: FFN Processor L1 at L1_G500_N0_X1_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID d9e18793c9c1c87a6645af46e385cf03e4a7edb6c51fe5d85140355434a02ff1 -> Type: processor, Status: active, Coords: L1_G500_N0_X1_Y0_Z0
+    SUCCESS: Saved FFN Processor L1 with ID: d9e18793c9c1c87a6645af46e385cf03e4a7edb6c51fe5d85140355434a02ff1 (Key: ffn_1)
+
+....................................................................
+
+  Processing Layer 27...
+  Defining Processor: Attention Processor L27 at L27_G500_N0_X0_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID 9818bcc8fc8dd23d4e4128acfd14b8b76a720335003cc7679c905b5f7422b7c8 -> Type: processor, Status: active, Coords: L27_G500_N0_X0_Y0_Z0
+    SUCCESS: Saved Attention Processor L27 with ID: 9818bcc8fc8dd23d4e4128acfd14b8b76a720335003cc7679c905b5f7422b7c8 (Key: attn_27)
+  Defining Processor: FFN Processor L27 at L27_G500_N0_X1_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID 1238d786628e4209e025de35d377209a6d2b9484afc8dbf6bd499b297c293d23 -> Type: processor, Status: active, Coords: L27_G500_N0_X1_Y0_Z0
+    SUCCESS: Saved FFN Processor L27 with ID: 1238d786628e4209e025de35d377209a6d2b9484afc8dbf6bd499b297c293d23 (Key: ffn_27)
+
+--- Defining Final Norm Processor ---
+  Defining Processor: Final Norm Processor at L-1_G500_N0_X1_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID 6577c7a755eccbecc951e4e2d491bb1a44683b70d45c8f6fc02828f37084e3b7 -> Type: processor, Status: active, Coords: L-1_G500_N0_X1_Y0_Z0
+    SUCCESS: Saved Final Norm Processor with ID: 6577c7a755eccbecc951e4e2d491bb1a44683b70d45c8f6fc02828f37084e3b7 (Key: final_norm)
+
+--- Defining LM Head Processor ---
+  Defining Processor: LM Head Processor at L-1_G500_N0_X2_Y0_Z0
+DEBUG INDEX UPDATE: Adding/Updating ID ab2f6f273bbbdb6ad3e897cd85f5107bf787cc85fe28b1ddcca5706b21a8535a -> Type: processor, Status: active, Coords: L-1_G500_N0_X2_Y0_Z0
+    SUCCESS: Saved LM Head Processor with ID: ab2f6f273bbbdb6ad3e897cd85f5107bf787cc85fe28b1ddcca5706b21a8535a (Key: lm_head)
+
+--- Finalizing Cell 3 (0 errors during processor creation) ---
+Saving processor map (59 entries) to /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_proc_map.pkl...
+Processor map saved successfully.
+
+Cleaning up resources for Cell 3...
+Closing Veector DB connection (saving main index to 'tensor_index.pkl')...
+Index size before final save in Cell 3: 398
+Closing VeectorDB connection (saving default index to 'tensor_index.pkl')...
+DEBUG INDEX SAVE: Attempting save to 'tensor_index.pkl'.
+DEBUG INDEX SAVE: Size in memory BEFORE save: 398
+DEBUG INDEX SAVE: Last 5 keys in memory: ['9561fb42a94dbbbfcec26d21a0899f0b809f4aa242a7a8638ff9b041052d098a', '9818bcc8fc8dd23d4e4128acfd14b8b76a720335003cc7679c905b5f7422b7c8', '1238d786628e4209e025de35d377209a6d2b9484afc8dbf6bd499b297c293d23', '6577c7a755eccbecc951e4e2d491bb1a44683b70d45c8f6fc02828f37084e3b7', 'ab2f6f273bbbdb6ad3e897cd85f5107bf787cc85fe28b1ddcca5706b21a8535a']
+DEBUG INDEX SAVE: pickle.dump and rename completed for /content/data/db/tensor_index.pkl.
+DEBUG INDEX SAVE: Attempting immediate reload for verification...
+DEBUG INDEX SAVE: Immediate reload SUCCESS. Size loaded: 398
+DEBUG INDEX SAVE: Size in memory AFTER save: 398
+Veector DB connection closed.
+Veector instance deleted.
+Garbage collection run.
+
+--- Cell 3 Finished Successfully in 0.47 seconds ---
+
+Torch and Transformers imported successfully.
+--- Running Cell 4: Reference HF Run for DeepSeek-R1-Distill-Qwen-1.5B ---
+    Using Prompt: 'Hello, how are you?'
+
+Loading Tokenizer from: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+tokenizer_config.json: 100%
+ 3.07k/3.07k [00:00<00:00, 122kB/s]
+tokenizer.json: 100%
+ 7.03M/7.03M [00:00<00:00, 34.6MB/s]
+Tokenizer class: LlamaTokenizerFast
+Added 2 special tokens explicitly.
+Tokens: BOS=151646, EOS=151643, PAD=151643, User=151665, Assistant=151666
+
+Preparing Input IDs (ONNX-style, no BOS)...
+Input IDs shape: torch.Size([1, 8])
+Decoded Input for Reference Run: '<|User|>Hello, how are you?<|Assistant|>'
+
+Loading HF Model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B with float32...
+Using device: cpu
+HF Model loaded to device: cpu
+
+Registering hooks...
+Registered 283 hooks.
+
+Running HF model forward pass (float32)...
+HF forward pass complete.
+
+Saving Captured Float32 Outputs (including MLP intermediates) to /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_hf_reference_outputs_fp32.pkl...
+Successfully saved 283 reference outputs.
+  Example saved keys: ['embed_tokens', 'L0_input_norm_out', 'L0_attn_out', 'L0_attn_block_output', 'L0_post_attn_norm_out']...['L27_mlp_down_out', 'L27_mlp_out', 'L27_layer_output', 'final_norm', 'lm_head']
+  Confirmed MLP intermediate keys (e.g., 'L0_mlp_gate_out') are present.
+
+Cleaning up resources for Cell 4...
+Removing 283 hooks...
+Removed hooks.
+HF model deleted.
+Garbage collection run.
+
+--- Cell 4 Finished in 21.38 seconds ---
+
+External and Veector libraries imported successfully.
+Veector Qwen2 Ops Module Loaded. Found 3 operations.
+Reloaded veector_models.qwen2.ops module.
+Loading model config for parameters...
+Using model params: RMS Eps=1e-06
+--- Running Cell 5 (RMSNorm L0 Processor Test v1.19 - Fix Interface) for DeepSeek-R1-Distill-Qwen-1.5B ---
+    DB Path: /content/data/db
+    Nest Level (Target DType): 1 (float16)
+    Comparison Tolerances: atol=0.01, rtol=0.01
+  [MEM_LOG_RMS_PROC] Start of Cell 5 (RMSNorm Processor Test): RSS=721.80 MB, RAM Used=13.8%
+\nLoading prerequisites...
+  Loading Reference HF outputs from: /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_hf_reference_outputs_fp32.pkl
+  Reference outputs loaded (283 entries).
+  Loading Knowledge map from: /content/data/db/DeepSeek-R1-Distill-Qwen-1.5B_knowledge_map.pkl
+  Knowledge map loaded (339 entries).
+\nInitializing Veector instance...
+--- Initializing Veector Core v0.7.17 ---
+    Requires: tensors v0.7.6+, veectordb v0.9.8+, operations v0.8.9+
+    IPFS: False, Address: /ip4/127.0.0.1/tcp/5001
+--- Initializing VeectorDB v0.9.8 ---
+DEBUG INDEX LOAD: Attempting to load from /content/data/db/tensor_index.pkl...
+DEBUG INDEX LOAD: Success. Loaded 398 entries from tensor_index.pkl.
+VeectorDB initialized at /content/data/db. Index entries loaded: 398 from 'tensor_index.pkl'.
+VeectorDB initialized by Veector Core.
+Cache initialized: Size=1000, Strategy=LRU
+Registered 83 standard operations.
+  Successfully registered 3 operations for Qwen2.
+Registered 3 model-specific operations.
+Initialized 86 total core operations.
+  [MEM_LOG] Veector Initialized: RSS=726.77 MB, RAM Used=13.8%
+Veector initialized. DB Index entries: 398
+\n--- Preparing Inputs for RMSNorm Processor Test L0 ---
+  [STATS_RMS_PROC] Input Data (Ref embed_tokens) (numpy): shape=(1, 8, 1536), dtype=float16, NaN=False
+  [STATS_RMS_PROC] Reference Output (L0_input_norm_out) (numpy): shape=(1, 8, 1536), dtype=float32, NaN=False
+\n--- Defining Temporary Processor Sequence for RMSNorm L0 ---
+Temporary sequence defined.
+  Knowledge need defined with tags: [2, 12, 21, 30, 41, 100]
+Creating temporary processor for RMSNorm at L0_G999_N996_X0_Y0_Z0...
+DEBUG INDEX UPDATE: Adding/Updating ID 715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7 -> Type: processor, Status: active, Coords: L0_G999_N996_X0_Y0_Z0
+Temporary processor for RMSNorm saved with ID: 715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7
+\n--- Running Temporary Veector RMSNorm Processor L0 (715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7) ---
+Executing vec_test_rms_proc.compute...
+Finished vec_test_rms_proc.compute.
+    Temporary Processor Execution OK.
+  [STATS_RMS_PROC] Output of RMSNorm Processor L0 (Vec) (numpy): shape=(1, 8, 1536), dtype=float16, NaN=False
+               Sample: [-0.548828125, 0.0347900390625, -0.042877197265625, -0.285400390625, 0.08721923828125]
+\n--- Comparing RMSNorm L0 Processor Output ---
+  Comparing Veector RMSNorm output ('Veector RMSNorm L0 Out') with Reference ('L0_input_norm_out')...
+    Ref Shape (fp32): (1, 8, 1536), dtype: float32
+    Vec Shape (fp32): (1, 8, 1536), dtype: float32 (Original Vec DType: float16)
+    Result: CLOSE
+\n--- RESULT (RMSNorm L0 Processor Test): Output is CLOSE! ---
+\nCleaning up resources for Cell 5...
+Deleted meta: /content/data/db/g999/l0/n996/715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7.meta
+DEBUG INDEX REMOVE: Removed ID 715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7
+Removed tensor 715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7 from index.
+DEBUG INDEX SAVE: Attempting save to 'tensor_index.pkl'.
+DEBUG INDEX SAVE: Size in memory BEFORE save: 398
+DEBUG INDEX SAVE: Last 5 keys in memory: ['9561fb42a94dbbbfcec26d21a0899f0b809f4aa242a7a8638ff9b041052d098a', '9818bcc8fc8dd23d4e4128acfd14b8b76a720335003cc7679c905b5f7422b7c8', '1238d786628e4209e025de35d377209a6d2b9484afc8dbf6bd499b297c293d23', '6577c7a755eccbecc951e4e2d491bb1a44683b70d45c8f6fc02828f37084e3b7', 'ab2f6f273bbbdb6ad3e897cd85f5107bf787cc85fe28b1ddcca5706b21a8535a']
+DEBUG INDEX SAVE: pickle.dump and rename completed for /content/data/db/tensor_index.pkl.
+DEBUG INDEX SAVE: Attempting immediate reload for verification...
+DEBUG INDEX SAVE: Immediate reload SUCCESS. Size loaded: 398
+DEBUG INDEX SAVE: Size in memory AFTER save: 398
+Temporary processor 715b502e5183a5b0a4946c28d19a8fb3827296bba9bbde71280627dcb71426b7 deletion attempt: Success
+Closing VeectorDB connection (saving default index to 'tensor_index.pkl')...
+DEBUG INDEX SAVE: Size in memory AFTER save: 398
+Veector DB connection closed.
+Garbage collection run.
+\n--- Final Verdict for Cell 5 ---
+--- RESULT: RMSNorm L0 Processor Test PASSED! Output is CLOSE. ---
+\n--- Cell 5 Finished in 0.77 seconds ---
+
+
+
+в весами проблем нет, мы провели с тобой серьезную проверку в одном из чатов и где пошагово все проверили и искюцхили етот вариант. до того как заглючить ты так же ставил под подозрение F.linear. кстати смотри файл transformera в нем реализован правильный инференс. 
